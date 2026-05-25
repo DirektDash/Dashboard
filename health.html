@@ -748,8 +748,8 @@ main {
     if (typeof initCloudSync !== 'function') return;
     initCloudSync({
       appKey: 'health',
-      syncedKeys: ['po_water_v1'],
-      syncedPrefixes: [],
+      syncedKeys: ['po_water_v1', 'sleep:goal', 'cal:goals'],
+      syncedPrefixes: ['sleep:log:', 'cal:log:'],
       onApplied: function () { window.dispatchEvent(new Event('storage')); }
     });
   });
