@@ -1070,8 +1070,9 @@ img, video, canvas, svg { max-width: 100%; }
   z-index: 100; overflow-y: auto;
   transform: translateY(100%);
   transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: none;
 }
-.wt-overlay.is-open { transform: translateY(0); }
+.wt-overlay.is-open { transform: translateY(0); pointer-events: auto; }
 .wt-overlay-inner {
   max-width: 720px; margin: 0 auto;
   padding: 24px 20px 40px;
@@ -3304,8 +3305,8 @@ img, video, canvas, svg { max-width: 100%; }
   // If you leave the placeholders unchanged the app still works,
   // just only on this device (data stays in your browser).
   // ============================================================
-  const SUPABASE_URL = 'PASTE-YOUR-SUPABASE-PROJECT-URL-HERE';
-  const SUPABASE_KEY = 'PASTE-YOUR-SUPABASE-PUBLISHABLE-KEY-HERE';
+  const SUPABASE_URL = 'https://midyjdjkqorcxhdnjanh.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_wsfPg84TDDlqqQk-WO887Q_j0Sa5x4p';
   const APP_KEY = 'po-coach';
   const PC_SYNCED_KEYS = ['po_coach_v1', 'po_coach_workout_done', 'po_coach_weights', 'po_coach_photos'];
 
