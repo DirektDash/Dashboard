@@ -172,9 +172,6 @@ html, body { -webkit-text-size-adjust: 100%; }
   <a href="gym.html" class="bottombar-tab" data-page="fitness">
     <span class="bottombar-tab-icon">💪</span><span>Fitness</span>
   </a>
-  <a href="ai.html" class="bottombar-tab" data-page="ai">
-    <span class="bottombar-tab-icon">✨</span><span>AI</span>
-  </a>
 </nav>`;
 
   function isFinancePage() {
@@ -189,7 +186,6 @@ html, body { -webkit-text-size-adjust: 100%; }
     const p = (window.location.pathname || '').toLowerCase();
     if (p.endsWith('health.html')) return 'health';
     if (p.endsWith('gym.html')) return 'fitness';
-    if (p.endsWith('ai.html')) return 'ai';
     return 'main';
   }
 
