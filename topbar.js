@@ -130,7 +130,6 @@ html, body { -webkit-text-size-adjust: 100%; }
 .modal-bg, .modal, .po-modal-bg, .po-modal, .wt-overlay, .wt-viewer {
   overscroll-behavior: contain;
 }
-body.topbar-modal-open { overflow: hidden; touch-action: none; }
 @media (max-width: 480px) {
   .modal-bg, .po-modal-bg {
     padding: 0 !important;
@@ -302,33 +301,11 @@ body.topbar-modal-open { overflow: hidden; touch-action: none; }
     pushWaterMergedToSupabase(state);
   }
 
-  function blockGesture(e) { e.preventDefault(); }
   function lockGestures() {
+    function blockGesture(e) { e.preventDefault(); }
     document.addEventListener('gesturestart', blockGesture, { passive: false });
     document.addEventListener('gesturechange', blockGesture, { passive: false });
     document.addEventListener('gestureend', blockGesture, { passive: false });
-    let lastTouch = 0;
-    document.addEventListener('touchend', (e) => {
-      const now = Date.now();
-      if (now - lastTouch <= 300) e.preventDefault();
-      lastTouch = now;
-    }, { passive: false });
-  }
-  function startModalLock() {
-    const MODAL_SELECTORS = ['.modal-bg', '.po-modal-bg', '.wt-overlay', '.wt-viewer', '.wt-cam'];
-    function anyOpen() {
-      for (const sel of MODAL_SELECTORS) {
-        const els = document.querySelectorAll(sel);
-        for (const el of els) {
-          if (el.classList.contains('show') || el.classList.contains('is-open')) return true;
-        }
-      }
-      return false;
-    }
-    function sync() { document.body.classList.toggle('topbar-modal-open', anyOpen()); }
-    const observer = new MutationObserver(sync);
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
-    sync();
   }
 
   function boot() {
@@ -337,7 +314,6 @@ body.topbar-modal-open { overflow: hidden; touch-action: none; }
     if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); addWater(); });
     render();
     lockGestures();
-    startModalLock();
     window.addEventListener('storage', render);
     window.addEventListener('focus', render);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
