@@ -3063,7 +3063,6 @@ img, video, canvas, svg { max-width: 100%; }
       }
     }
     photosRender();
-    const id = entry.id;
     uploadPhotoToStorage(entry.dataUrl).then((url) => {
       if (!url) return;
       const e = photos.find(p => p.id === id);
