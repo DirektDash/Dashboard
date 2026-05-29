@@ -10,6 +10,7 @@ const TOKEN_URL     = 'https://api.sparebank1.no/oauth/token'
 serve(async (req: Request) => {
   const url   = new URL(req.url)
   const code  = url.searchParams.get('code')
+  const state = url.searchParams.get('state') || ''
   const error = url.searchParams.get('error')
 
   if (error) {
@@ -24,11 +25,12 @@ serve(async (req: Request) => {
 
   // Exchange authorization code for access + refresh tokens
   const body = new URLSearchParams({
-    grant_type:   'authorization_code',
+    grant_type:    'authorization_code',
     code,
-    redirect_uri: REDIRECT_URI,
-    client_id:    CLIENT_ID,
+    redirect_uri:  REDIRECT_URI,
+    client_id:     CLIENT_ID,
     client_secret: CLIENT_SECRET,
+    state,
   })
 
   const tokenRes = await fetch(TOKEN_URL, {

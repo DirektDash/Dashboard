@@ -3403,6 +3403,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       redirect_uri:  SB1_REDIRECT,
       response_type: 'code',
       scope:         'accounts transactions',
+      finInst:       'fid-sor-norge',
       state,
     });
     window.location.href = SB1_AUTH_URL + '?' + params.toString();

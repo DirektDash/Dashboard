@@ -67,7 +67,10 @@ serve(async (req: Request) => {
     }
   }
 
-  const authHeaders = { Authorization: `Bearer ${access_token}`, Accept: 'application/json' }
+  const authHeaders = {
+    Authorization: `Bearer ${access_token}`,
+    Accept: 'application/vnd.sparebank1.v1+json; charset=utf-8',
+  }
 
   // Fetch accounts
   const accountsRes = await fetch(ACCOUNTS_URL, { headers: authHeaders })
