@@ -3414,7 +3414,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     if (btn) { btn.classList.add('syncing'); btn.textContent = 'Syncing…'; }
 
     try {
-      const res  = await fetch(SB1_FETCH_URL, { headers: { apikey: SB1_ANON_KEY } });
+      const res  = await fetch(SB1_FETCH_URL, { headers: { apikey: SB1_ANON_KEY, Authorization: 'Bearer ' + SB1_ANON_KEY } });
       const data = await res.json();
 
       if (!res.ok || data.error === 'not_connected') {
