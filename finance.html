@@ -1529,6 +1529,44 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 @media (max-width: 600px) {
   .sub-auto-toggle { width: 100%; justify-content: space-between; padding: 12px 14px; }
 }
+
+/* ===== Sparebank 1 connect bar ===== */
+.sb1-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 0 2px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  margin-top: 8px;
+}
+.sb1-status-text {
+  font-size: 10.5px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+.sb1-btn {
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, opacity 0.15s;
+  flex-shrink: 0;
+}
+.sb1-btn:hover { background: rgba(255,255,255,0.10); }
+.sb1-btn.syncing { opacity: 0.5; pointer-events: none; }
+.sb1-btn.connected {
+  color: #6BE3A4;
+  border-color: rgba(107,227,164,0.25);
+  background: rgba(107,227,164,0.08);
+}
 </style>
 </head>
 <body>
@@ -1650,6 +1688,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       <div class="card nw-subcard">
         <div class="label" style="display:flex;justify-content:space-between;align-items:center"><span>🏦 Bank accounts</span><span id="bankTotal" style="font-size:13px;color:var(--text-primary);font-weight:600">0</span></div>
         <div id="bankList" class="nw-list"></div>
+        <div class="sb1-bar">
+          <span id="sb1Status" class="sb1-status-text">Not connected</span>
+          <button id="sb1Btn" class="sb1-btn" type="button">Connect Sparebank 1</button>
+        </div>
         <div class="quick-add">
           <input type="text" placeholder="Account name" id="bankName" />
           <input type="number" placeholder="Amount" id="bankAmount" step="0.01" />
@@ -3340,6 +3382,94 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
   safeRenderTicker();
   setInterval(safeRenderTicker, 1500);
+
+  // ============================================================
+  // SPAREBANK 1 OPEN BANKING
+  // client_id is a public identifier — safe in frontend JS.
+  // client_secret lives only in the Edge Function env vars.
+  // ============================================================
+  const SB1_CLIENT_ID  = 'a7ac2cb9-0af3-43cb-8538-0bba9c39f515';
+  const SB1_AUTH_URL   = 'https://api.sparebank1.no/oauth/authorize';
+  const SB1_REDIRECT   = 'https://midyjdjkqorcxhdnjanh.supabase.co/functions/v1/sparebank1-auth';
+  const SB1_FETCH_URL  = 'https://midyjdjkqorcxhdnjanh.supabase.co/functions/v1/sparebank1-fetch';
+  const SB1_ANON_KEY   = 'sb_publishable_wsfPg84TDDlqqQk-WO887Q_j0Sa5x4p';
+  const SB1_SYNC_KEY   = 'sb1:last_sync';
+
+  window.sb1Connect = function () {
+    const state = Math.random().toString(36).slice(2);
+    sessionStorage.setItem('sb1_state', state);
+    const params = new URLSearchParams({
+      client_id:     SB1_CLIENT_ID,
+      redirect_uri:  SB1_REDIRECT,
+      response_type: 'code',
+      scope:         'accounts transactions',
+      state,
+    });
+    window.location.href = SB1_AUTH_URL + '?' + params.toString();
+  };
+
+  async function sb1Sync() {
+    const btn      = document.getElementById('sb1Btn');
+    const statusEl = document.getElementById('sb1Status');
+    if (btn) { btn.classList.add('syncing'); btn.textContent = 'Syncing…'; }
+
+    try {
+      const res  = await fetch(SB1_FETCH_URL, { headers: { apikey: SB1_ANON_KEY } });
+      const data = await res.json();
+
+      if (!res.ok || data.error === 'not_connected') {
+        if (statusEl) statusEl.textContent = 'Not connected';
+        if (btn) {
+          btn.classList.remove('syncing', 'connected');
+          btn.textContent = 'Connect Sparebank 1';
+          btn.onclick = () => window.sb1Connect();
+        }
+        return;
+      }
+
+      const accounts = data.accounts || [];
+      if (accounts.length) {
+        const bankItems = accounts.map(a => ({
+          name:   a.name || a.ownerCustomerName || a.accountNumber || 'Account',
+          amount: parseFloat(a.balance ?? a.availableBalance ?? 0),
+        }));
+        storeSet('nw:bank', bankItems);
+        renderAllNetWorth();
+      }
+
+      storeSet(SB1_SYNC_KEY, Date.now());
+      const t = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      if (statusEl) statusEl.textContent = 'Live · ' + accounts.length + ' account' + (accounts.length === 1 ? '' : 's') + ' · ' + t;
+      if (btn) {
+        btn.classList.remove('syncing');
+        btn.classList.add('connected');
+        btn.textContent = 'Sync now';
+        btn.onclick = sb1Sync;
+      }
+
+    } catch (e) {
+      if (statusEl) statusEl.textContent = 'Sync failed';
+      if (btn) { btn.classList.remove('syncing'); btn.textContent = 'Retry'; btn.onclick = sb1Sync; }
+    }
+  }
+
+  // Wire connect button + handle OAuth return / auto-sync
+  (function initSb1() {
+    const btn = document.getElementById('sb1Btn');
+    if (btn) btn.onclick = () => window.sb1Connect();
+
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('bank_connected')) {
+      history.replaceState({}, '', window.location.pathname);
+      sb1Sync();
+    } else if (p.get('bank_error')) {
+      const statusEl = document.getElementById('sb1Status');
+      if (statusEl) statusEl.textContent = 'Connect failed — try again';
+      history.replaceState({}, '', window.location.pathname);
+    } else if (storeGet(SB1_SYNC_KEY)) {
+      sb1Sync();
+    }
+  })();
 
 })();
 </script>
