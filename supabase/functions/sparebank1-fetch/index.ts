@@ -5,9 +5,8 @@ const CLIENT_ID     = Deno.env.get('SPAREBANK1_CLIENT_ID')!
 const CLIENT_SECRET = Deno.env.get('SPAREBANK1_CLIENT_SECRET')!
 const TOKEN_URL     = 'https://api.sparebank1.no/oauth/token'
 
-// Verify these paths against developer.sparebank1.no once you have API access confirmed
-const ACCOUNTS_URL      = 'https://api.sparebank1.no/open/account/accounts'
-const TRANSACTIONS_BASE = 'https://api.sparebank1.no/open/account/transactions'
+const ACCOUNTS_URL      = 'https://api.sparebank1.no/personal/banking/accounts'
+const TRANSACTIONS_BASE = 'https://api.sparebank1.no/personal/banking/transactions'
 
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
@@ -88,7 +87,7 @@ serve(async (req: Request) => {
   const transactions: any[] = []
 
   for (const acc of accounts.slice(0, 6)) {
-    const key = acc.accountKey ?? acc.accountNumber ?? ''
+    const key = acc.key ?? ''
     if (!key) continue
     const txRes = await fetch(
       `${TRANSACTIONS_BASE}?accountKey=${encodeURIComponent(key)}&fromDate=${fromDate}`,

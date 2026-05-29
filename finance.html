@@ -3431,7 +3431,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       const accounts = data.accounts || [];
       if (accounts.length) {
         const bankItems = accounts.map(a => ({
-          name:   a.name || a.ownerCustomerName || a.accountNumber || 'Account',
+          name:   a.description || a.name || a.accountNumber || 'Account',
           amount: parseFloat(a.balance ?? a.availableBalance ?? 0),
         }));
         storeSet('nw:bank', bankItems);
