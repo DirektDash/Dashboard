@@ -1114,6 +1114,12 @@ const CONFIG = {
 
   // BOOT
   renderAll();
+
+  // Re-render when cloud sync applies remote data
+  window.addEventListener('storage', function() {
+    state = loadState();
+    renderAll();
+  });
 })();
 </script>
 <style>

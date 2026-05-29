@@ -105,6 +105,20 @@
         lastSyncedJson = json;
       } catch (e) {}
     }
+    async function pullFromCloud() {
+      if (!supa) return;
+      try {
+        const { data, error } = await supa.from('app_state').select('data').eq('key', appKey).maybeSingle();
+        if (!error && data && data.data && Object.keys(data.data).length > 0) {
+          const incoming = JSON.stringify(data.data);
+          if (incoming !== lastSyncedJson) {
+            lastSyncedJson = incoming;
+            applyRemote(data.data);
+          }
+        }
+      } catch (e) {}
+    }
+
     (async function init() {
       supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       try {
@@ -127,9 +141,14 @@
           applyRemote(payload.new.data);
         })
         .subscribe();
+
+      // Poll every 30s as a fallback for when Supabase Realtime isn't configured
+      setInterval(pullFromCloud, 30000);
     })();
     window.addEventListener('beforeunload', flushOnUnload);
     window.addEventListener('pagehide', flushOnUnload);
     window.addEventListener('storage', (e) => { if (e.key && matches(e.key)) schedulePush(); });
+    // Pull fresh data when the tab becomes visible again (e.g. switching from phone to desktop)
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) pullFromCloud(); });
   };
 })();
