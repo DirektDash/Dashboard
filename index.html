@@ -208,7 +208,85 @@ body {
   .day-ring-status { font-size: 13px; }
 }
 
-/* ===== Component 4: section + To Do List ===== */
+/* ===== Component 4: Summary Grid ===== */
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.summary-card {
+  position: relative;
+  display: flex; flex-direction: column;
+  padding: 16px 16px 14px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
+  -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.25s var(--spring-card);
+  -webkit-tap-highlight-color: transparent;
+  animation: slideUp 0.45s var(--spring-smooth) 0.22s both;
+}
+.summary-card:nth-child(2) { animation-delay: 0.28s; }
+.summary-card:nth-child(3) { animation-delay: 0.34s; }
+.summary-card:nth-child(4) { animation-delay: 0.40s; }
+.summary-card:hover {
+  background: var(--glass-bg-hover);
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px);
+}
+.summary-card:active { transform: scale(0.97); }
+.summary-icon {
+  font-size: 20px;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+.summary-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 5px;
+}
+.summary-value {
+  font-size: 24px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+.summary-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin-top: auto;
+  padding-top: 4px;
+}
+.summary-arrow {
+  position: absolute; top: 13px; right: 14px;
+  color: var(--text-quaternary);
+  font-size: 16px;
+  font-weight: 300;
+}
+.summary-card.is-good .summary-value { color: var(--success); }
+.summary-card.is-warn .summary-value { color: var(--warning); }
+.summary-card.is-bad  .summary-value { color: var(--danger); }
+@media (max-width: 480px) {
+  .summary-grid { gap: 8px; }
+  .summary-card { padding: 14px 12px 12px; }
+  .summary-value { font-size: 20px; }
+  .summary-icon { font-size: 18px; margin-bottom: 8px; }
+}
+
+/* ===== Component 5: section + To Do List ===== */
 .section { margin-top: 8px; }
 .section-title {
   font-family: var(--font-mono);
@@ -632,6 +710,38 @@ body {
       <div class="day-ring-remaining" id="dayRingRemaining">—</div>
       <div class="day-ring-hours">8:00 AM – 12:00 AM</div>
     </div>
+  </div>
+
+  <!-- Summary Grid -->
+  <div class="summary-grid">
+    <a href="health.html" class="summary-card" id="sumSleep">
+      <span class="summary-arrow">›</span>
+      <div class="summary-icon">😴</div>
+      <div class="summary-eyebrow">Sleep</div>
+      <div class="summary-value" id="sumSleepVal">—</div>
+      <div class="summary-sub" id="sumSleepSub">last night</div>
+    </a>
+    <a href="gym.html" class="summary-card" id="sumGym">
+      <span class="summary-arrow">›</span>
+      <div class="summary-icon">💪</div>
+      <div class="summary-eyebrow">Today's Workout</div>
+      <div class="summary-value" id="sumGymVal">—</div>
+      <div class="summary-sub" id="sumGymSub">loading…</div>
+    </a>
+    <a href="finance.html" class="summary-card" id="sumFinance">
+      <span class="summary-arrow">›</span>
+      <div class="summary-icon">💰</div>
+      <div class="summary-eyebrow">Net Worth</div>
+      <div class="summary-value" id="sumFinanceVal">—</div>
+      <div class="summary-sub" id="sumFinanceSub">all accounts</div>
+    </a>
+    <a href="health.html#water" class="summary-card" id="sumWater">
+      <span class="summary-arrow">›</span>
+      <div class="summary-icon">💧</div>
+      <div class="summary-eyebrow">Water</div>
+      <div class="summary-value" id="sumWaterVal">—</div>
+      <div class="summary-sub" id="sumWaterSub">bottles today</div>
+    </a>
   </div>
 
   <div class="section">
@@ -1314,6 +1424,132 @@ body {
       }
     });
   });
+</script>
+<script>
+(function () {
+  'use strict';
+
+  function sg(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  }
+
+  // ── Sleep ──────────────────────────────────────────────
+  function loadSleep() {
+    const hours = sg('sleep:log:' + todayStr());
+    const goal  = sg('sleep:goal') || 8;
+    const valEl = document.getElementById('sumSleepVal');
+    const subEl = document.getElementById('sumSleepSub');
+    const card  = document.getElementById('sumSleep');
+    if (hours === null) {
+      valEl.textContent = '—';
+      subEl.textContent = 'no entry yet';
+      return;
+    }
+    valEl.textContent = hours + 'h';
+    subEl.textContent = 'goal ' + goal + 'h';
+    const pct = hours / goal;
+    if (pct >= 1)    card.classList.add('is-good');
+    else if (pct >= 0.75) card.classList.add('is-warn');
+    else              card.classList.add('is-bad');
+  }
+
+  // ── Today's Workout ────────────────────────────────────
+  function loadGym() {
+    const valEl = document.getElementById('sumGymVal');
+    const subEl = document.getElementById('sumGymSub');
+    const DEFAULT_DAYS = [
+      { id:'mon', name:'Upper A',      dayOfWeek:1 },
+      { id:'tue', name:'Lower',        dayOfWeek:2 },
+      { id:'wed', name:'Rest',         dayOfWeek:3, rest:true },
+      { id:'thu', name:'Upper B',      dayOfWeek:4 },
+      { id:'fri', name:'Rest',         dayOfWeek:5, rest:true },
+      { id:'sat', name:'Lower + Arms', dayOfWeek:6 },
+      { id:'sun', name:'Rest',         dayOfWeek:0, rest:true }
+    ];
+    const DEFAULT_EXERCISES = [
+      { day:'mon' }, { day:'mon' }, { day:'mon' }, { day:'mon' }, { day:'mon' }, { day:'mon' },
+      { day:'tue' }, { day:'tue' }, { day:'tue' }, { day:'tue' }, { day:'tue' },
+      { day:'thu' }, { day:'thu' }, { day:'thu' }, { day:'thu' }, { day:'thu' }, { day:'thu' },
+      { day:'sat' }, { day:'sat' }, { day:'sat' }, { day:'sat' }, { day:'sat' }, { day:'sat' }
+    ];
+    const saved = sg('gym_plan_v3');
+    const days      = (saved && saved.days)      || DEFAULT_DAYS;
+    const exercises = (saved && saved.exercises) || DEFAULT_EXERCISES;
+    const dow = new Date().getDay();
+    const day = days.find(function(d) { return d.dayOfWeek === dow; });
+    if (!day) { valEl.textContent = '—'; subEl.textContent = 'no plan'; return; }
+    if (day.rest) { valEl.textContent = 'Rest'; subEl.textContent = 'recovery day'; return; }
+    const exCount = exercises.filter(function(e) { return e.day === day.id; }).length;
+    valEl.textContent = day.name;
+    subEl.textContent = exCount + ' exercise' + (exCount !== 1 ? 's' : '');
+  }
+
+  // ── Net Worth ──────────────────────────────────────────
+  async function loadFinance() {
+    const valEl = document.getElementById('sumFinanceVal');
+    const subEl = document.getElementById('sumFinanceSub');
+    const cats  = ['bank', 'stocks', 'crypto', 'other'];
+    let totalCHF = 0;
+    let hasData  = false;
+    cats.forEach(function(cat) {
+      const items = sg('nw:' + cat) || [];
+      items.forEach(function(it) {
+        const amt = Number(it.amount) || 0;
+        if (amt > 0) { totalCHF += amt; hasData = true; }
+      });
+    });
+    if (!hasData) { valEl.textContent = '—'; subEl.textContent = 'no data yet'; return; }
+
+    const currency = sg('nw_currency') || 'NOK';
+    let rate = 1;
+    try {
+      const res  = await fetch('https://open.er-api.com/v6/latest/NOK');
+      const data = await res.json();
+      if (data && data.rates && data.rates[currency]) {
+        const chfPerNok = data.rates.CHF || 1;
+        const displayPerNok = data.rates[currency] || 1;
+        rate = displayPerNok / chfPerNok;
+      }
+    } catch (_) {}
+
+    const total = totalCHF * rate;
+    const sym   = { USD:'$', EUR:'€', GBP:'£' }[currency] || '';
+    const label = sym + Math.round(total).toLocaleString('en');
+    valEl.textContent = label;
+    subEl.textContent = currency + ' · all accounts';
+  }
+
+  // ── Water ──────────────────────────────────────────────
+  function loadWater() {
+    const valEl = document.getElementById('sumWaterVal');
+    const subEl = document.getElementById('sumWaterSub');
+    const card  = document.getElementById('sumWater');
+    const state = sg('po_water_v1');
+    const key   = todayStr();
+    const count = (state && state.logs && state.logs[key]) || 0;
+    const bottleMl = (state && state.bottleMl) || 500;
+    const weight   = (state && state.profile && state.profile.weight) || 80;
+    const target   = Math.max(4, Math.ceil((weight * 35) / bottleMl));
+    valEl.textContent = count + ' / ' + target;
+    subEl.textContent = 'bottles today';
+    const pct = count / target;
+    if (pct >= 1)    card.classList.add('is-good');
+    else if (pct >= 0.6) card.classList.add('is-warn');
+  }
+
+  loadSleep();
+  loadGym();
+  loadFinance();
+  loadWater();
+
+  // Refresh on storage changes (e.g. cloud sync applied)
+  window.addEventListener('storage', function () {
+    loadSleep(); loadGym(); loadWater();
+  });
+})();
 </script>
 </body>
 </html>
