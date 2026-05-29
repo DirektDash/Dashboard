@@ -1509,9 +1509,8 @@ body {
       const res  = await fetch('https://open.er-api.com/v6/latest/NOK');
       const data = await res.json();
       if (data && data.rates && data.rates[currency]) {
-        const chfPerNok = data.rates.CHF || 1;
         const displayPerNok = data.rates[currency] || 1;
-        rate = displayPerNok / chfPerNok;
+        rate = displayPerNok;
       }
     } catch (_) {}
 
