@@ -1406,6 +1406,18 @@ body {
         window.dispatchEvent(new Event('storage'));
       }
     });
+    initCloudSync({
+      appKey: 'health',
+      syncedKeys: ['po_water_v1', 'sleep:goal', 'cal:goals'],
+      syncedPrefixes: ['sleep:log:', 'cal:log:'],
+      onApplied: function () { window.dispatchEvent(new Event('storage')); }
+    });
+    initCloudSync({
+      appKey: 'finance',
+      syncedKeys: ['nw_currency', 'nw:activity', 'nw:history'],
+      syncedPrefixes: ['nw:'],
+      onApplied: function () { window.dispatchEvent(new Event('storage')); }
+    });
   });
 </script>
 <script>
@@ -1444,21 +1456,22 @@ body {
     const valEl = document.getElementById('sumGymVal');
     const subEl = document.getElementById('sumGymSub');
     const DEFAULT_DAYS = [
-      { id:'mon', name:'Upper A',      dayOfWeek:1 },
-      { id:'tue', name:'Lower',        dayOfWeek:2 },
-      { id:'wed', name:'Rest',         dayOfWeek:3, rest:true },
-      { id:'thu', name:'Upper B',      dayOfWeek:4 },
-      { id:'fri', name:'Rest',         dayOfWeek:5, rest:true },
-      { id:'sat', name:'Lower + Arms', dayOfWeek:6 },
-      { id:'sun', name:'Rest',         dayOfWeek:0, rest:true }
+      { id:'mon', name:'Chest & Back',     dayOfWeek:1 },
+      { id:'tue', name:'Shoulders & Arms', dayOfWeek:2 },
+      { id:'wed', name:'Rest',             dayOfWeek:3, rest:true },
+      { id:'thu', name:'Quad Focus',       dayOfWeek:4 },
+      { id:'fri', name:'Abs & Cardio',     dayOfWeek:5 },
+      { id:'sat', name:'Upper Body',       dayOfWeek:6 },
+      { id:'sun', name:'Rest',             dayOfWeek:0, rest:true }
     ];
     const DEFAULT_EXERCISES = [
-      { day:'mon' }, { day:'mon' }, { day:'mon' }, { day:'mon' }, { day:'mon' }, { day:'mon' },
-      { day:'tue' }, { day:'tue' }, { day:'tue' }, { day:'tue' }, { day:'tue' },
+      { day:'mon' }, { day:'mon' }, { day:'mon' }, { day:'mon' }, { day:'mon' }, { day:'mon' }, { day:'mon' },
+      { day:'tue' }, { day:'tue' }, { day:'tue' }, { day:'tue' }, { day:'tue' }, { day:'tue' }, { day:'tue' },
       { day:'thu' }, { day:'thu' }, { day:'thu' }, { day:'thu' }, { day:'thu' }, { day:'thu' },
-      { day:'sat' }, { day:'sat' }, { day:'sat' }, { day:'sat' }, { day:'sat' }, { day:'sat' }
+      { day:'fri' }, { day:'fri' }, { day:'fri' },
+      { day:'sat' }, { day:'sat' }, { day:'sat' }, { day:'sat' }, { day:'sat' }, { day:'sat' }, { day:'sat' }
     ];
-    const saved = sg('gym_plan_v3');
+    const saved = sg('gym_plan_v4');
     const days      = (saved && saved.days)      || DEFAULT_DAYS;
     const exercises = (saved && saved.exercises) || DEFAULT_EXERCISES;
     const dow = new Date().getDay();
@@ -1529,7 +1542,7 @@ body {
 
   // Refresh on storage changes (e.g. cloud sync applied)
   window.addEventListener('storage', function () {
-    loadSleep(); loadGym(); loadWater();
+    loadSleep(); loadGym(); loadFinance(); loadWater();
   });
 })();
 </script>
