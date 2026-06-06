@@ -667,7 +667,7 @@ html,body{min-height:100vh;overflow-x:hidden;}
 // DEFAULTS — Mon=Upper A, Tue=Lower, Wed=Rest, Thu=Upper B,
 //            Fri=Rest, Sat=Lower+Arms, Sun=Rest
 // ============================================================
-const PLAN_KEY    = 'gym_plan_v3';
+const PLAN_KEY    = 'gym_plan_v4';
 const SESSION_KEY = 'gym_sessions_v2';
 const DONE_KEY    = 'po_coach_workout_done';
 const WT_KEY      = 'po_coach_weights';
@@ -675,43 +675,51 @@ const PHOTO_KEY   = 'po_coach_photos';
 const UNITS       = 'kg';
 
 const DEFAULT_DAYS = [
-  { id:'mon', name:'Upper A',      dayOfWeek:1 },
-  { id:'tue', name:'Lower',        dayOfWeek:2 },
-  { id:'wed', name:'Rest',         dayOfWeek:3, rest:true },
-  { id:'thu', name:'Upper B',      dayOfWeek:4 },
-  { id:'fri', name:'Rest',         dayOfWeek:5, rest:true },
-  { id:'sat', name:'Lower + Arms', dayOfWeek:6 },
-  { id:'sun', name:'Rest',         dayOfWeek:0, rest:true }
+  { id:'mon', name:'Chest & Back',   dayOfWeek:1 },
+  { id:'tue', name:'Shoulders & Arms', dayOfWeek:2 },
+  { id:'wed', name:'Rest',           dayOfWeek:3, rest:true },
+  { id:'thu', name:'Quad Focus',     dayOfWeek:4 },
+  { id:'fri', name:'Abs & Cardio',   dayOfWeek:5 },
+  { id:'sat', name:'Upper Body',     dayOfWeek:6 },
+  { id:'sun', name:'Rest',           dayOfWeek:0, rest:true }
 ];
 
 const DEFAULT_EXERCISES = [
-  // Upper A
-  { name:'Weighted pull-ups',      day:'mon', sets:4, repMin:6,  repMax:8,  step:2.5, startWeight:10,  notes:'Add 5–10kg to belt, focus on full range' },
-  { name:'Barbell row',            day:'mon', sets:4, repMin:6,  repMax:8,  step:2.5, startWeight:60,  notes:'Retract scapula, control the pull, no momentum' },
-  { name:'Chest-supported DB row', day:'mon', sets:3, repMin:10, repMax:12, step:2,   startWeight:24,  notes:'Eliminate all momentum, feel the squeeze' },
-  { name:'Cable face pull',        day:'mon', sets:3, repMin:15, repMax:15, step:2.5, startWeight:20,  notes:'Rear delt and external rotation, don\'t go heavy' },
-  { name:'Barbell curl',           day:'mon', sets:3, repMin:8,  repMax:10, step:2.5, startWeight:30,  notes:'Slow eccentric, strict form, no swinging' },
-  { name:'Hammer curl',            day:'mon', sets:2, repMin:12, repMax:12, step:2,   startWeight:16,  notes:'Brachialis and forearm thickness' },
-  // Lower
-  { name:'Squat',                  day:'tue', sets:4, repMin:5,  repMax:6,  step:5,   startWeight:80,  notes:'Work up to a heavy set, brace hard' },
-  { name:'Romanian deadlift',      day:'tue', sets:3, repMin:8,  repMax:10, step:5,   startWeight:70,  notes:'Feel the full hamstring stretch at the bottom' },
-  { name:'Leg press',              day:'tue', sets:3, repMin:12, repMax:12, step:10,  startWeight:120, notes:'Higher foot placement targets glutes more' },
-  { name:'Leg curl machine',       day:'tue', sets:3, repMin:12, repMax:15, step:5,   startWeight:40,  notes:'Seated or lying both work' },
-  { name:'Calf raise',             day:'tue', sets:4, repMin:15, repMax:20, step:5,   startWeight:60,  notes:'Full stretch at the bottom, pause there' },
-  // Upper B
-  { name:'Bench press',            day:'thu', sets:4, repMin:5,  repMax:6,  step:2.5, startWeight:80,  notes:'Heavy, maintain your existing strength' },
-  { name:'Incline DB press',       day:'thu', sets:3, repMin:8,  repMax:10, step:2,   startWeight:28,  notes:'Upper chest emphasis, controlled descent' },
-  { name:'Overhead press',         day:'thu', sets:3, repMin:6,  repMax:8,  step:2.5, startWeight:50,  notes:'Seated or standing, keep core tight' },
-  { name:'Lateral raise',          day:'thu', sets:4, repMin:15, repMax:15, step:1,   startWeight:10,  notes:'Key for shoulder width, don\'t rush these' },
-  { name:'Tricep pushdown cable',  day:'thu', sets:3, repMin:10, repMax:12, step:2.5, startWeight:25,  notes:'Rope or straight bar, elbows locked' },
-  { name:'Overhead DB tricep ext', day:'thu', sets:2, repMin:12, repMax:12, step:2.5, startWeight:20,  notes:'Long head stretch, elbows tight to head' },
-  // Lower + Arms
-  { name:'Deadlift',               day:'sat', sets:4, repMin:4,  repMax:5,  step:5,   startWeight:100, notes:'Conventional, also builds back thickness' },
-  { name:'Hack squat / leg press', day:'sat', sets:3, repMin:10, repMax:10, step:10,  startWeight:100, notes:'Quad pump finisher' },
-  { name:'Walking lunges',         day:'sat', sets:3, repMin:10, repMax:10, step:2.5, startWeight:20,  notes:'DB or barbell' },
-  { name:'Incline DB curl',        day:'sat', sets:3, repMin:10, repMax:10, step:2,   startWeight:12,  notes:'Best stretch position for bicep peak' },
-  { name:'Cable curl',             day:'sat', sets:2, repMin:15, repMax:15, step:2.5, startWeight:15,  notes:'Constant tension finisher' },
-  { name:'Weighted tricep dip',    day:'sat', sets:3, repMin:8,  repMax:8,  step:2.5, startWeight:10,  notes:'Add weight if bodyweight 10+ reps is easy' }
+  // Chest & Back
+  { name:'Incline Press',                   day:'mon', sets:3, repMin:5,  repMax:8,  step:2.5, startWeight:60,  notes:'Drive through upper chest, controlled descent' },
+  { name:'Slight Incline Smith Machine Press', day:'mon', sets:2, repMin:5, repMax:8, step:2.5, startWeight:60, notes:'Slight incline for upper chest emphasis' },
+  { name:'Pec Deck / Cable Fly',            day:'mon', sets:3, repMin:8,  repMax:12, step:2.5, startWeight:30,  notes:'Full stretch at the bottom, squeeze at top' },
+  { name:'Chest Supported Upper Back Row',  day:'mon', sets:3, repMin:5,  repMax:8,  step:2.5, startWeight:40,  notes:'Retract scapula, lead with elbows' },
+  { name:'Lat Pulldown',                    day:'mon', sets:3, repMin:5,  repMax:8,  step:2.5, startWeight:50,  notes:'Chest up, pull to upper chest, full stretch at top' },
+  { name:'Lat Biased Chest Supported Row',  day:'mon', sets:2, repMin:6,  repMax:10, step:2.5, startWeight:30,  notes:'Elbows flared, emphasise lat stretch' },
+  { name:'Pull-up Finisher',               day:'mon', sets:3, repMin:5,  repMax:10, step:0,   startWeight:0,   notes:'Bodyweight AMRAP sets, rest 2 min between' },
+  // Shoulders & Arms
+  { name:'Lateral Raise',                  day:'tue', sets:3, repMin:6,  repMax:10, step:1,   startWeight:10,  notes:'Control the negative, no momentum' },
+  { name:'Shoulder Press',                 day:'tue', sets:3, repMin:6,  repMax:10, step:2.5, startWeight:40,  notes:'Seated or standing, brace core' },
+  { name:'Rear Delt Fly',                  day:'tue', sets:3, repMin:8,  repMax:15, step:1,   startWeight:8,   notes:'Bent over or machine, squeeze rear delts' },
+  { name:'Preacher Curl',                  day:'tue', sets:3, repMin:6,  repMax:10, step:2.5, startWeight:25,  notes:'Full range, slow eccentric' },
+  { name:'Overhead Tricep Extension',      day:'tue', sets:3, repMin:5,  repMax:8,  step:2.5, startWeight:20,  notes:'Long head stretch, elbows tight to head' },
+  { name:'Seated Bicep Curl',              day:'tue', sets:3, repMin:8,  repMax:15, step:2,   startWeight:14,  notes:'Supinate at top, no swinging' },
+  { name:'Tricep Pushdown',               day:'tue', sets:3, repMin:8,  repMax:12, step:2.5, startWeight:25,  notes:'Rope or bar, elbows locked at sides' },
+  // Quad Focus
+  { name:'Leg Adductor Machine',           day:'thu', sets:2, repMin:10, repMax:20, step:5,   startWeight:40,  notes:'Full range, don\'t rush the reps' },
+  { name:'Hack Squat',                     day:'thu', sets:2, repMin:5,  repMax:8,  step:5,   startWeight:60,  notes:'Knees tracking toes, full depth' },
+  { name:'Leg Press',                      day:'thu', sets:2, repMin:6,  repMax:10, step:10,  startWeight:100, notes:'Feet lower for quad emphasis' },
+  { name:'Leg Extensions',                 day:'thu', sets:2, repMin:10, repMax:15, step:5,   startWeight:40,  notes:'Pause and squeeze at top' },
+  { name:'Leg Curl',                       day:'thu', sets:3, repMin:6,  repMax:10, step:5,   startWeight:35,  notes:'Seated or lying, full hamstring contraction' },
+  { name:'Calf Raise',                     day:'thu', sets:4, repMin:6,  repMax:10, step:5,   startWeight:60,  notes:'Full stretch at bottom, pause there' },
+  // Abs & Cardio
+  { name:'Cable Crunch',                   day:'fri', sets:4, repMin:6,  repMax:10, step:2.5, startWeight:20,  notes:'Round the spine, lead with abs not arms' },
+  { name:'Leg Raises',                     day:'fri', sets:4, repMin:10, repMax:20, step:0,   startWeight:0,   notes:'To failure each set, slow and controlled' },
+  { name:'Incline Treadmill',              day:'fri', sets:1, repMin:15, repMax:20, step:0,   startWeight:0,   notes:'minutes at 8–10% incline, moderate pace' },
+  // Upper Body
+  { name:'Incline Press',                  day:'sat', sets:3, repMin:5,  repMax:8,  step:2.5, startWeight:60,  notes:'Drive through upper chest, controlled descent' },
+  { name:'Pec Deck Fly',                   day:'sat', sets:3, repMin:8,  repMax:12, step:2.5, startWeight:30,  notes:'Full stretch, squeeze at top' },
+  { name:'Chest Supported Upper Back Row', day:'sat', sets:2, repMin:6,  repMax:10, step:2.5, startWeight:40,  notes:'Retract scapula, lead with elbows' },
+  { name:'Lat Pulldown',                   day:'sat', sets:2, repMin:6,  repMax:10, step:2.5, startWeight:50,  notes:'Chest up, pull to upper chest' },
+  { name:'Lateral Raise',                  day:'sat', sets:4, repMin:6,  repMax:10, step:1,   startWeight:10,  notes:'Key for shoulder width, control the negative' },
+  { name:'Bicep Curl',                     day:'sat', sets:3, repMin:8,  repMax:12, step:2,   startWeight:14,  notes:'Supinate at top, slow eccentric' },
+  { name:'Tricep Pushdown',               day:'sat', sets:3, repMin:8,  repMax:12, step:2.5, startWeight:25,  notes:'Rope or bar, elbows locked at sides' }
 ];
 
 // ============================================================
