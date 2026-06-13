@@ -928,8 +928,11 @@ function loadActive() {
   let a = null;
   try { a = JSON.parse(localStorage.getItem(ACTIVE_KEY)); } catch (e) {}
   if (!a || !a.startedAt) return null;
-  // Only resume a session started today
-  if (a.startedAt.slice(0,10) !== dateKey()) { clearActive(); return null; }
+  // Only resume a session started today. Compare in LOCAL time: startedAt is
+  // stored as a UTC ISO string, so slicing its date would mismatch the local
+  // dateKey() whenever the local date differs from UTC (e.g. evenings in the
+  // Americas, just-after-midnight in Europe) and silently drop the session.
+  if (dateKey(new Date(a.startedAt)) !== dateKey()) { clearActive(); return null; }
   return a;
 }
 function clearActive() { try { localStorage.removeItem(ACTIVE_KEY); } catch (e) {} }
