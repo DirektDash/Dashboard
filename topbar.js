@@ -85,31 +85,43 @@
 .bottombar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
   display: flex; justify-content: space-around; align-items: stretch;
-  padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
-  background: #0a0a0b;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 2px;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  background: rgba(10, 10, 11, 0.72);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
 }
 .bottombar-tab {
   flex: 1;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; padding: 6px 0 4px; text-decoration: none;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
-  -webkit-tap-highlight-color: transparent; transition: color 0.15s;
+  gap: 4px; padding: 6px 0 5px; text-decoration: none;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 10px; font-weight: 600; letter-spacing: 0.03em;
+  -webkit-tap-highlight-color: transparent; transition: color 0.2s var(--ease-fast, ease);
 }
 .bottombar-tab-icon {
-  font-size: 24px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  width: 46px; height: 30px;
+  font-size: 21px; line-height: 1;
+  border-radius: 11px;
   filter: grayscale(100%) brightness(1.2); opacity: 0.55;
-  transition: opacity 0.15s, filter 0.15s, transform 0.10s;
+  transition: opacity 0.2s, filter 0.2s, transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1),
+              background 0.2s, box-shadow 0.2s;
 }
 .bottombar-tab.active { color: #FAFAFA; }
 .bottombar-tab.active .bottombar-tab-icon {
-  filter: grayscale(100%) brightness(1.6); opacity: 1;
+  filter: grayscale(100%) brightness(1.7); opacity: 1;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 2px 10px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
 }
-.bottombar-tab:active .bottombar-tab-icon { transform: scale(0.92); }
+.bottombar-tab:not(.active):hover .bottombar-tab-icon { opacity: 0.8; }
+.bottombar-tab:active .bottombar-tab-icon { transform: scale(0.9); }
 body.has-bottombar {
-  padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(82px + env(safe-area-inset-bottom)) !important;
 }
 @media (max-width: 480px) {
   .topbar { padding-left: 10px; padding-right: 10px; gap: 6px; }
@@ -118,8 +130,8 @@ body.has-bottombar {
   .topbar-water-add { width: 40px; font-size: 18px; }
   .topbar-finance-btn { width: 40px; height: 38px; }
   .topbar-finance-icon { font-size: 18px; }
-  .bottombar-tab-icon { font-size: 22px; }
-  .bottombar-tab { font-size: 10px; }
+  .bottombar-tab-icon { font-size: 20px; width: 42px; height: 28px; }
+  .bottombar-tab { font-size: 9.5px; }
 }
 html, body { -webkit-text-size-adjust: 100%; }
 @media (max-width: 768px) {
@@ -172,6 +184,9 @@ html, body { -webkit-text-size-adjust: 100%; }
   <a href="gym.html" class="bottombar-tab" data-page="fitness">
     <span class="bottombar-tab-icon">💪</span><span>Fitness</span>
   </a>
+  <a href="work.html" class="bottombar-tab" data-page="work">
+    <span class="bottombar-tab-icon">💼</span><span>Work</span>
+  </a>
 </nav>`;
 
   function isFinancePage() {
@@ -186,6 +201,7 @@ html, body { -webkit-text-size-adjust: 100%; }
     const p = (window.location.pathname || '').toLowerCase();
     if (p.endsWith('health.html')) return 'health';
     if (p.endsWith('gym.html')) return 'fitness';
+    if (p.endsWith('work.html')) return 'work';
     return 'main';
   }
 

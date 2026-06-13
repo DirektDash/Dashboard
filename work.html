@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050506">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/Icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Work">
+<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');</script>
+<title>Work — Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="sync.js" defer></script>
+<script src="topbar.js" defer></script>
+<link rel="stylesheet" href="tokens.css">
+<style>
+:root {
+  --work-active: #93C5FD;
+  --work-hold:   #FBBF24;
+  --work-done:   #34D399;
+}
+
+body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
+.page { max-width: 760px; margin: 0 auto; }
+
+/* ===== Page header ===== */
+.wk-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  margin: 0 0 20px;
+  animation: slideUp 0.4s var(--spring-smooth) both;
+}
+.wk-head-left { display: flex; flex-direction: column; gap: 4px; }
+.wk-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.wk-title {
+  margin: 0;
+  font-size: 30px; font-weight: 700; letter-spacing: -0.03em;
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.72) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+.wk-new-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 18px;
+  border: 0; border-radius: var(--radius-md);
+  background: linear-gradient(180deg, #FFFFFF 0%, #E8E8E8 100%);
+  color: #000; font-family: inherit; font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 4px 16px rgba(0,0,0,0.40), 0 1px 3px rgba(0,0,0,0.20);
+  transition: transform 0.15s var(--spring-bounce), filter 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.wk-new-btn:hover { filter: brightness(1.04); transform: translateY(-1px); }
+.wk-new-btn:active { transform: scale(0.97); }
+.wk-new-btn-plus { font-size: 16px; line-height: 1; }
+@media (max-width: 480px) { .wk-title { font-size: 24px; } }
+
+/* ===== Stat strip ===== */
+.wk-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  margin-bottom: 20px;
+}
+.wk-stat {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 14px 14px 13px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
+  -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
+  box-shadow: var(--card-shadow);
+  animation: slideUp 0.45s var(--spring-smooth) 0.08s both;
+}
+.wk-stat:nth-child(2) { animation-delay: 0.13s; }
+.wk-stat:nth-child(3) { animation-delay: 0.18s; }
+.wk-stat:nth-child(4) { animation-delay: 0.23s; }
+.wk-stat-label {
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.wk-stat-value {
+  font-size: 26px; font-weight: 700; line-height: 1;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+.wk-stat-value.accent-active { color: var(--work-active); }
+.wk-stat-value.accent-hold   { color: var(--work-hold); }
+.wk-stat-value.accent-done   { color: var(--work-done); }
+@media (max-width: 560px) {
+  .wk-stats { grid-template-columns: 1fr 1fr; }
+  .wk-stat-value { font-size: 22px; }
+}
+
+/* ===== Filter segmented control ===== */
+.wk-filters {
+  display: inline-flex; gap: 3px; padding: 4px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: slideUp 0.45s var(--spring-smooth) 0.26s both;
+}
+.wk-filter {
+  border: 0; background: transparent;
+  padding: 7px 15px; border-radius: 999px;
+  color: var(--text-secondary);
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.02em; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: background 0.18s, color 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.wk-filter .wk-filter-count {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 6px; border-radius: 999px;
+  background: rgba(255,255,255,0.08); color: var(--text-tertiary);
+}
+.wk-filter:hover { color: var(--text-primary); }
+.wk-filter.active {
+  background: rgba(255,255,255,0.12);
+  color: var(--text-primary);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16);
+}
+.wk-filter.active .wk-filter-count { background: rgba(255,255,255,0.16); color: var(--text-primary); }
+@media (max-width: 480px) {
+  .wk-filters { display: flex; width: 100%; overflow-x: auto; }
+  .wk-filter { flex: 1 0 auto; justify-content: center; }
+}
+
+/* ===== Project grid ===== */
+.wk-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+
+.wk-proj {
+  position: relative; overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
+  -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
+  box-shadow: var(--card-shadow);
+  transition: background 0.25s, box-shadow 0.25s, transform 0.25s var(--spring-card);
+  animation: slideUp 0.45s var(--spring-smooth) 0.3s both;
+}
+.wk-proj:hover { background: var(--glass-bg-hover); box-shadow: var(--card-shadow-hover); }
+.wk-proj::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--work-active); opacity: 0.85;
+}
+.wk-proj[data-status="hold"]::before { background: var(--work-hold); }
+.wk-proj[data-status="done"]::before { background: var(--work-done); }
+.wk-proj[data-status="done"] { opacity: 0.82; }
+
+.wk-proj-head {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 18px 18px 14px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.wk-proj-main { flex: 1; min-width: 0; }
+.wk-proj-title-row { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.wk-proj-name {
+  font-size: 16px; font-weight: 700; letter-spacing: -0.01em;
+  color: var(--text-primary);
+  outline: none; border-radius: 4px; padding: 1px 3px; margin: -1px -3px;
+}
+.wk-proj-name[contenteditable="true"] { outline: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); }
+.wk-proj[data-status="done"] .wk-proj-name { text-decoration: line-through; text-decoration-color: rgba(255,255,255,0.3); }
+
+.wk-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 999px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  cursor: pointer; user-select: none;
+  border: 1px solid transparent;
+  transition: filter 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.wk-badge:active { transform: scale(0.94); }
+.wk-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.wk-badge.status-active { color: var(--work-active); background: rgba(147,197,253,0.12); border-color: rgba(147,197,253,0.28); }
+.wk-badge.status-hold   { color: var(--work-hold);   background: rgba(251,191,36,0.12);  border-color: rgba(251,191,36,0.28); }
+.wk-badge.status-done   { color: var(--work-done);   background: rgba(52,211,153,0.12);  border-color: rgba(52,211,153,0.28); }
+
+.wk-prio {
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 6px; cursor: pointer; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.wk-prio.prio-high { color: var(--danger);  background: rgba(248,113,113,0.12); }
+.wk-prio.prio-med  { color: var(--warning); background: rgba(251,191,36,0.12); }
+.wk-prio.prio-low  { color: var(--text-tertiary); background: rgba(255,255,255,0.06); }
+
+.wk-proj-meta {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-top: 8px;
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary);
+}
+.wk-proj-meta .wk-meta-item { display: inline-flex; align-items: center; gap: 5px; }
+.wk-meta-item.is-overdue { color: var(--danger); }
+.wk-meta-item.is-soon { color: var(--warning); }
+
+.wk-proj-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+.wk-proj-pct {
+  font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em; color: var(--text-primary); line-height: 1;
+}
+.wk-chev {
+  color: var(--text-tertiary); font-size: 13px; line-height: 1;
+  transition: transform 0.25s var(--spring-smooth);
+}
+.wk-proj.is-open .wk-chev { transform: rotate(180deg); }
+
+/* progress bar */
+.wk-progress {
+  height: 5px; margin: 2px 18px 0; border-radius: 999px;
+  background: rgba(255,255,255,0.08); overflow: hidden;
+}
+.wk-progress-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, rgba(147,197,253,0.85), rgba(52,211,153,0.85));
+  transition: width 0.6s var(--spring-smooth);
+}
+.wk-proj[data-status="done"] .wk-progress-fill { background: var(--work-done); }
+.wk-proj[data-status="hold"] .wk-progress-fill { background: var(--work-hold); opacity: 0.8; }
+
+/* expandable body */
+.wk-proj-body { display: none; padding: 14px 18px 18px; }
+.wk-proj.is-open .wk-proj-body { display: block; animation: fadeIn 0.25s ease both; }
+
+.wk-tasks { list-style: none; margin: 0 0 10px; padding: 0; }
+.wk-task {
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 12px; margin-bottom: 5px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  transition: background 0.18s, border-color 0.18s, opacity 0.25s;
+}
+.wk-task:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.14); }
+.wk-task.done { opacity: 0.42; }
+.wk-task.done .wk-task-text { text-decoration: line-through; text-decoration-color: rgba(255,255,255,0.35); }
+.wk-check {
+  appearance: none; -webkit-appearance: none;
+  width: 19px; height: 19px; flex-shrink: 0; margin: 0;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.35); border-radius: 6px;
+  position: relative; cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.25s, transform 0.15s var(--spring-bounce);
+}
+.wk-check:checked {
+  background: var(--success); border-color: var(--success);
+  box-shadow: 0 0 12px rgba(52,211,153,0.4); transform: scale(1.05);
+}
+.wk-check:checked::after {
+  content: ''; position: absolute; left: 5px; top: 1.5px;
+  width: 5px; height: 10px; border: solid #0A0A0B; border-width: 0 2.2px 2.2px 0;
+  transform: rotate(45deg);
+}
+.wk-task-text {
+  flex: 1; font-size: 13.5px; color: var(--text-primary);
+  outline: none; border-radius: 4px; padding: 1px 3px; margin: -1px -3px; cursor: text;
+}
+.wk-task-text[contenteditable="true"] { outline: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.28); }
+.wk-task-del {
+  border: 0; background: transparent; color: var(--text-tertiary);
+  font-size: 17px; cursor: pointer; padding: 0 3px; opacity: 0.5;
+  transition: opacity 0.2s, color 0.2s;
+}
+.wk-task:hover .wk-task-del { opacity: 1; }
+.wk-task-del:hover { color: var(--danger); }
+
+.wk-task-add {
+  display: flex; gap: 8px; align-items: center; margin-top: 4px;
+}
+.wk-task-input {
+  flex: 1; min-width: 0; padding: 9px 12px;
+  border: 1px solid var(--glass-border); border-radius: var(--radius-md);
+  background: rgba(0,0,0,0.35); color: var(--text-primary);
+  font-family: inherit; font-size: 13px; outline: none;
+  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+}
+.wk-task-input::placeholder { color: var(--text-quaternary); }
+.wk-task-input:focus { border-color: rgba(255,255,255,0.4); background: rgba(0,0,0,0.45); box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
+.wk-task-add-btn {
+  padding: 9px 14px; border: 1px solid rgba(255,255,255,0.14); border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.06); color: var(--text-secondary);
+  font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+.wk-task-add-btn:hover { background: rgba(255,255,255,0.1); color: var(--text-primary); border-color: rgba(255,255,255,0.22); }
+
+.wk-proj-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.wk-tasks-empty { font-size: 12px; font-style: italic; color: var(--text-tertiary); padding: 6px 0 12px; }
+.wk-proj-delete {
+  border: 0; background: transparent; color: var(--text-tertiary);
+  font-family: inherit; font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+  cursor: pointer; padding: 5px 8px; border-radius: 7px;
+  transition: color 0.18s, background 0.18s;
+}
+.wk-proj-delete:hover { color: var(--danger); background: rgba(248,113,113,0.08); }
+
+/* empty page state */
+.wk-empty {
+  text-align: center; padding: 56px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg); border: 1px dashed var(--glass-border);
+  animation: slideUp 0.45s var(--spring-smooth) 0.3s both;
+}
+.wk-empty-icon { font-size: 40px; margin-bottom: 12px; filter: grayscale(0.2); }
+.wk-empty-title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.wk-empty-sub { font-size: 13px; color: var(--text-tertiary); }
+
+/* ===== Modal ===== */
+.wk-modal-bg {
+  position: fixed; inset: 0; z-index: 60;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.2s ease both;
+}
+.wk-modal-bg.open { display: flex; }
+.wk-modal {
+  width: 100%; max-width: 420px;
+  border-radius: var(--radius-lg);
+  background: rgba(20,20,22,0.92);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(40px) saturate(1.6);
+  -webkit-backdrop-filter: blur(40px) saturate(1.6);
+  box-shadow: var(--card-shadow-hover);
+  padding: 24px;
+  animation: slideUp 0.3s var(--spring-card) both;
+}
+.wk-modal-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 0 0 18px; letter-spacing: -0.01em; }
+.wk-field { margin-bottom: 16px; }
+.wk-field-label {
+  display: block; font-family: var(--font-mono);
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-tertiary); margin-bottom: 7px;
+}
+.wk-field input[type="text"], .wk-field input[type="date"] {
+  width: 100%; padding: 11px 14px;
+  border: 1px solid var(--glass-border); border-radius: var(--radius-md);
+  background: rgba(0,0,0,0.4); color: var(--text-primary);
+  font-family: inherit; font-size: 14px; outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.wk-field input::placeholder { color: var(--text-quaternary); }
+.wk-field input:focus { border-color: rgba(255,255,255,0.4); box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
+.wk-field input[type="date"] { color-scheme: dark; }
+.wk-seg { display: flex; gap: 6px; }
+.wk-seg-btn {
+  flex: 1; padding: 9px 8px; border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border); background: rgba(255,255,255,0.04);
+  color: var(--text-secondary); font-family: inherit; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.wk-seg-btn.sel { background: rgba(255,255,255,0.12); color: var(--text-primary); border-color: rgba(255,255,255,0.24); }
+.wk-seg-btn[data-val="high"].sel { color: var(--danger); border-color: rgba(248,113,113,0.4); }
+.wk-seg-btn[data-val="med"].sel  { color: var(--warning); border-color: rgba(251,191,36,0.4); }
+.wk-modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+.wk-btn-cancel {
+  flex: 1; padding: 12px; border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border); background: transparent;
+  color: var(--text-secondary); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.wk-btn-cancel:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+.wk-btn-save {
+  flex: 1.4; padding: 12px; border-radius: var(--radius-md); border: 0;
+  background: linear-gradient(180deg, #FFFFFF 0%, #E8E8E8 100%); color: #000;
+  font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 4px 14px rgba(0,0,0,0.35);
+  transition: transform 0.15s var(--spring-bounce), filter 0.15s;
+}
+.wk-btn-save:hover { filter: brightness(1.04); transform: translateY(-1px); }
+.wk-btn-save:active { transform: scale(0.97); }
+
+@media (max-width: 480px) {
+  body { padding: max(18px, env(safe-area-inset-top)) 14px 80px; }
+  .wk-modal-bg { padding: 0; align-items: stretch; }
+  .wk-modal {
+    max-width: 100%; border-radius: 0; min-height: 100vh;
+    padding-top: max(28px, env(safe-area-inset-top));
+    display: flex; flex-direction: column;
+  }
+  .wk-modal-actions { margin-top: auto; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="wk-head">
+    <div class="wk-head-left">
+      <span class="wk-eyebrow">Workspace</span>
+      <h1 class="wk-title">Work</h1>
+    </div>
+    <button type="button" class="wk-new-btn" id="newProjectBtn">
+      <span class="wk-new-btn-plus">+</span> New Project
+    </button>
+  </header>
+
+  <div class="wk-stats">
+    <div class="wk-stat">
+      <span class="wk-stat-label">Active</span>
+      <span class="wk-stat-value accent-active" id="statActive">0</span>
+    </div>
+    <div class="wk-stat">
+      <span class="wk-stat-label">On Hold</span>
+      <span class="wk-stat-value accent-hold" id="statHold">0</span>
+    </div>
+    <div class="wk-stat">
+      <span class="wk-stat-label">Open Tasks</span>
+      <span class="wk-stat-value" id="statTasks">0</span>
+    </div>
+    <div class="wk-stat">
+      <span class="wk-stat-label">Done</span>
+      <span class="wk-stat-value accent-done" id="statDone">0</span>
+    </div>
+  </div>
+
+  <div class="wk-filters" id="filters">
+    <button class="wk-filter active" data-filter="all">All <span class="wk-filter-count" id="cntAll">0</span></button>
+    <button class="wk-filter" data-filter="active">Active <span class="wk-filter-count" id="cntActive">0</span></button>
+    <button class="wk-filter" data-filter="hold">On Hold <span class="wk-filter-count" id="cntHold">0</span></button>
+    <button class="wk-filter" data-filter="done">Done <span class="wk-filter-count" id="cntDone">0</span></button>
+  </div>
+
+  <div class="wk-grid" id="projGrid"></div>
+
+  <div class="wk-empty" id="emptyState" style="display:none;">
+    <div class="wk-empty-icon">💼</div>
+    <div class="wk-empty-title">No projects yet</div>
+    <div class="wk-empty-sub">Create your first project to start tracking work.</div>
+  </div>
+
+</div>
+
+<!-- New project modal -->
+<div class="wk-modal-bg" id="modalBg">
+  <div class="wk-modal" role="dialog" aria-modal="true" aria-label="New project">
+    <h2 class="wk-modal-title">New Project</h2>
+    <div class="wk-field">
+      <label class="wk-field-label" for="npName">Project name</label>
+      <input type="text" id="npName" placeholder="e.g. Q3 Landing Page Redesign" autocomplete="off">
+    </div>
+    <div class="wk-field">
+      <label class="wk-field-label">Status</label>
+      <div class="wk-seg" id="npStatus">
+        <button type="button" class="wk-seg-btn sel" data-val="active">Active</button>
+        <button type="button" class="wk-seg-btn" data-val="hold">On Hold</button>
+        <button type="button" class="wk-seg-btn" data-val="done">Done</button>
+      </div>
+    </div>
+    <div class="wk-field">
+      <label class="wk-field-label">Priority</label>
+      <div class="wk-seg" id="npPrio">
+        <button type="button" class="wk-seg-btn" data-val="high">High</button>
+        <button type="button" class="wk-seg-btn sel" data-val="med">Medium</button>
+        <button type="button" class="wk-seg-btn" data-val="low">Low</button>
+      </div>
+    </div>
+    <div class="wk-field">
+      <label class="wk-field-label" for="npDue">Due date <span style="text-transform:none;letter-spacing:0;font-weight:600;">(optional)</span></label>
+      <input type="date" id="npDue">
+    </div>
+    <div class="wk-modal-actions">
+      <button type="button" class="wk-btn-cancel" id="npCancel">Cancel</button>
+      <button type="button" class="wk-btn-save" id="npSave">Create Project</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORE_KEY = 'work:projects';
+
+  // ---------- storage ----------
+  function load() {
+    try { var v = JSON.parse(localStorage.getItem(STORE_KEY)); return Array.isArray(v) ? v : []; }
+    catch (e) { return []; }
+  }
+  function save(list) {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+  // ---------- date helpers ----------
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function todayKey() { var d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function fmtDue(s) {
+    if (!s) return '';
+    var p = s.split('-').map(Number);
+    var d = new Date(p[0], p[1] - 1, p[2]);
+    var mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+    return mo + ' ' + d.getDate();
+  }
+  function dueClass(s, status) {
+    if (!s || status === 'done') return '';
+    var t = todayKey();
+    if (s < t) return 'is-overdue';
+    // within 3 days
+    var p = s.split('-').map(Number), due = new Date(p[0], p[1]-1, p[2]);
+    var now = new Date(); now.setHours(0,0,0,0);
+    var diff = (due - now) / 86400000;
+    if (diff <= 3) return 'is-soon';
+    return '';
+  }
+  function dueLabel(s, status) {
+    if (!s) return '';
+    if (status === 'done') return fmtDue(s);
+    var t = todayKey();
+    if (s < t) return 'Overdue · ' + fmtDue(s);
+    if (s === t) return 'Due today';
+    return 'Due ' + fmtDue(s);
+  }
+
+  function progressOf(p) {
+    if (p.status === 'done') return 100;
+    var tasks = p.tasks || [];
+    if (tasks.length === 0) return 0;
+    var done = tasks.filter(function (t) { return t.done; }).length;
+    return Math.round(done / tasks.length * 100);
+  }
+
+  // ---------- state ----------
+  var projects = load();
+  var filter = 'all';
+  var openSet = {}; // id -> true when expanded
+
+  var STATUS_LABEL = { active: 'Active', hold: 'On Hold', done: 'Done' };
+  var STATUS_ORDER = ['active', 'hold', 'done'];
+  var PRIO_LABEL = { high: 'High', med: 'Med', low: 'Low' };
+  var PRIO_ORDER = ['low', 'med', 'high'];
+
+  var grid = document.getElementById('projGrid');
+  var emptyState = document.getElementById('emptyState');
+
+  // ---------- render ----------
+  function persist() { save(projects); render(); }
+
+  function setText(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+
+  function renderStats() {
+    var active = projects.filter(function (p) { return p.status === 'active'; }).length;
+    var hold = projects.filter(function (p) { return p.status === 'hold'; }).length;
+    var done = projects.filter(function (p) { return p.status === 'done'; }).length;
+    var openTasks = 0;
+    projects.forEach(function (p) {
+      if (p.status === 'done') return;
+      (p.tasks || []).forEach(function (t) { if (!t.done) openTasks++; });
+    });
+    setText('statActive', active);
+    setText('statHold', hold);
+    setText('statTasks', openTasks);
+    setText('statDone', done);
+    setText('cntAll', projects.length);
+    setText('cntActive', active);
+    setText('cntHold', hold);
+    setText('cntDone', done);
+  }
+
+  function makeInlineEdit(el, commit) {
+    el.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (el.getAttribute('contenteditable') === 'true') return;
+      var original = el.textContent;
+      el.setAttribute('contenteditable', 'true');
+      el.focus();
+      var r = document.createRange(); r.selectNodeContents(el); r.collapse(false);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      function done() {
+        var next = el.textContent.trim();
+        el.removeAttribute('contenteditable');
+        if (next && next !== original) commit(next);
+        else el.textContent = original;
+      }
+      el.addEventListener('blur', done, { once: true });
+      el.addEventListener('keydown', function onKey(ev) {
+        if (ev.key === 'Enter') { ev.preventDefault(); el.removeEventListener('keydown', onKey); el.blur(); }
+        else if (ev.key === 'Escape') { ev.preventDefault(); el.textContent = original; el.removeEventListener('keydown', onKey); el.blur(); }
+      });
+    });
+  }
+
+  function buildTaskRow(proj, task) {
+    var li = document.createElement('li');
+    li.className = 'wk-task' + (task.done ? ' done' : '');
+
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.className = 'wk-check'; cb.checked = !!task.done;
+    cb.addEventListener('change', function () { task.done = cb.checked; persist(); });
+    li.appendChild(cb);
+
+    var text = document.createElement('span');
+    text.className = 'wk-task-text'; text.textContent = task.text;
+    makeInlineEdit(text, function (next) { task.text = next; persist(); });
+    li.appendChild(text);
+
+    var del = document.createElement('button');
+    del.className = 'wk-task-del'; del.type = 'button'; del.textContent = '×';
+    del.setAttribute('aria-label', 'Delete task');
+    del.addEventListener('click', function () {
+      proj.tasks = (proj.tasks || []).filter(function (t) { return t.id !== task.id; });
+      persist();
+    });
+    li.appendChild(del);
+    return li;
+  }
+
+  function buildProjectCard(p) {
+    var card = document.createElement('div');
+    card.className = 'wk-proj' + (openSet[p.id] ? ' is-open' : '');
+    card.setAttribute('data-status', p.status);
+
+    // ----- header -----
+    var head = document.createElement('div');
+    head.className = 'wk-proj-head';
+
+    var main = document.createElement('div');
+    main.className = 'wk-proj-main';
+
+    var titleRow = document.createElement('div');
+    titleRow.className = 'wk-proj-title-row';
+
+    var name = document.createElement('span');
+    name.className = 'wk-proj-name'; name.textContent = p.name;
+    makeInlineEdit(name, function (next) { p.name = next; persist(); });
+    titleRow.appendChild(name);
+
+    var badge = document.createElement('span');
+    badge.className = 'wk-badge status-' + p.status;
+    badge.innerHTML = '<span class="wk-badge-dot"></span>' + STATUS_LABEL[p.status];
+    badge.title = 'Tap to change status';
+    badge.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var i = STATUS_ORDER.indexOf(p.status);
+      p.status = STATUS_ORDER[(i + 1) % STATUS_ORDER.length];
+      persist();
+    });
+    titleRow.appendChild(badge);
+
+    var prio = document.createElement('span');
+    prio.className = 'wk-prio prio-' + p.priority;
+    prio.textContent = PRIO_LABEL[p.priority];
+    prio.title = 'Tap to change priority';
+    prio.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var i = PRIO_ORDER.indexOf(p.priority);
+      p.priority = PRIO_ORDER[(i + 1) % PRIO_ORDER.length];
+      persist();
+    });
+    titleRow.appendChild(prio);
+    main.appendChild(titleRow);
+
+    // meta
+    var meta = document.createElement('div');
+    meta.className = 'wk-proj-meta';
+    var tasks = p.tasks || [];
+    var doneCount = tasks.filter(function (t) { return t.done; }).length;
+    var taskItem = document.createElement('span');
+    taskItem.className = 'wk-meta-item';
+    taskItem.innerHTML = '✓ ' + doneCount + '/' + tasks.length + ' tasks';
+    meta.appendChild(taskItem);
+    if (p.due) {
+      var dueItem = document.createElement('span');
+      dueItem.className = 'wk-meta-item ' + dueClass(p.due, p.status);
+      dueItem.innerHTML = '◷ ' + dueLabel(p.due, p.status);
+      meta.appendChild(dueItem);
+    }
+    main.appendChild(meta);
+    head.appendChild(main);
+
+    // side
+    var side = document.createElement('div');
+    side.className = 'wk-proj-side';
+    var pct = document.createElement('span');
+    pct.className = 'wk-proj-pct'; pct.textContent = progressOf(p) + '%';
+    side.appendChild(pct);
+    var chev = document.createElement('span');
+    chev.className = 'wk-chev'; chev.textContent = '▾';
+    side.appendChild(chev);
+    head.appendChild(side);
+
+    head.addEventListener('click', function () {
+      openSet[p.id] = !openSet[p.id];
+      card.classList.toggle('is-open', !!openSet[p.id]);
+    });
+    card.appendChild(head);
+
+    // progress bar
+    var prog = document.createElement('div');
+    prog.className = 'wk-progress';
+    var fill = document.createElement('div');
+    fill.className = 'wk-progress-fill';
+    fill.style.width = progressOf(p) + '%';
+    prog.appendChild(fill);
+    card.appendChild(prog);
+
+    // ----- body -----
+    var body = document.createElement('div');
+    body.className = 'wk-proj-body';
+
+    if (tasks.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'wk-tasks-empty';
+      empty.textContent = 'No tasks yet — add one below.';
+      body.appendChild(empty);
+    } else {
+      var ul = document.createElement('ul');
+      ul.className = 'wk-tasks';
+      tasks.forEach(function (t) { ul.appendChild(buildTaskRow(p, t)); });
+      body.appendChild(ul);
+    }
+
+    // add task
+    var addWrap = document.createElement('div');
+    addWrap.className = 'wk-task-add';
+    var input = document.createElement('input');
+    input.className = 'wk-task-input'; input.type = 'text';
+    input.placeholder = 'Add a task…'; input.autocomplete = 'off';
+    var addBtn = document.createElement('button');
+    addBtn.className = 'wk-task-add-btn'; addBtn.type = 'button'; addBtn.textContent = 'Add';
+    function addTask() {
+      var v = input.value.trim();
+      if (!v) return;
+      p.tasks = p.tasks || [];
+      p.tasks.push({ id: uid(), text: v, done: false });
+      input.value = '';
+      openSet[p.id] = true;
+      persist();
+    }
+    addBtn.addEventListener('click', addTask);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addTask(); } });
+    addWrap.appendChild(input); addWrap.appendChild(addBtn);
+    body.appendChild(addWrap);
+
+    // footer
+    var footer = document.createElement('div');
+    footer.className = 'wk-proj-footer';
+    var created = document.createElement('span');
+    created.style.cssText = 'font-family:var(--font-mono);font-size:10px;color:var(--text-quaternary);';
+    created.textContent = p.due ? ('Due ' + fmtDue(p.due)) : 'No due date';
+    footer.appendChild(created);
+    var delProj = document.createElement('button');
+    delProj.className = 'wk-proj-delete'; delProj.type = 'button'; delProj.textContent = 'Delete project';
+    delProj.addEventListener('click', function () {
+      if (!confirm('Delete "' + p.name + '"? This removes all its tasks.')) return;
+      projects = projects.filter(function (x) { return x.id !== p.id; });
+      persist();
+    });
+    footer.appendChild(delProj);
+    body.appendChild(footer);
+
+    card.appendChild(body);
+    return card;
+  }
+
+  function sortProjects(list) {
+    var statusRank = { active: 0, hold: 1, done: 2 };
+    var prioRank = { high: 0, med: 1, low: 2 };
+    return list.slice().sort(function (a, b) {
+      if (statusRank[a.status] !== statusRank[b.status]) return statusRank[a.status] - statusRank[b.status];
+      if (prioRank[a.priority] !== prioRank[b.priority]) return prioRank[a.priority] - prioRank[b.priority];
+      // due date soonest first (no due last)
+      var ad = a.due || '9999', bd = b.due || '9999';
+      return ad < bd ? -1 : ad > bd ? 1 : 0;
+    });
+  }
+
+  function render() {
+    renderStats();
+    var visible = sortProjects(projects).filter(function (p) {
+      return filter === 'all' ? true : p.status === filter;
+    });
+    grid.innerHTML = '';
+    if (projects.length === 0) {
+      emptyState.style.display = 'block';
+      emptyState.querySelector('.wk-empty-title').textContent = 'No projects yet';
+      emptyState.querySelector('.wk-empty-sub').textContent = 'Create your first project to start tracking work.';
+      return;
+    }
+    if (visible.length === 0) {
+      emptyState.style.display = 'block';
+      emptyState.querySelector('.wk-empty-title').textContent = 'Nothing here';
+      emptyState.querySelector('.wk-empty-sub').textContent = 'No projects match this filter.';
+      return;
+    }
+    emptyState.style.display = 'none';
+    visible.forEach(function (p) { grid.appendChild(buildProjectCard(p)); });
+  }
+
+  // ---------- filters ----------
+  document.getElementById('filters').addEventListener('click', function (e) {
+    var btn = e.target.closest('.wk-filter');
+    if (!btn) return;
+    filter = btn.getAttribute('data-filter');
+    document.querySelectorAll('.wk-filter').forEach(function (b) { b.classList.toggle('active', b === btn); });
+    render();
+  });
+
+  // ---------- modal ----------
+  var modalBg = document.getElementById('modalBg');
+  var npName = document.getElementById('npName');
+  var npDue = document.getElementById('npDue');
+  var npStatus = document.getElementById('npStatus');
+  var npPrio = document.getElementById('npPrio');
+
+  function segWire(container) {
+    container.addEventListener('click', function (e) {
+      var b = e.target.closest('.wk-seg-btn');
+      if (!b) return;
+      container.querySelectorAll('.wk-seg-btn').forEach(function (x) { x.classList.toggle('sel', x === b); });
+    });
+  }
+  segWire(npStatus); segWire(npPrio);
+  function segVal(container) {
+    var sel = container.querySelector('.wk-seg-btn.sel');
+    return sel ? sel.getAttribute('data-val') : null;
+  }
+
+  function openModal() {
+    npName.value = '';
+    npDue.value = '';
+    npStatus.querySelectorAll('.wk-seg-btn').forEach(function (x) { x.classList.toggle('sel', x.getAttribute('data-val') === 'active'); });
+    npPrio.querySelectorAll('.wk-seg-btn').forEach(function (x) { x.classList.toggle('sel', x.getAttribute('data-val') === 'med'); });
+    modalBg.classList.add('open');
+    setTimeout(function () { npName.focus(); }, 60);
+  }
+  function closeModal() { modalBg.classList.remove('open'); }
+
+  document.getElementById('newProjectBtn').addEventListener('click', openModal);
+  document.getElementById('npCancel').addEventListener('click', closeModal);
+  modalBg.addEventListener('click', function (e) { if (e.target === modalBg) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modalBg.classList.contains('open')) closeModal(); });
+
+  function saveNew() {
+    var name = npName.value.trim();
+    if (!name) { npName.focus(); return; }
+    var proj = {
+      id: uid(),
+      name: name,
+      status: segVal(npStatus) || 'active',
+      priority: segVal(npPrio) || 'med',
+      due: npDue.value || '',
+      tasks: [],
+      createdAt: Date.now()
+    };
+    projects.push(proj);
+    openSet[proj.id] = true;
+    closeModal();
+    persist();
+  }
+  document.getElementById('npSave').addEventListener('click', saveNew);
+  npName.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); saveNew(); } });
+
+  // ---------- boot ----------
+  render();
+
+  // refresh when cloud sync applies remote changes
+  window.addEventListener('storage', function () { projects = load(); render(); });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof initCloudSync !== 'function') return;
+    initCloudSync({
+      appKey: 'work',
+      syncedKeys: ['work:projects'],
+      syncedPrefixes: ['work:'],
+      onApplied: function () { projects = load(); render(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
