@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#050506">
+<meta name="theme-color" content="#F5F5F7">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/Icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Dashboard">
 <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');</script>
 <title>My Dashboard</title>
@@ -46,7 +46,7 @@ body {
   font-size: 30px;
   font-weight: 700;
   letter-spacing: -0.03em;
-  background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.72) 100%);
+  background: linear-gradient(155deg, #1A1A1E 0%, #4F46E5 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -97,7 +97,7 @@ body {
   content: '';
   position: absolute; top: 0; bottom: 0;
   width: 30%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+  background: linear-gradient(90deg, transparent, rgba(99,102,241,0.06), transparent);
   pointer-events: none;
   animation: ticker-sweep 8s linear infinite;
 }
@@ -154,8 +154,8 @@ body {
   color: var(--text-tertiary);
   padding: 3px 9px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.08);
 }
 @media (max-width: 480px) {
   .goal-ticker { padding: 9px 12px; }
@@ -191,7 +191,7 @@ body {
   flex-shrink: 0;
 }
 .day-ring svg { width: 100%; height: 100%; display: block; }
-.day-ring-track { fill: none; stroke: rgba(255,255,255,0.10); stroke-width: 8; }
+.day-ring-track { fill: none; stroke: rgba(0,0,0,0.08); stroke-width: 8; }
 .day-ring-fill {
   fill: none;
   stroke-width: 8;
@@ -287,9 +287,13 @@ body {
 }
 .summary-card:active { transform: scale(0.97); }
 .summary-icon {
-  font-size: 20px;
-  margin-bottom: 10px;
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px;
+  margin-bottom: 12px;
   line-height: 1;
+  border-radius: 11px;
+  background: var(--accent-soft);
 }
 .summary-eyebrow {
   font-family: var(--font-mono);
@@ -327,8 +331,50 @@ body {
   .summary-grid { gap: 8px; }
   .summary-card { padding: 14px 12px 12px; }
   .summary-value { font-size: 20px; }
-  .summary-icon { font-size: 18px; margin-bottom: 8px; }
+  .summary-icon { font-size: 17px; width: 34px; height: 34px; margin-bottom: 10px; }
 }
+
+/* ===== Quick actions ===== */
+.quick-actions {
+  display: flex; gap: 10px;
+  margin-bottom: 22px;
+  animation: slideUp 0.45s var(--spring-smooth) 0.14s both;
+}
+.qa-btn {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 15px 8px 13px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--card-shadow);
+  color: var(--text-secondary);
+  text-decoration: none; cursor: pointer;
+  font-family: inherit; font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+  transition: transform 0.18s var(--spring-card), background 0.2s, box-shadow 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.qa-btn:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
+.qa-btn:active { transform: scale(0.95); }
+.qa-icon {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; border-radius: 14px;
+  background: var(--accent-soft); color: var(--accent-strong);
+  transition: background 0.2s, transform 0.12s;
+}
+.qa-btn.qa-flash .qa-icon { background: var(--accent); transform: scale(1.08); }
+
+/* ===== Home wellness pill ===== */
+.day-ring-wellness {
+  display: inline-flex; align-items: center; gap: 7px;
+  align-self: flex-start; margin-top: 2px;
+  padding: 5px 12px; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent-strong);
+  font-size: 11.5px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.day-ring-wellness .drw-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 
 /* ===== Component 5: section + To Do List ===== */
 .section { margin-top: 8px; }
@@ -342,11 +388,11 @@ body {
 }
 .section-title::before {
   content: ''; width: 18px; height: 1px;
-  background: rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.14);
 }
 .section-title::after {
   content: ''; flex: 1; height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.12), transparent);
+  background: linear-gradient(90deg, rgba(0,0,0,0.10), transparent);
 }
 
 .gm-card {
@@ -421,8 +467,8 @@ body {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.08);
   color: var(--text-tertiary);
   font-size: 11px; font-weight: 600;
   letter-spacing: 0.10em; text-transform: uppercase;
@@ -451,7 +497,7 @@ body {
 .gm-bar:empty { display: none; }
 .gm-bar-seg {
   flex: 1;
-  background: rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.08);
   border-radius: 3px;
   transition: background 0.35s var(--spring-smooth), box-shadow 0.35s var(--spring-smooth);
 }
@@ -472,15 +518,15 @@ body {
   display: flex; align-items: center; gap: 12px;
   padding: 12px 14px;
   margin-bottom: 6px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.03);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   transition: background 0.18s ease, border-color 0.18s ease, opacity 0.3s ease, transform 0.18s var(--spring-card);
   position: relative;
 }
 .gm-row:hover {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.14);
   transform: translateX(2px);
 }
 .gm-row.gm-row-done {
@@ -489,7 +535,7 @@ body {
 }
 .gm-row.gm-row-done .gm-text {
   text-decoration: line-through;
-  text-decoration-color: rgba(255,255,255,0.35);
+  text-decoration-color: rgba(0,0,0,0.35);
 }
 .gm-row.gm-row-queued {
   background: rgba(251,191,36,0.08);
@@ -500,9 +546,9 @@ body {
 .gm-row.is-drag-over { border-top: 2px solid #6BE3A4; }
 .gm-row.is-queue-flashing { animation: gm-queue-flash 0.48s ease-out; }
 @keyframes gm-queue-flash {
-  0%   { background: rgba(255,255,255,0.04); transform: scale(1); }
+  0%   { background: rgba(0,0,0,0.03); transform: scale(1); }
   40%  { background: rgba(251,191,36,0.28); transform: scale(1.015); }
-  100% { background: rgba(255,255,255,0.04); transform: scale(1); }
+  100% { background: rgba(0,0,0,0.03); transform: scale(1); }
 }
 
 .gm-handle {
@@ -522,8 +568,8 @@ body {
   appearance: none; -webkit-appearance: none;
   width: 22px; height: 22px; flex-shrink: 0;
   margin: 0;
-  border: 1.5px solid rgba(255,255,255,0.20);
-  background: rgba(0,0,0,0.35);
+  border: 1.5px solid rgba(0,0,0,0.22);
+  background: #FFFFFF;
   border-radius: 7px;
   position: relative;
   cursor: pointer;
@@ -539,7 +585,7 @@ body {
   content: '';
   position: absolute; left: 6px; top: 2px;
   width: 6px; height: 11px;
-  border: solid #0A0A0B;
+  border: solid #FFFFFF;
   border-width: 0 2.5px 2.5px 0;
   transform: rotate(45deg);
   animation: gm-check-pop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -561,8 +607,8 @@ body {
   margin: -2px -4px;
 }
 .gm-text[contenteditable="true"] {
-  outline: 1px solid rgba(255,255,255,0.18);
-  background: rgba(0,0,0,0.28);
+  outline: 1px solid rgba(99,102,241,0.5);
+  background: rgba(99,102,241,0.06);
 }
 
 .gm-queue-btn {
@@ -599,7 +645,7 @@ body {
   width: 100%;
   margin: 6px 0 0;
   padding: 9px;
-  border: 1px dashed rgba(255,255,255,0.14);
+  border: 1px dashed rgba(0,0,0,0.16);
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--text-tertiary);
@@ -611,15 +657,15 @@ body {
 }
 .gm-show-toggle:hover {
   color: var(--text-primary);
-  border-color: rgba(255,255,255,0.28);
-  background: rgba(255,255,255,0.04);
+  border-color: rgba(0,0,0,0.28);
+  background: rgba(0,0,0,0.03);
 }
 
 .gm-push-btn {
   width: 100%;
   margin-top: 14px;
   padding: 11px;
-  border: 1px dashed rgba(255,255,255,0.16);
+  border: 1px dashed rgba(0,0,0,0.18);
   border-radius: var(--radius-md);
   background: transparent;
   color: var(--text-tertiary);
@@ -631,23 +677,23 @@ body {
 }
 .gm-push-btn:hover {
   color: var(--text-primary);
-  border-color: rgba(255,255,255,0.32);
+  border-color: rgba(0,0,0,0.3);
   border-style: solid;
-  background: rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.04);
 }
 
 .goal-input-wrap.gm-input-wrap {
   display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
   margin-top: 14px;
   padding-top: 14px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(0,0,0,0.08);
 }
 .gm-input {
   flex: 1; min-width: 0;
   padding: 11px 14px;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
-  background: rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.03);
   color: var(--text-primary);
   font-family: inherit; font-size: 14px;
   outline: none;
@@ -655,23 +701,22 @@ body {
 }
 .gm-input::placeholder { color: var(--text-quaternary); }
 .gm-input:focus {
-  border-color: rgba(255,255,255,0.40);
-  background: rgba(0,0,0,0.45);
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.07);
+  border-color: var(--accent);
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
 }
 
 .gm-add {
   padding: 11px 20px;
   border: 0;
   border-radius: var(--radius-md);
-  background: linear-gradient(180deg, #FFFFFF 0%, #E8E8E8 100%);
-  color: #000000;
+  background: linear-gradient(180deg, #6366F1 0%, #4F46E5 100%);
+  color: #FFFFFF;
   font-family: inherit; font-size: 13px; font-weight: 700;
   cursor: pointer;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.95),
-    0 4px 16px rgba(0,0,0,0.40),
-    0 1px 3px rgba(0,0,0,0.20);
+    0 4px 16px rgba(99,102,241,0.35),
+    0 1px 3px rgba(0,0,0,0.12);
   transition: transform 0.15s var(--spring-bounce), filter 0.15s ease, box-shadow 0.15s ease;
 }
 .gm-add:hover { filter: brightness(1.04); transform: translateY(-1px); }
@@ -679,17 +724,17 @@ body {
 
 .gm-polish {
   padding: 11px 18px;
-  border: 1px solid rgba(255,255,255,0.14);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
-  background: rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.03);
   color: var(--text-secondary);
   font-family: inherit; font-size: 13px; font-weight: 600;
   cursor: pointer;
   transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
 .gm-polish:hover {
-  background: rgba(255,255,255,0.09);
-  border-color: rgba(255,255,255,0.22);
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.14);
   color: var(--text-primary);
 }
 
@@ -762,7 +807,23 @@ body {
       <div class="day-ring-status"    id="dayRingStatus">Loading…</div>
       <div class="day-ring-remaining" id="dayRingRemaining">—</div>
       <div class="day-ring-hours">8:00 AM – 12:00 AM</div>
+      <a href="health.html" class="day-ring-wellness" id="homeWellness" style="display:none">
+        <span class="drw-dot"></span><span id="homeWellnessText">—</span>
+      </a>
     </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="quick-actions">
+    <button type="button" class="qa-btn" id="qaWater">
+      <span class="qa-icon">💧</span>Log water
+    </button>
+    <a href="gym.html" class="qa-btn" id="qaWorkout">
+      <span class="qa-icon">💪</span>Workout
+    </a>
+    <button type="button" class="qa-btn" id="qaGoal">
+      <span class="qa-icon">✓</span>Add goal
+    </button>
   </div>
 
   <!-- Summary Grid -->
@@ -1655,6 +1716,64 @@ body {
   window.addEventListener('storage', function () {
     loadSleep(); loadGym(); loadFinance(); loadWater(); loadWork();
   });
+})();
+</script>
+
+<!-- Quick actions + home wellness pill -->
+<script>
+(function () {
+  'use strict';
+  function sg(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function todayStr() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()); }
+  function clamp01(x) { return Math.max(0, Math.min(1, x)); }
+
+  function wellnessScore() {
+    let water = 0;
+    try { if (typeof window.dashWaterProgress === 'function') { const w = window.dashWaterProgress(); water = w.total ? clamp01(w.done / w.total) : 0; } } catch (e) {}
+    const sGoal = sg('sleep:goal') || 8;
+    const sVal = sg('sleep:log:' + todayStr());
+    const sleep = typeof sVal === 'number' ? clamp01(sVal / sGoal) : 0;
+    const goals = Object.assign({ kcal: 2500, protein: 150, steps: 10000 }, sg('cal:goals') || {});
+    const log = Object.assign({ foods: [], steps: 0 }, sg('cal:log:' + todayStr()) || {});
+    const kcal = (log.foods || []).reduce(function (s, f) { return s + (f.kcal || 0); }, 0);
+    const prot = (log.foods || []).reduce(function (s, f) { return s + (f.protein || 0); }, 0);
+    const nutrition = (clamp01(kcal / goals.kcal) + clamp01(prot / goals.protein)) / 2;
+    const steps = clamp01((log.steps || 0) / goals.steps);
+    return Math.round((water + sleep + nutrition + steps) / 4 * 100);
+  }
+
+  function renderWellness() {
+    const el = document.getElementById('homeWellness');
+    const txt = document.getElementById('homeWellnessText');
+    if (!el || !txt) return;
+    const score = wellnessScore();
+    if (score <= 0) { el.style.display = 'none'; return; }
+    el.style.display = '';
+    const word = score >= 85 ? 'Excellent' : score >= 65 ? 'On track' : score >= 40 ? 'Keep going' : 'Just started';
+    txt.textContent = 'Wellness ' + score + ' · ' + word;
+  }
+
+  // Quick actions
+  const qaWater = document.getElementById('qaWater');
+  if (qaWater) qaWater.addEventListener('click', function () {
+    try { if (typeof window.dashAddWater === 'function') window.dashAddWater(); } catch (e) {}
+    qaWater.classList.add('qa-flash');
+    setTimeout(function () { qaWater.classList.remove('qa-flash'); }, 240);
+    setTimeout(renderWellness, 50);
+  });
+  const qaGoal = document.getElementById('qaGoal');
+  if (qaGoal) qaGoal.addEventListener('click', function () {
+    const inp = document.getElementById('goalInput');
+    if (inp) { inp.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(function () { inp.focus(); }, 300); }
+  });
+
+  renderWellness();
+  // topbar.js is deferred, so dashWaterProgress may not exist yet at parse time — re-render on load.
+  window.addEventListener('load', renderWellness);
+  window.addEventListener('storage', renderWellness);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) renderWellness(); });
+  setInterval(renderWellness, 30000);
 })();
 </script>
 </body>

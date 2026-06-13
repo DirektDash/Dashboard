@@ -1,52 +1,58 @@
 /* ============================================================
-   tokens.css — Apple Liquid Glass design system
+   tokens.css — Light "soft white" design system
    Shared foundation for all dashboard pages.
    Link this BEFORE any page-specific <style> blocks.
+   Primary: white / light gray.  Accent: indigo (#6366F1).
    ============================================================ */
 
 :root {
   /* Background */
-  --bg: #000000;
+  --bg: #F5F5F7;
 
-  /* Glass surfaces */
-  --glass-bg:        rgba(255, 255, 255, 0.08);
-  --glass-bg-hover:  rgba(255, 255, 255, 0.11);
-  --glass-bg-press:  rgba(255, 255, 255, 0.05);
-  --glass-border:    rgba(255, 255, 255, 0.14);
-  --glass-highlight: rgba(255, 255, 255, 0.22);
+  /* Accent — indigo/violet, the brand colour */
+  --accent:        #6366F1;
+  --accent-strong: #4F46E5;
+  --accent-soft:   rgba(99, 102, 241, 0.10);
 
-  /* Text — cool-white scale */
-  --text-primary:    #FFFFFF;
-  --text-secondary:  rgba(255, 255, 255, 0.65);
-  --text-tertiary:   rgba(255, 255, 255, 0.38);
-  --text-quaternary: rgba(255, 255, 255, 0.20);
+  /* Card surfaces (formerly "glass") — now solid white */
+  --glass-bg:        #FFFFFF;
+  --glass-bg-hover:  #FAFAFB;
+  --glass-bg-press:  #F0F0F3;
+  --glass-border:    rgba(0, 0, 0, 0.08);
+  --glass-highlight: rgba(0, 0, 0, 0.04);
+
+  /* Text — ink scale on light */
+  --text-primary:    #1A1A1E;
+  --text-secondary:  rgba(0, 0, 0, 0.58);
+  --text-tertiary:   rgba(0, 0, 0, 0.40);
+  --text-quaternary: rgba(0, 0, 0, 0.24);
 
   /* Aliases: gym.html / po-water.html use --text-1/2/3/4 */
-  --text-1: #FFFFFF;
-  --text-2: rgba(255, 255, 255, 0.65);
-  --text-3: rgba(255, 255, 255, 0.38);
-  --text-4: rgba(255, 255, 255, 0.20);
+  --text-1: #1A1A1E;
+  --text-2: rgba(0, 0, 0, 0.58);
+  --text-3: rgba(0, 0, 0, 0.40);
+  --text-4: rgba(0, 0, 0, 0.24);
 
   /* Aliases: gym/water use --bg-card */
-  --bg-card: rgba(255, 255, 255, 0.08);
+  --bg-card: #FFFFFF;
 
-  /* Status — the only colour in the UI */
-  --success: #34D399;
-  --warning: #FBBF24;
-  --danger:  #F87171;
+  /* Status */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger:  #EF4444;
 
   /* Aliases: gym/water use --good/warn/bad */
-  --good: #34D399;
-  --warn: #FBBF24;
-  --bad:  #F87171;
+  --good: #10B981;
+  --warn: #F59E0B;
+  --bad:  #EF4444;
 
-  /* Info (water bar gradient) */
-  --info: #93C5FD;
+  /* Info (water bar gradient) — lean on the accent family */
+  --info: #6366F1;
 
   /* Border aliases */
-  --border:        rgba(255, 255, 255, 0.12);
-  --border-soft:   rgba(255, 255, 255, 0.06);
-  --border-strong: rgba(255, 255, 255, 0.20);
+  --border:        rgba(0, 0, 0, 0.08);
+  --border-soft:   rgba(0, 0, 0, 0.05);
+  --border-strong: rgba(0, 0, 0, 0.14);
 
   /* Typography */
   --font:      -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -63,17 +69,13 @@
   --spring-card:   cubic-bezier(0.34, 1.20, 0.64, 1);
   --ease-fast:     cubic-bezier(0.22, 1.00, 0.36, 1);
 
-  /* Liquid glass card box-shadow */
+  /* Soft drop-shadow card elevation */
   --card-shadow:
-    inset 0  1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
-    0 20px 60px rgba(0, 0, 0, 0.55),
-    0  2px  8px rgba(0, 0, 0, 0.25);
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(16, 16, 30, 0.06);
   --card-shadow-hover:
-    inset 0  1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
-    0 28px 70px rgba(0, 0, 0, 0.65),
-    0  4px 12px rgba(0, 0, 0, 0.30);
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    0 16px 36px rgba(16, 16, 30, 0.10);
 }
 
 /* ── Base reset ── */
@@ -93,7 +95,7 @@ html, body {
   overflow-x: hidden;
 }
 
-/* ── Ambient backdrop — cool-white radial glows ── */
+/* ── Ambient backdrop — faint indigo radial glows ── */
 body::before {
   content: '';
   position: fixed;
@@ -101,8 +103,8 @@ body::before {
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(65% 50% at 78% 8%,  rgba(255, 255, 255, 0.07) 0%, transparent 60%),
-    radial-gradient(55% 45% at 18% 88%, rgba(255, 255, 255, 0.04) 0%, transparent 60%);
+    radial-gradient(65% 50% at 78% 8%,  rgba(99, 102, 241, 0.08) 0%, transparent 60%),
+    radial-gradient(55% 45% at 18% 88%, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
   filter: blur(60px);
   animation: drift 40s ease-in-out infinite alternate;
 }
@@ -114,7 +116,7 @@ body::after {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.015) 1px, transparent 1px);
   background-size: 3px 3px;
 }
 
@@ -147,20 +149,26 @@ body::after {
 
 /* ── Selection ── */
 ::selection {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+  background: rgba(99, 102, 241, 0.18);
+  color: #1A1A1E;
+}
+
+/* ── Focus ring (accessibility on the lighter UI) ── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 999px;
   border: 1px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.30);
   background-clip: content-box;
 }

@@ -21,24 +21,26 @@
   display: flex; justify-content: flex-end; align-items: center;
   gap: 8px;
   padding: max(10px, env(safe-area-inset-top)) 14px 8px;
-  background: #0a0a0b;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
 }
 .topbar-water-wrap { display: flex; align-items: stretch; }
 .topbar-water-pill {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 9px 14px;
-  background: rgba(125, 211, 252, 0.08);
-  border: 1px solid rgba(125, 211, 252, 0.16);
+  background: rgba(99, 102, 241, 0.07);
+  border: 1px solid rgba(99, 102, 241, 0.18);
   border-right: none;
   border-radius: 12px 0 0 12px;
-  text-decoration: none; color: #FAFAFA;
+  text-decoration: none; color: #1A1A1E;
   -webkit-tap-highlight-color: transparent;
 }
 .topbar-water-pill .topbar-pill-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: #7DD3FC; flex-shrink: 0;
+  background: #6366F1; flex-shrink: 0;
 }
 .topbar-water-pill.warn .topbar-pill-dot { background: #fbbf24; }
 .topbar-water-pill.miss .topbar-pill-dot {
@@ -51,13 +53,13 @@
 }
 .topbar-pill-count {
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 13px; font-weight: 700; color: #FAFAFA;
+  font-size: 13px; font-weight: 700; color: #1A1A1E;
   font-variant-numeric: tabular-nums; white-space: nowrap;
 }
 .topbar-water-add {
   width: 44px;
-  border: 1px solid rgba(125, 211, 252, 0.16);
-  background: linear-gradient(180deg, rgba(125, 211, 252, 0.28), rgba(110, 231, 183, 0.28));
+  border: 1px solid rgba(99, 102, 241, 0.22);
+  background: linear-gradient(180deg, #6366F1, #4F46E5);
   color: #FFFFFF; font-family: inherit;
   font-size: 20px; font-weight: 700; line-height: 1;
   cursor: pointer; border-radius: 0 12px 12px 0;
@@ -66,39 +68,39 @@
 }
 .topbar-water-add:active { transform: scale(0.94); }
 .topbar-water-add.flash {
-  background: linear-gradient(180deg, rgba(125, 211, 252, 0.7), rgba(110, 231, 183, 0.7));
+  background: linear-gradient(180deg, #818CF8, #6366F1);
 }
 .topbar-finance-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 44px; height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.03);
   border-radius: 12px; text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s;
 }
-.topbar-finance-btn:hover { background: rgba(255, 255, 255, 0.08); }
+.topbar-finance-btn:hover { background: rgba(0, 0, 0, 0.06); }
 .topbar-finance-icon {
   font-size: 20px; line-height: 1;
-  filter: grayscale(100%) brightness(1.4); opacity: 0.85;
+  opacity: 0.85;
 }
 .bottombar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
   display: flex; justify-content: space-around; align-items: stretch;
   gap: 2px;
   padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
-  background: rgba(10, 10, 11, 0.72);
+  background: rgba(255, 255, 255, 0.80);
   backdrop-filter: blur(28px) saturate(1.6);
   -webkit-backdrop-filter: blur(28px) saturate(1.6);
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -4px 24px rgba(16, 16, 30, 0.06);
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
 }
 .bottombar-tab {
   flex: 1;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 4px; padding: 6px 0 5px; text-decoration: none;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(0, 0, 0, 0.40);
   font-size: 10px; font-weight: 600; letter-spacing: 0.03em;
   -webkit-tap-highlight-color: transparent; transition: color 0.2s var(--ease-fast, ease);
 }
@@ -107,15 +109,15 @@
   width: 46px; height: 30px;
   font-size: 21px; line-height: 1;
   border-radius: 11px;
-  filter: grayscale(100%) brightness(1.2); opacity: 0.55;
+  filter: grayscale(100%); opacity: 0.5;
   transition: opacity 0.2s, filter 0.2s, transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1),
               background 0.2s, box-shadow 0.2s;
 }
-.bottombar-tab.active { color: #FAFAFA; }
+.bottombar-tab.active { color: var(--accent, #6366F1); }
 .bottombar-tab.active .bottombar-tab-icon {
-  filter: grayscale(100%) brightness(1.7); opacity: 1;
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 2px 10px rgba(0, 0, 0, 0.3);
+  filter: none; opacity: 1;
+  background: var(--accent-soft, rgba(99, 102, 241, 0.10));
+  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.18);
   transform: translateY(-1px);
 }
 .bottombar-tab:not(.active):hover .bottombar-tab-icon { opacity: 0.8; }
@@ -323,6 +325,11 @@ html, body { -webkit-text-size-adjust: 100%; }
     document.addEventListener('gesturechange', blockGesture, { passive: false });
     document.addEventListener('gestureend', blockGesture, { passive: false });
   }
+
+  // Expose helpers so pages can reuse the hydration math + water logging
+  // without re-implementing it (health wellness ring, homepage quick action).
+  window.dashWaterProgress = getWaterProgress;
+  window.dashAddWater = addWater;
 
   function boot() {
     injectStyleAndHTML();
