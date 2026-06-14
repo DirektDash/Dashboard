@@ -28,6 +28,7 @@ Contact: rowan.wisere@gmail.com
 <script src="sync.js" defer></script>
 <script src="topbar.js" defer></script>
 <link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="cinematic.css">
 
 <!-- =============================================================
      EDIT THIS BLOCK TO MAKE THE APP YOURS.
@@ -108,8 +109,8 @@ html, body { background: transparent; }
 .divider {
   display: flex; align-items: center; gap: 14px; margin-bottom: 14px;
 }
-.divider::before { content: ''; width: 18px; height: 1px; background: rgba(0,0,0,0.14); }
-.divider::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0,0,0,0.10), transparent); }
+.divider::before { content: ''; width: 18px; height: 1px; background: rgba(255,255,255,0.14); }
+.divider::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255,255,255,0.10), transparent); }
 .divider span {
   font-family: var(--font-mono);
   font-size: 10.5px; letter-spacing: 0.18em; font-weight: 700;
@@ -149,21 +150,21 @@ html, body { background: transparent; }
 .water-bar-wrap { position: relative; margin: 14px 0 22px; }
 .water-bar-track {
   position: relative; height: 28px; border-radius: 14px;
-  background: rgba(0,0,0,0.04);
+  background: rgba(255,255,255,0.04);
   overflow: hidden;
 }
 .water-bar-fill {
   position: absolute; top: 0; bottom: 0; left: 0;
   border-radius: 14px;
-  background: linear-gradient(90deg, #3B82F6, #6366F1);
+  background: linear-gradient(90deg, #3B82F6, #46E0A8);
   transition: width 0.55s var(--spring-smooth);
 }
 .water-bar-fill.over {
-  background: linear-gradient(90deg, #6366F1, var(--warn));
+  background: linear-gradient(90deg, #46E0A8, var(--warn));
 }
 .water-bar-zone {
   position: absolute; top: 0; bottom: 0;
-  width: 1px; background: rgba(0,0,0,0.14);
+  width: 1px; background: rgba(255,255,255,0.14);
 }
 .water-bar-labels {
   display: flex; justify-content: space-between;
@@ -215,7 +216,7 @@ html, body { background: transparent; }
 /* ----- Why this target? collapsible ----- */
 .why-toggle {
   width: 100%; display: flex; align-items: center; justify-content: space-between;
-  background: rgba(0,0,0,0.03); border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
   color: var(--text-2); border-radius: var(--radius-sm);
   padding: 11px 14px; cursor: pointer; margin-top: 14px;
   font-family: inherit; font-size: 12px; font-weight: 600;
@@ -224,8 +225,8 @@ html, body { background: transparent; }
   transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
 .why-toggle:hover {
-  background: rgba(0,0,0,0.05);
-  border-color: rgba(0,0,0,0.14);
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.14);
   color: var(--text-1);
 }
 .why-arrow { transition: transform 0.2s; display: inline-flex; }
@@ -233,7 +234,7 @@ html, body { background: transparent; }
 .why-body {
   margin-top: 8px;
   padding: 14px 16px;
-  background: rgba(0,0,0,0.03);
+  background: rgba(255,255,255,0.03);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   display: none;
@@ -263,10 +264,10 @@ html, body { background: transparent; }
 .hist-row:last-child { border-bottom: none; }
 .hist-date { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); }
 .hist-bar-wrap {
-  height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden;
+  height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden;
 }
 .hist-bar-fill {
-  height: 100%; background: linear-gradient(90deg, #3B82F6, #6366F1);
+  height: 100%; background: linear-gradient(90deg, #3B82F6, #46E0A8);
   border-radius: 4px;
 }
 .hist-bar-fill.miss { background: rgba(239,68,68,0.55); }
@@ -281,7 +282,7 @@ html, body { background: transparent; }
 .spark-bar { fill: #3B82F6; }
 .spark-bar.miss { fill: rgba(239,68,68,0.55); }
 .spark-target {
-  stroke: rgba(0,0,0,0.20);
+  stroke: rgba(255,255,255,0.20);
   stroke-width: 1; stroke-dasharray: 3 3;
   vector-effect: non-scaling-stroke;
 }
@@ -289,7 +290,7 @@ html, body { background: transparent; }
 /* ----- Modal ----- */
 .modal-bg {
   display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.30);
+  background: rgba(255,255,255,0.30);
   z-index: 100; align-items: center; justify-content: center; padding: 20px;
 }
 .modal-bg.show { display: flex; }
@@ -316,7 +317,7 @@ html, body { background: transparent; }
   letter-spacing: 0.06em; text-transform: uppercase;
 }
 .field input[type="number"], .field input[type="text"], .field select {
-  background: rgba(0,0,0,0.03);
+  background: rgba(255,255,255,0.03);
   border: 1px solid var(--glass-border);
   color: var(--text-1);
   font-family: inherit; font-size: 14px;
@@ -333,7 +334,7 @@ html, body { background: transparent; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .seg {
   display: flex; gap: 4px;
-  background: rgba(0,0,0,0.03);
+  background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);
   border-radius: 10px; padding: 3px;
 }
@@ -351,7 +352,7 @@ html, body { background: transparent; }
 /* ----- Stimulant search ----- */
 .search-wrap { position: relative; }
 .search-input {
-  width: 100%; background: rgba(0,0,0,0.03);
+  width: 100%; background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);
   color: var(--text-1); font-family: inherit; font-size: 14px;
   padding: 11px 14px; border-radius: 10px; outline: none;
@@ -373,7 +374,7 @@ html, body { background: transparent; }
   cursor: pointer; font-size: 13px;
   -webkit-tap-highlight-color: transparent;
 }
-.search-result:hover { background: rgba(0,0,0,0.04); }
+.search-result:hover { background: rgba(255,255,255,0.04); }
 .search-result-name { color: var(--text-1); font-weight: 600; }
 .search-result-meta {
   font-size: 10.5px; color: var(--text-3);
@@ -385,7 +386,7 @@ html, body { background: transparent; }
 .sub-row {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 12px;
-  background: rgba(0,0,0,0.03);
+  background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);
   border-radius: 10px;
   flex-wrap: wrap;
@@ -399,7 +400,7 @@ html, body { background: transparent; }
 }
 .sub-row-dose {
   display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(0,0,0,0.03);
+  background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 4px 8px;
@@ -451,7 +452,7 @@ html, body { background: transparent; }
 }
 .btn-secondary:hover {
   background: var(--glass-bg-hover);
-  border-color: rgba(0,0,0,0.14);
+  border-color: rgba(255,255,255,0.14);
 }
 .modal-actions {
   display: flex; gap: 8px; margin-top: 16px;

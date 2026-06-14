@@ -16,10 +16,11 @@
 <script src="sync.js" defer></script>
 <script src="topbar.js" defer></script>
 <link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="cinematic.css">
 <style>
 :root {
-  --bg-input:       rgba(0, 0, 0, 0.03);
-  --bg-input-focus: #FFFFFF;
+  --bg-input:       rgba(255,255,255, 0.03);
+  --bg-input-focus: rgba(255,255,255,0.10);
 }
 
 main {
@@ -40,12 +41,12 @@ main {
 }
 .section-title::before {
   content: ''; width: 18px; height: 1px;
-  background: rgba(0,0,0,0.14);
+  background: rgba(255,255,255,0.14);
   flex-shrink: 0;
 }
 .section-title::after {
   content: ''; flex: 1; height: 1px;
-  background: linear-gradient(90deg, rgba(0,0,0,0.10), transparent);
+  background: linear-gradient(90deg, rgba(255,255,255,0.10), transparent);
 }
 
 .water-embed { margin-top: 56px; animation: slideUp 0.5s var(--spring-smooth) both; }
@@ -87,7 +88,7 @@ main {
 }
 
 .hl-track {
-  height: 5px; background: rgba(0,0,0,0.07);
+  height: 5px; background: rgba(255,255,255,0.07);
   border-radius: 999px; overflow: hidden; margin: 10px 0 4px;
 }
 .hl-fill {
@@ -130,15 +131,15 @@ main {
   color: var(--text-secondary); font-variant-numeric: tabular-nums;
 }
 .hl-goal-edit-btn {
-  background: rgba(0,0,0,0.04); border: 1px solid var(--border-soft);
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border-soft);
   color: var(--text-tertiary); font-size: 10px; font-family: var(--font-mono);
   font-weight: 700; letter-spacing: 0.06em; padding: 3px 9px; border-radius: 6px;
   cursor: pointer; transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
 .hl-goal-edit-btn:hover {
   color: var(--text-primary);
-  background: rgba(0,0,0,0.07);
-  border-color: rgba(0,0,0,0.14);
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.14);
 }
 
 .hl-week-strip {
@@ -151,15 +152,15 @@ main {
   color: var(--text-quaternary); text-transform: uppercase; font-family: var(--font-mono);
 }
 .hl-week-bar-wrap {
-  width: 100%; height: 36px; background: rgba(0,0,0,0.05);
+  width: 100%; height: 36px; background: rgba(255,255,255,0.05);
   border-radius: 5px; display: flex; align-items: flex-end; overflow: hidden;
 }
 .hl-week-bar {
-  width: 100%; min-height: 2px; background: rgba(0,0,0,0.14);
+  width: 100%; min-height: 2px; background: rgba(255,255,255,0.14);
   border-radius: 4px; transition: height 0.5s var(--spring-smooth);
 }
 .hl-week-bar.is-good  { background: var(--success); box-shadow: 0 0 8px rgba(16,185,129,0.35); }
-.hl-week-bar.is-today { box-shadow: 0 0 0 1.5px rgba(99,102,241,0.55); }
+.hl-week-bar.is-today { box-shadow: 0 0 0 1.5px rgba(70,224,168,0.55); }
 .hl-week-day-val {
   font-size: 9px; font-family: var(--font-mono);
   color: var(--text-tertiary); font-variant-numeric: tabular-nums;
@@ -186,17 +187,17 @@ main {
   outline: none;
   border-color: var(--accent);
   background: var(--bg-input-focus);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+  box-shadow: 0 0 0 3px rgba(70,224,168,0.15);
 }
 
 .hl-btn {
   font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: var(--radius-md);
   border: none;
-  background: linear-gradient(180deg, #6366F1 0%, #4F46E5 100%);
+  background: linear-gradient(180deg, #46E0A8 0%, #2FCF92 100%);
   color: #FFFFFF; cursor: pointer; white-space: nowrap; font-family: inherit;
   box-shadow:
-    0 4px 16px rgba(99,102,241,0.35),
-    0 1px 3px rgba(0,0,0,0.12);
+    0 4px 16px rgba(70,224,168,0.35),
+    0 1px 3px rgba(0,0,0,0.5);
   transition: transform 0.15s var(--spring-bounce), filter 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
@@ -208,7 +209,7 @@ main {
 /* ── Calorie indicator boxes ── */
 .cal-indicators { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
 .cal-box {
-  background: rgba(0,0,0,0.025);
+  background: rgba(255,255,255,0.025);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   padding: 14px 12px 12px;
@@ -216,7 +217,7 @@ main {
   transition: background 0.2s ease;
 }
 .cal-box:hover {
-  background: rgba(0,0,0,0.045);
+  background: rgba(255,255,255,0.045);
 }
 .cal-box-lbl {
   font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
@@ -235,11 +236,11 @@ main {
 .cal-food-list { display: flex; flex-direction: column; gap: 5px; }
 .cal-food-row {
   display: flex; align-items: center; gap: 10px; padding: 9px 12px;
-  border-radius: var(--radius-sm); background: rgba(0,0,0,0.025);
+  border-radius: var(--radius-sm); background: rgba(255,255,255,0.025);
   border: 1px solid var(--border-soft); font-size: 13px;
   transition: background 0.15s ease;
 }
-.cal-food-row:hover { background: rgba(0,0,0,0.05); }
+.cal-food-row:hover { background: rgba(255,255,255,0.05); }
 .cal-food-name {
   flex: 1; color: var(--text-primary); min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -263,14 +264,14 @@ main {
 .hl-goals-toggle {
   display: flex; align-items: center; justify-content: space-between;
   width: 100%; margin-top: 14px; padding: 10px 14px; border-radius: var(--radius-sm);
-  background: rgba(0,0,0,0.025); border: 1px solid var(--border-soft);
+  background: rgba(255,255,255,0.025); border: 1px solid var(--border-soft);
   color: var(--text-secondary); font-family: inherit; font-size: 12px; font-weight: 600;
   cursor: pointer; letter-spacing: 0.04em; transition: background 0.18s ease, border-color 0.18s ease;
   -webkit-tap-highlight-color: transparent;
 }
 .hl-goals-toggle:hover {
-  background: rgba(0,0,0,0.05);
-  border-color: rgba(0,0,0,0.14);
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.14);
 }
 .hl-goals-arrow { font-size: 10px; transition: transform 0.2s; }
 .hl-goals-panel { margin-top: 10px; }
@@ -280,14 +281,14 @@ main {
 .wellness-hero { margin-top: 8px; }
 .wellness-card {
   padding: 24px 22px 20px;
-  background: rgba(0,0,0,0.025);
+  background: rgba(255,255,255,0.025);
   border: 1px solid var(--border-soft);
   box-shadow: none;
 }
 .wellness-top { display: flex; align-items: center; gap: 22px; }
 .wellness-ring-wrap { position: relative; width: 116px; height: 116px; flex-shrink: 0; }
 .wellness-ring { width: 116px; height: 116px; transform: rotate(-90deg); }
-.wellness-ring-bg { fill: none; stroke: rgba(0,0,0,0.07); stroke-width: 10; }
+.wellness-ring-bg { fill: none; stroke: rgba(255,255,255,0.07); stroke-width: 10; }
 .wellness-ring-fill {
   fill: none; stroke: url(#wellnessGrad); stroke-width: 10; stroke-linecap: round;
   transition: stroke-dashoffset 0.8s var(--spring-smooth);
@@ -361,7 +362,7 @@ main {
             <defs>
               <linearGradient id="wellnessGrad" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%"  stop-color="#818CF8"/>
-                <stop offset="100%" stop-color="#6366F1"/>
+                <stop offset="100%" stop-color="#46E0A8"/>
               </linearGradient>
             </defs>
             <circle class="wellness-ring-bg"   cx="58" cy="58" r="50"/>

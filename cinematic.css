@@ -1,0 +1,88 @@
+/* ============================================================
+   cinematic.css — dark "Vitality" theme overlay
+   Link AFTER tokens.css on any page to flip it to the
+   cinematic dark theme. Overrides the canonical token names
+   so existing var(--…) usage converts automatically; pages
+   only need their few hardcoded light colors fixed by hand.
+   ============================================================ */
+:root {
+  /* Background */
+  --bg: #07090C;
+  --bg-2: #0B0E13;
+
+  /* Accent — teal/green, the "Vitality" brand */
+  --accent:        #46E0A8;
+  --accent-strong: #2FCF92;
+  --accent-soft:   rgba(70, 224, 168, 0.12);
+
+  /* Card surfaces — translucent on dark */
+  --glass-bg:        rgba(255, 255, 255, 0.028);
+  --glass-bg-hover:  rgba(255, 255, 255, 0.055);
+  --glass-bg-press:  rgba(255, 255, 255, 0.085);
+  --glass-border:    rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.05);
+  --bg-card:         rgba(255, 255, 255, 0.028);
+
+  /* Text — light scale on dark */
+  --text-primary:    #F4F6F8;
+  --text-secondary:  rgba(244, 246, 248, 0.62);
+  --text-tertiary:   rgba(244, 246, 248, 0.40);
+  --text-quaternary: rgba(244, 246, 248, 0.24);
+  --text-1: #F4F6F8;
+  --text-2: rgba(244, 246, 248, 0.62);
+  --text-3: rgba(244, 246, 248, 0.40);
+  --text-4: rgba(244, 246, 248, 0.24);
+
+  /* Status — brighter for legibility on dark */
+  --success: #34D399; --warning: #FBBF24; --danger: #F87171;
+  --good:    #34D399; --warn:    #FBBF24; --bad:    #F87171;
+  --info:    #60A5FA;
+
+  /* Borders */
+  --border:        rgba(255, 255, 255, 0.08);
+  --border-soft:   rgba(255, 255, 255, 0.05);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  /* Elevation — deep shadows read on dark */
+  --card-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 14px 36px rgba(0, 0, 0, 0.5);
+  --card-shadow-hover:
+    0 2px 6px rgba(0, 0, 0, 0.55),
+    0 22px 50px rgba(0, 0, 0, 0.6);
+
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+}
+
+html, body { background: var(--bg); color: var(--text-secondary); }
+
+/* Ambient cinematic backdrop (replaces the light radial glows) */
+body::before {
+  background:
+    radial-gradient(65% 50% at 78% 8%,  rgba(70, 224, 168, 0.10) 0%, transparent 60%),
+    radial-gradient(55% 45% at 18% 92%, rgba(80, 120, 255, 0.07) 0%, transparent 62%),
+    linear-gradient(180deg, #07090C 0%, #0B0E13 100%) !important;
+  filter: blur(50px) !important;
+}
+/* Grain — light specks on dark */
+body::after {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px) !important;
+}
+
+/* Selection + scrollbar for dark */
+::selection { background: rgba(70, 224, 168, 0.24); color: #F4F6F8; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.30); background-clip: content-box; }
+
+/* Inputs/selects default to the dark surface unless a page overrides */
+input, textarea, select { color: var(--text-primary); }
+input::placeholder, textarea::placeholder { color: var(--text-quaternary); }
+
+/* Native <select> dropdowns: the translucent card background renders as a
+   light popup, leaving light option text invisible. Force a solid dark
+   popup with light text so options are legible on every page. */
+select { background-color: #11151C; color: var(--text-primary); }
+option, optgroup {
+  background-color: #11151C !important;
+  color: var(--text-primary) !important;
+}

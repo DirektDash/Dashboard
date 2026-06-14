@@ -28,13 +28,24 @@
   const css = `
 .topbar {
   position: sticky; top: 0; z-index: 40;
-  display: flex; justify-content: flex-end; align-items: center;
+  display: flex; justify-content: space-between; align-items: center;
   gap: 8px;
   padding: max(10px, env(safe-area-inset-top)) 14px 8px;
-  background: var(--bg, #F5F5F7);
-  border-bottom: 1px solid var(--border-soft, rgba(0, 0, 0, 0.05));
+  background: transparent;
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
 }
+.topbar-home {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 14px 8px 11px; border-radius: 999px;
+  background: var(--glass-bg, rgba(255,255,255,0.03));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
+  color: var(--text-secondary, rgba(244,246,248,0.62));
+  text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 0.01em;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s, border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.2,0.64,1);
+}
+.topbar-home svg { width: 18px; height: 18px; }
+.topbar-home:hover { color: var(--text-primary, #F4F6F8); border-color: var(--border-strong, rgba(255,255,255,0.16)); transform: translateY(-1px); }
 .topbar-water-wrap { display: flex; align-items: stretch; }
 .topbar-water-pill {
   display: inline-flex; align-items: center; gap: 8px;
@@ -158,7 +169,8 @@ html, body { -webkit-text-size-adjust: 100%; }
 `;
 
   const topbarHtml = `
-<header class="topbar" id="topbar" role="navigation" aria-label="Quick actions">
+<header class="topbar" id="topbar" role="navigation" aria-label="Navigation">
+  <a href="index.html" class="topbar-home" id="topbarHome" aria-label="Home">${icon.home}<span>Home</span></a>
   <div class="topbar-water-wrap">
     <a href="health.html#water" class="topbar-water-pill" id="topbarWater" aria-label="Water progress">
       <span class="topbar-pill-dot"></span>
@@ -166,9 +178,6 @@ html, body { -webkit-text-size-adjust: 100%; }
     </a>
     <button class="topbar-water-add" id="topbarWaterAdd" aria-label="Log one drink" type="button">+</button>
   </div>
-  <a href="finance.html" class="topbar-finance-btn" id="topbarFinance" aria-label="Finance">
-    <span class="topbar-finance-icon">${icon.wallet}</span>
-  </a>
 </header>`;
 
   const bottombarHtml = `
@@ -213,14 +222,6 @@ html, body { -webkit-text-size-adjust: 100%; }
     const topWrap = document.createElement('div');
     topWrap.innerHTML = topbarHtml.trim();
     document.body.insertBefore(topWrap.firstChild, document.body.firstChild);
-    const bottomWrap = document.createElement('div');
-    bottomWrap.innerHTML = bottombarHtml.trim();
-    document.body.appendChild(bottomWrap.firstChild);
-    const active = currentPageKey();
-    document.querySelectorAll('.bottombar-tab').forEach((t) => {
-      t.classList.toggle('active', t.getAttribute('data-page') === active);
-    });
-    document.body.classList.add('has-bottombar');
   }
 
   function calendarDateKey() {
