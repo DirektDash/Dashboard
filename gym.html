@@ -49,20 +49,16 @@ html,body{min-height:100vh;overflow-x:hidden;}
 /* ===== CARD ===== */
 .card {
   background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--border-soft);
   border-radius: 20px;
   padding: 20px;
   margin-bottom: 12px;
-  backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  box-shadow: var(--card-shadow);
   animation: slideUp 0.45s cubic-bezier(0.22,1,0.36,1) both;
-  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.25s cubic-bezier(0.34,1.2,0.64,1);
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 .card:hover {
   background: var(--glass-bg-hover);
-  box-shadow: var(--card-shadow-hover);
-  transform: translateY(-2px);
+  border-color: var(--border);
 }
 .card-title{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px;}
 
@@ -108,7 +104,27 @@ html,body{min-height:100vh;overflow-x:hidden;}
 .today-ex-name{font-size:14px;font-weight:600;}
 .today-ex-meta{font-size:12px;color:var(--text-3);font-family:var(--font-mono);margin-top:3px;}
 .today-ex-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(16,185,129,0.12);color:var(--good);white-space:nowrap;margin-left:10px;}
-.today-rest{text-align:center;padding:40px 20px;color:var(--text-3);font-size:15px;}
+.today-rest{text-align:center;padding:24px 20px;color:var(--text-3);font-size:15px;}
+
+/* Workout picker */
+.picker-label{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3);margin:4px 0 10px;}
+.picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;}
+.picker-grid:last-child{margin-bottom:0;}
+.picker-btn{
+  display:flex;align-items:center;gap:10px;
+  padding:13px 14px;text-align:left;
+  background:rgba(0,0,0,0.03);border:1px solid var(--border-soft);border-radius:14px;
+  color:var(--text-1);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  transition:background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+.picker-btn:hover{background:rgba(0,0,0,0.06);border-color:rgba(0,0,0,0.14);}
+.picker-btn:active{transform:scale(0.98);}
+.picker-btn .picker-ic{color:var(--accent);flex-shrink:0;display:flex;align-items:center;}
+.picker-btn .picker-txt{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.picker-btn .picker-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.picker-btn .picker-sub{font-size:11px;font-weight:500;color:var(--text-3);}
+.picker-manual .picker-btn{background:transparent;}
+.picker-manual .picker-btn .picker-ic{color:var(--text-3);}
 
 /* Done banner */
 .done-banner{display:none;align-items:center;gap:12px;padding:14px 16px;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.28);border-radius:14px;margin-bottom:16px;color:var(--good);font-size:14px;font-weight:600;}
@@ -121,12 +137,13 @@ html,body{min-height:100vh;overflow-x:hidden;}
 .today-resume-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:pulse 1.6s ease-in-out infinite;}
 
 /* Rest timer */
-.rest-timer{display:none;text-align:center;margin:0 0 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--accent-strong);letter-spacing:0.04em;}
-.rest-timer.running{display:block;}
+.rest-timer{display:none;align-items:center;justify-content:center;gap:6px;margin:0 0 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--accent-strong);letter-spacing:0.04em;}
+.rest-timer.running{display:flex;}
+.rest-timer-ic{flex-shrink:0;}
 
 /* Finish summary */
 .session-summary{text-align:center;}
-.session-summary-emoji{font-size:44px;margin-bottom:6px;}
+.session-summary-icon{display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:var(--good);}
 .session-summary-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;}
 .session-summary-stat{display:flex;flex-direction:column;gap:3px;padding:14px 8px;background:rgba(0,0,0,0.03);border:1px solid var(--border);border-radius:14px;}
 .session-summary-stat .ss-num{font-size:24px;font-weight:800;color:var(--text-1);font-variant-numeric:tabular-nums;}
@@ -238,7 +255,7 @@ html,body{min-height:100vh;overflow-x:hidden;}
 .plan-ex-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(0,0,0,0.03);border:1px solid var(--border);border-radius:10px;}
 .plan-ex-item-name{flex:1;font-size:13px;font-weight:600;}
 .plan-ex-item-target{font-size:12px;color:var(--text-3);font-family:var(--font-mono);}
-.plan-ex-edit-btn{background:transparent;border:none;color:var(--text-4);font-size:15px;cursor:pointer;padding:4px 8px;}
+.plan-ex-edit-btn{display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:var(--text-4);cursor:pointer;padding:4px 8px;}
 .plan-ex-edit-btn:hover{color:var(--text-2);}
 .plan-add-ex-btn{width:100%;padding:10px;background:rgba(0,0,0,0.02);border:1px dashed var(--border);border-radius:10px;color:var(--text-3);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;margin-top:6px;}
 .plan-add-ex-btn:hover{background:rgba(0,0,0,0.05);color:var(--text-2);}
@@ -429,13 +446,18 @@ html,body{min-height:100vh;overflow-x:hidden;}
     </div>
 
     <div class="done-banner" id="doneBanner">
-      <span class="done-banner-icon">✓</span>
+      <span class="done-banner-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
       <span>Workout done!</span>
     </div>
 
     <div class="card">
       <div class="card-title">Today's exercises</div>
       <div class="today-exercise-list" id="todayExList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Start a workout</div>
+      <div id="todayPicker"></div>
     </div>
 
     <!-- Past workouts -->
@@ -549,7 +571,7 @@ html,body{min-height:100vh;overflow-x:hidden;}
     </div>
     <div class="session-progress" id="sessionProgress"></div>
     <div id="sessionExCard"></div>
-    <div class="rest-timer" id="restTimer">⏱ 0:00</div>
+    <div class="rest-timer" id="restTimer"><svg class="rest-timer-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="2" x2="14" y2="2"></line><line x1="12" y1="14" x2="15" y2="11"></line><circle cx="12" cy="14" r="8"></circle></svg> <span id="restTimerVal">0:00</span></div>
     <div class="session-nav">
       <button class="session-btn session-btn-prev" id="sessionPrev">← Back</button>
       <button class="session-btn session-btn-next" id="sessionNext">Next →</button>
@@ -850,54 +872,131 @@ function renderToday() {
   $('doneBanner').classList.toggle('show', isDone);
 
   const list = $('todayExList');
-  if (!day || day.rest) {
-    list.innerHTML = '<div class="today-rest">Rest day — recover well.</div>';
-    $('startWorkoutBtn').disabled = true;
-    return;
-  }
-  const exs = exsForDay(dayId);
-  if (!exs.length) {
-    list.innerHTML = '<div class="today-rest">No exercises planned — go to Plan to add some.</div>';
-    $('startWorkoutBtn').disabled = true;
-    return;
-  }
-  $('startWorkoutBtn').disabled = false;
+  const exs = (day && !day.rest) ? exsForDay(dayId) : [];
 
-  // Resume banner if an in-progress session exists for today
+  // Logging is always allowed — even on rest days or when nothing is planned.
+  // The Start button starts today's planned workout if there is one, otherwise
+  // it scrolls to the picker so the user can choose a preset or a manual type.
   const active = loadActive();
-  const resumable = active && active.dayId === dayId;
-  $('startWorkoutBtn').textContent = resumable ? 'Resume workout' : 'Start workout';
+  const resumable = !!active;
+  $('startWorkoutBtn').textContent = resumable ? 'Resume workout'
+    : (exs.length ? 'Start workout' : 'Choose workout');
 
   let resumeHtml = '';
   if (resumable) {
     const doneCount = (active.sets || []).filter(setArr => (setArr || []).some(s => s && s.checked)).length;
+    const total = active.exIds ? active.exIds.length : 0;
     resumeHtml = '<div class="today-resume" id="todayResume">'
       + '<span class="today-resume-dot"></span>'
-      + 'Workout in progress · ' + doneCount + '/' + (active.exIds ? active.exIds.length : exs.length) + ' exercises started'
+      + 'Workout in progress' + (total ? ' · ' + doneCount + '/' + total + ' exercises started' : '')
       + '</div>';
   }
 
-  list.innerHTML = resumeHtml + exs.map(ex => {
-    const rx = prescribeNext(ex, getExLogs(ex.id));
-    const badge = (ex.sets||3)+'×'+(rx.w ? rx.w+UNITS+' × '+rx.r : rx.r+' reps');
-    const ll = lastLog(ex.id);
-    const meta = ll ? ('Last: '+fmtSet(ex, ll)) : 'First time';
-    return '<div class="today-ex-row">'
-      + '<div><div class="today-ex-name">'+esc(ex.name)+'</div>'
-      + '<div class="today-ex-meta">'+meta+'</div></div>'
-      + '<span class="today-ex-badge">'+esc(badge)+'</span>'
-      + '</div>';
-  }).join('');
+  if (!exs.length) {
+    const msg = (!day || day.rest)
+      ? 'Rest day — log a workout below if you train today.'
+      : 'No exercises planned — pick a workout below to start logging.';
+    list.innerHTML = resumeHtml + '<div class="today-rest">' + msg + '</div>';
+  } else {
+    list.innerHTML = resumeHtml + exs.map(ex => {
+      const rx = prescribeNext(ex, getExLogs(ex.id));
+      const badge = (ex.sets||3)+'×'+(rx.w ? rx.w+UNITS+' × '+rx.r : rx.r+' reps');
+      const ll = lastLog(ex.id);
+      const meta = ll ? ('Last: '+fmtSet(ex, ll)) : 'First time';
+      return '<div class="today-ex-row">'
+        + '<div><div class="today-ex-name">'+esc(ex.name)+'</div>'
+        + '<div class="today-ex-meta">'+meta+'</div></div>'
+        + '<span class="today-ex-badge">'+esc(badge)+'</span>'
+        + '</div>';
+    }).join('');
+  }
 
+  renderPicker();
   renderPastWorkouts();
 }
 
+// Quick-select menu of preset weekly workouts + manual log types.
+const IC_DUMBBELL = '<svg class="picker-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"></path><path d="m21 21-1-1"></path><path d="m3 3 1 1"></path><path d="m18 22 4-4"></path><path d="m2 6 4-4"></path><path d="m3 10 7-7"></path><path d="m14 21 7-7"></path></svg>';
+const IC_PLUS = '<svg class="picker-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>';
+
+// Manual log categories (no preset exercises — start a blank labeled log).
+const MANUAL_TYPES = ['Cardio', 'Upper', 'Lower', 'Abs', 'Full Body', 'Other'];
+
+function renderPicker() {
+  const cont = $('todayPicker');
+  if (!cont) return;
+  const todayId = todayDayId();
+  const presets = plan.days.filter(d => !d.rest);
+
+  let html = '';
+  if (presets.length) {
+    html += '<div class="picker-label">Your weekly workouts</div>';
+    html += '<div class="picker-grid">' + presets.map(d => {
+      const n = exsForDay(d.id).length;
+      const sub = (d.id === todayId ? 'Today · ' : '') + n + ' exercise' + (n === 1 ? '' : 's');
+      return '<button class="picker-btn" data-preset="'+esc(d.id)+'">'
+        + IC_DUMBBELL
+        + '<span class="picker-txt"><span class="picker-name">'+esc(d.name)+'</span>'
+        + '<span class="picker-sub">'+esc(sub)+'</span></span>'
+        + '</button>';
+    }).join('') + '</div>';
+  }
+
+  html += '<div class="picker-label">Manual log</div>';
+  html += '<div class="picker-grid picker-manual">' + MANUAL_TYPES.map(t =>
+    '<button class="picker-btn" data-manual="'+esc(t)+'">'
+      + IC_PLUS
+      + '<span class="picker-txt"><span class="picker-name">'+esc(t)+'</span></span>'
+      + '</button>'
+  ).join('') + '</div>';
+
+  cont.innerHTML = html;
+
+  cont.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const d = dayById(btn.dataset.preset);
+      if (!d) return;
+      openSession(exsForDay(d.id), d.name, d.id);
+    });
+  });
+  cont.querySelectorAll('[data-manual]').forEach(btn => {
+    btn.addEventListener('click', () => openSessionManual(btn.dataset.manual));
+  });
+}
+
 $('startWorkoutBtn').addEventListener('click', () => {
+  const active = loadActive();
+  if (active) {
+    // Resume whatever session is in progress today (planned or manual). Prefer
+    // the stored exercise snapshot; fall back to plan lookup for older blobs.
+    let exs = Array.isArray(active.exs) ? active.exs : null;
+    if (!exs) {
+      const byId = {};
+      plan.exercises.forEach(e => { byId[e.id] = e; });
+      exs = (active.exIds || []).map(id => byId[id]).filter(Boolean);
+    }
+    if (exs && exs.length) { openSession(exs, active.title, active.dayId); return; }
+  }
   const dayId = todayDayId();
-  const exs = exsForDay(dayId);
-  if (!exs.length) return;
-  openSession(exs, dayById(dayId).name, dayId);
+  const day = dayById(dayId);
+  const exs = (day && !day.rest) ? exsForDay(dayId) : [];
+  if (exs.length) { openSession(exs, day.name, dayId); return; }
+  // Nothing planned — send the user to the picker.
+  const picker = $('todayPicker');
+  if (picker) picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
+
+// Start a blank, labeled log for a manual category. Uses a synthetic day id so
+// autosave/resume keeps working, and a single ad-hoc exercise (its own session
+// key) so sets are committed through the existing gym_sessions_v2 mechanism.
+function openSessionManual(type) {
+  const adhoc = {
+    id: 'manual_' + Date.now() + '_' + Math.floor(Math.random()*99999),
+    name: type,
+    sets: 3, repMin: 1, repMax: 20, step: 2.5, startWeight: 0, notes: ''
+  };
+  openSession([adhoc], type, 'manual:' + type);
+}
 
 // ============================================================
 // SESSION OVERLAY
@@ -919,6 +1018,9 @@ function saveActive() {
       title: sessTitle,
       idx: sessIdx,
       exIds: sessExs.map(e => e.id),
+      // Full exercise snapshot so manual/ad-hoc sessions (whose exercises are not
+      // in plan.exercises) can be rebuilt on resume. Transient autosave blob only.
+      exs: sessExs,
       sets: sessSets,
       startedAt: new Date().toISOString()
     }));
@@ -976,6 +1078,11 @@ function openSession(exs, title, dayId) {
   const active = loadActive();
   if (active && active.dayId === sessDayId && Array.isArray(active.sets)
       && active.sets.length === sessSets.length) {
+    // Reuse the snapshotted exercises so ids/notes match the restored sets
+    // (matters for manual ad-hoc exercises that aren't in plan.exercises).
+    if (Array.isArray(active.exs) && active.exs.length === sessSets.length) {
+      sessExs = active.exs;
+    }
     sessSets = active.sets;
     sessIdx = Math.min(Math.max(0, active.idx || 0), sessExs.length - 1);
   }
@@ -1003,9 +1110,10 @@ function startRest() {
   if (!el) return;
   restStart = Date.now();
   el.classList.add('running');
+  const valEl = $('restTimerVal');
   const tick = () => {
     const s = Math.floor((Date.now() - restStart) / 1000);
-    el.textContent = '⏱ ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    if (valEl) valEl.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
   };
   tick();
   if (restTimer) clearInterval(restTimer);
@@ -1185,7 +1293,7 @@ function showFinishSummary() {
   });
   const card = $('sessionExCard');
   card.innerHTML = '<div class="session-ex-card session-summary">'
-    + '<div class="session-summary-emoji">🎉</div>'
+    + '<div class="session-summary-icon"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.8 11.3 2 22l10.7-3.79"></path><path d="M4 3h.01"></path><path d="M22 8h.01"></path><path d="M15 2h.01"></path><path d="M22 20h.01"></path><path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 12"></path><path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11c-.11.7-.72 1.22-1.43 1.22H17"></path><path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"></path><path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"></path></svg></div>'
     + '<div class="session-ex-name" style="text-align:center">Workout complete</div>'
     + '<div class="session-summary-stats">'
     +   '<div class="session-summary-stat"><span class="ss-num">' + exDone + '</span><span class="ss-lbl">exercises</span></div>'
@@ -1229,7 +1337,7 @@ function renderPlan() {
         return '<div class="plan-ex-item">'
           + '<div style="flex:1"><div class="plan-ex-item-name">'+esc(ex.name)+'</div>'
           + '<div class="plan-ex-item-target">'+esc(target)+'</div></div>'
-          + '<button class="plan-ex-edit-btn" data-exid="'+ex.id+'">✎</button>'
+          + '<button class="plan-ex-edit-btn" data-exid="'+ex.id+'" aria-label="Edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>'
           + '</div>';
       }).join('')+'</div>';
     }
