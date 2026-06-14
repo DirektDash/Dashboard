@@ -42,45 +42,58 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 .wk-title {
   margin: 0;
   font-size: 30px; font-weight: 700; letter-spacing: -0.03em;
-  background: linear-gradient(180deg, #1A1A1E 0%, #4F46E5 100%);
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent; color: transparent;
+  color: var(--text-primary);
 }
 .wk-new-btn {
   display: inline-flex; align-items: center; gap: 7px;
-  padding: 11px 18px;
+  padding: 11px 16px;
   border: 0; border-radius: var(--radius-md);
-  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-strong) 100%);
+  background: var(--accent);
   color: #fff; font-family: inherit; font-size: 13px; font-weight: 700;
   cursor: pointer;
-  box-shadow: var(--card-shadow);
   transition: transform 0.15s var(--spring-bounce), filter 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
-.wk-new-btn:hover { filter: brightness(1.04); transform: translateY(-1px); }
+.wk-new-btn:hover { filter: brightness(1.05); }
 .wk-new-btn:active { transform: scale(0.97); }
-.wk-new-btn-plus { font-size: 16px; line-height: 1; }
+.wk-new-btn svg { width: 16px; height: 16px; }
 @media (max-width: 480px) { .wk-title { font-size: 24px; } }
+
+/* ===== Tab switcher (Projects / Timer) ===== */
+.wk-tabs {
+  display: inline-flex; gap: 2px; padding: 3px;
+  margin-bottom: 22px;
+  border-radius: 999px;
+  background: var(--border-soft);
+  animation: slideUp 0.45s var(--spring-smooth) 0.05s both;
+}
+.wk-tab {
+  border: 0; background: transparent;
+  padding: 8px 18px; border-radius: 999px;
+  color: var(--text-secondary);
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px;
+  transition: background 0.18s, color 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.wk-tab svg { width: 15px; height: 15px; }
+.wk-tab:hover { color: var(--text-primary); }
+.wk-tab.active {
+  background: #FFFFFF;
+  color: var(--text-primary);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.wk-view { display: none; }
+.wk-view.active { display: block; }
 
 /* ===== Stat strip ===== */
 .wk-stats {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-  margin-bottom: 20px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+  margin-bottom: 22px; padding: 4px 2px 18px;
+  border-bottom: 1px solid var(--border-soft);
 }
-.wk-stat {
-  display: flex; flex-direction: column; gap: 6px;
-  padding: 14px 14px 13px;
-  border-radius: var(--radius-lg);
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  box-shadow: var(--card-shadow);
-  animation: slideUp 0.45s var(--spring-smooth) 0.08s both;
-}
-.wk-stat:nth-child(2) { animation-delay: 0.13s; }
-.wk-stat:nth-child(3) { animation-delay: 0.18s; }
-.wk-stat:nth-child(4) { animation-delay: 0.23s; }
+.wk-stat { display: flex; flex-direction: column; gap: 6px; }
 .wk-stat-label {
   font-family: var(--font-mono);
   font-size: 9px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
@@ -95,7 +108,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 .wk-stat-value.accent-hold   { color: var(--work-hold); }
 .wk-stat-value.accent-done   { color: var(--work-done); }
 @media (max-width: 560px) {
-  .wk-stats { grid-template-columns: 1fr 1fr; }
+  .wk-stats { grid-template-columns: 1fr 1fr; gap: 18px; }
   .wk-stat-value { font-size: 22px; }
 }
 
@@ -104,10 +117,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
   display: inline-flex; gap: 3px; padding: 4px;
   margin-bottom: 18px;
   border-radius: 999px;
-  background: rgba(0,0,0,0.03);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--border-soft);
   animation: slideUp 0.45s var(--spring-smooth) 0.26s both;
 }
 .wk-filter {
@@ -128,9 +138,9 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 }
 .wk-filter:hover { color: var(--text-primary); }
 .wk-filter.active {
-  background: var(--glass-bg);
+  background: #FFFFFF;
   color: var(--text-primary);
-  box-shadow: var(--card-shadow);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 .wk-filter.active .wk-filter-count { background: rgba(0,0,0,0.06); color: var(--text-primary); }
 @media (max-width: 480px) {
@@ -138,34 +148,32 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
   .wk-filter { flex: 1 0 auto; justify-content: center; }
 }
 
-/* ===== Project grid ===== */
-.wk-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+/* ===== Project list ===== */
+.wk-grid { display: grid; grid-template-columns: 1fr; gap: 4px; }
 
 .wk-proj {
-  position: relative; overflow: hidden;
-  border-radius: var(--radius-lg);
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  box-shadow: var(--card-shadow);
-  transition: background 0.25s, box-shadow 0.25s, transform 0.25s var(--spring-card);
-  animation: slideUp 0.45s var(--spring-smooth) 0.3s both;
+  position: relative;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border-bottom: 1px solid var(--border-soft);
+  transition: background 0.2s;
+  animation: slideUp 0.4s var(--spring-smooth) 0.3s both;
 }
-.wk-proj:hover { background: var(--glass-bg-hover); box-shadow: var(--card-shadow-hover); }
-.wk-proj::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-  background: var(--work-active); opacity: 0.85;
-}
-.wk-proj[data-status="hold"]::before { background: var(--work-hold); }
-.wk-proj[data-status="done"]::before { background: var(--work-done); }
-.wk-proj[data-status="done"] { opacity: 0.82; }
+.wk-proj:last-child { border-bottom: 0; }
+.wk-proj.is-open { background: #FFFFFF; border-radius: var(--radius-lg); border-bottom-color: transparent; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(16,16,30,0.05); margin: 4px 0; }
+.wk-proj[data-status="done"] { opacity: 0.7; }
 
 .wk-proj-head {
   display: flex; align-items: flex-start; gap: 12px;
-  padding: 18px 18px 14px;
+  padding: 16px 14px 14px;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
+.wk-proj-dot {
+  width: 8px; height: 8px; border-radius: 50%; margin-top: 7px; flex-shrink: 0;
+  background: var(--work-active);
+}
+.wk-proj[data-status="hold"] .wk-proj-dot { background: var(--work-hold); }
+.wk-proj[data-status="done"] .wk-proj-dot { background: var(--work-done); }
 .wk-proj-main { flex: 1; min-width: 0; }
 .wk-proj-title-row { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
 .wk-proj-name {
@@ -187,9 +195,9 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 }
 .wk-badge:active { transform: scale(0.94); }
 .wk-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.wk-badge.status-active { color: var(--work-active); background: rgba(99,102,241,0.10);  border-color: rgba(99,102,241,0.28); }
-.wk-badge.status-hold   { color: var(--work-hold);   background: rgba(245,158,11,0.12);  border-color: rgba(245,158,11,0.28); }
-.wk-badge.status-done   { color: var(--work-done);   background: rgba(16,185,129,0.12);  border-color: rgba(16,185,129,0.28); }
+.wk-badge.status-active { color: var(--work-active); background: rgba(99,102,241,0.10);  border-color: rgba(99,102,241,0.22); }
+.wk-badge.status-hold   { color: var(--work-hold);   background: rgba(245,158,11,0.12);  border-color: rgba(245,158,11,0.22); }
+.wk-badge.status-done   { color: var(--work-done);   background: rgba(16,185,129,0.12);  border-color: rgba(16,185,129,0.22); }
 
 .wk-prio {
   font-family: var(--font-mono);
@@ -207,6 +215,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
   font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary);
 }
 .wk-proj-meta .wk-meta-item { display: inline-flex; align-items: center; gap: 5px; }
+.wk-proj-meta .wk-meta-item svg { width: 12px; height: 12px; }
 .wk-meta-item.is-overdue { color: var(--danger); }
 .wk-meta-item.is-soon { color: var(--warning); }
 
@@ -216,51 +225,51 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
   letter-spacing: -0.02em; color: var(--text-primary); line-height: 1;
 }
 .wk-chev {
-  color: var(--text-tertiary); font-size: 13px; line-height: 1;
+  color: var(--text-tertiary); line-height: 0;
   transition: transform 0.25s var(--spring-smooth);
 }
+.wk-chev svg { width: 16px; height: 16px; }
 .wk-proj.is-open .wk-chev { transform: rotate(180deg); }
 
 /* progress bar */
 .wk-progress {
-  height: 5px; margin: 2px 18px 0; border-radius: 999px;
+  height: 4px; margin: 2px 14px 0; border-radius: 999px;
   background: rgba(0,0,0,0.06); overflow: hidden;
 }
 .wk-progress-fill {
   height: 100%; border-radius: 999px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  background: var(--accent);
   transition: width 0.6s var(--spring-smooth);
 }
 .wk-proj[data-status="done"] .wk-progress-fill { background: var(--work-done); }
 .wk-proj[data-status="hold"] .wk-progress-fill { background: var(--work-hold); opacity: 0.8; }
 
 /* expandable body */
-.wk-proj-body { display: none; padding: 14px 18px 18px; }
+.wk-proj-body { display: none; padding: 14px 14px 18px; }
 .wk-proj.is-open .wk-proj-body { display: block; animation: fadeIn 0.25s ease both; }
 
 .wk-tasks { list-style: none; margin: 0 0 10px; padding: 0; }
 .wk-task {
   display: flex; align-items: center; gap: 11px;
-  padding: 9px 12px; margin-bottom: 5px;
-  background: rgba(0,0,0,0.03);
-  border: 1px solid var(--glass-border);
+  padding: 9px 12px; margin-bottom: 4px;
+  background: rgba(0,0,0,0.025);
   border-radius: var(--radius-md);
-  transition: background 0.18s, border-color 0.18s, opacity 0.25s;
+  transition: background 0.18s, opacity 0.25s;
 }
-.wk-task:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.14); }
+.wk-task:hover { background: rgba(0,0,0,0.045); }
 .wk-task.done { opacity: 0.42; }
 .wk-task.done .wk-task-text { text-decoration: line-through; text-decoration-color: rgba(0,0,0,0.35); }
 .wk-check {
   appearance: none; -webkit-appearance: none;
   width: 19px; height: 19px; flex-shrink: 0; margin: 0;
   border: 1.5px solid rgba(0,0,0,0.18);
-  background: rgba(0,0,0,0.03); border-radius: 6px;
+  background: #FFFFFF; border-radius: 6px;
   position: relative; cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, box-shadow 0.25s, transform 0.15s var(--spring-bounce);
+  transition: background 0.2s, border-color 0.2s, transform 0.15s var(--spring-bounce);
 }
 .wk-check:checked {
   background: var(--success); border-color: var(--success);
-  box-shadow: 0 0 12px rgba(16,185,129,0.3); transform: scale(1.05);
+  transform: scale(1.05);
 }
 .wk-check:checked::after {
   content: ''; position: absolute; left: 5px; top: 1.5px;
@@ -274,36 +283,37 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 .wk-task-text[contenteditable="true"] { outline: 1px solid var(--accent); background: rgba(0,0,0,0.03); }
 .wk-task-del {
   border: 0; background: transparent; color: var(--text-tertiary);
-  font-size: 17px; cursor: pointer; padding: 0 3px; opacity: 0.5;
+  cursor: pointer; padding: 2px; opacity: 0.5; line-height: 0;
   transition: opacity 0.2s, color 0.2s;
 }
+.wk-task-del svg { width: 15px; height: 15px; }
 .wk-task:hover .wk-task-del { opacity: 1; }
 .wk-task-del:hover { color: var(--danger); }
 
-.wk-task-add {
-  display: flex; gap: 8px; align-items: center; margin-top: 4px;
-}
+.wk-task-add { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
 .wk-task-input {
   flex: 1; min-width: 0; padding: 9px 12px;
-  border: 1px solid var(--glass-border); border-radius: var(--radius-md);
-  background: rgba(0,0,0,0.03); color: var(--text-primary);
+  border: 1px solid var(--border-soft); border-radius: var(--radius-md);
+  background: rgba(0,0,0,0.025); color: var(--text-primary);
   font-family: inherit; font-size: 13px; outline: none;
   transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
 }
 .wk-task-input::placeholder { color: var(--text-quaternary); }
 .wk-task-input:focus { border-color: var(--accent); background: #FFFFFF; box-shadow: 0 0 0 3px var(--accent-soft); }
 .wk-task-add-btn {
-  padding: 9px 14px; border: 1px solid var(--glass-border); border-radius: var(--radius-md);
-  background: rgba(0,0,0,0.03); color: var(--text-secondary);
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 9px 14px; border: 1px solid var(--border-soft); border-radius: var(--radius-md);
+  background: rgba(0,0,0,0.025); color: var(--text-secondary);
   font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
   transition: background 0.18s, color 0.18s, border-color 0.18s;
 }
-.wk-task-add-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); border-color: rgba(0,0,0,0.14); }
+.wk-task-add-btn svg { width: 14px; height: 14px; }
+.wk-task-add-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); }
 
 .wk-proj-footer {
   display: flex; align-items: center; justify-content: space-between;
   margin-top: 14px; padding-top: 12px;
-  border-top: 1px solid var(--glass-border);
+  border-top: 1px solid var(--border-soft);
 }
 .wk-tasks-empty { font-size: 12px; font-style: italic; color: var(--text-tertiary); padding: 6px 0 12px; }
 .wk-proj-delete {
@@ -314,16 +324,162 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 }
 .wk-proj-delete:hover { color: var(--danger); background: rgba(239,68,68,0.08); }
 
-/* empty page state */
+/* ===== Empty state (shared) ===== */
 .wk-empty {
-  text-align: center; padding: 56px 24px;
-  border-radius: var(--radius-lg);
-  background: var(--glass-bg); border: 1px dashed var(--glass-border);
+  text-align: center; padding: 64px 24px;
   animation: slideUp 0.45s var(--spring-smooth) 0.3s both;
 }
-.wk-empty-icon { font-size: 40px; margin-bottom: 12px; filter: grayscale(0.2); }
-.wk-empty-title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
-.wk-empty-sub { font-size: 13px; color: var(--text-tertiary); }
+.wk-empty-icon {
+  width: 56px; height: 56px; margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 18px;
+  background: var(--accent-soft); color: var(--accent);
+}
+.wk-empty-icon svg { width: 28px; height: 28px; }
+.wk-empty-title { font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.wk-empty-sub { font-size: 13px; color: var(--text-tertiary); max-width: 320px; margin: 0 auto 20px; line-height: 1.5; }
+.wk-empty-cta {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 18px; border: 0; border-radius: var(--radius-md);
+  background: var(--accent); color: #fff;
+  font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: filter 0.15s, transform 0.15s var(--spring-bounce);
+}
+.wk-empty-cta svg { width: 16px; height: 16px; }
+.wk-empty-cta:hover { filter: brightness(1.05); }
+.wk-empty-cta:active { transform: scale(0.97); }
+
+/* ===== Timer view ===== */
+.tm-setup {
+  background: #FFFFFF; border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(16,16,30,0.05);
+  padding: 22px; margin-bottom: 24px;
+  animation: slideUp 0.4s var(--spring-smooth) 0.05s both;
+}
+.tm-setup-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-tertiary); margin-bottom: 10px; display: block;
+}
+.tm-types { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.tm-type {
+  flex: 1 1 0; min-width: 80px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 12px 10px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-soft); background: rgba(0,0,0,0.025);
+  color: var(--text-secondary); font-family: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.tm-type svg { width: 16px; height: 16px; }
+.tm-type.sel { background: var(--accent-soft); color: var(--accent); border-color: rgba(99,102,241,0.28); }
+.tm-note {
+  width: 100%; padding: 11px 14px; margin-bottom: 18px;
+  border: 1px solid var(--border-soft); border-radius: var(--radius-md);
+  background: rgba(0,0,0,0.025); color: var(--text-primary);
+  font-family: inherit; font-size: 14px; outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+}
+.tm-note::placeholder { color: var(--text-quaternary); }
+.tm-note:focus { border-color: var(--accent); background: #FFFFFF; box-shadow: 0 0 0 3px var(--accent-soft); }
+.tm-start {
+  width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 15px; border: 0; border-radius: var(--radius-md);
+  background: var(--accent); color: #fff;
+  font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: filter 0.15s, transform 0.15s var(--spring-bounce);
+}
+.tm-start svg { width: 18px; height: 18px; }
+.tm-start:hover { filter: brightness(1.05); }
+.tm-start:active { transform: scale(0.98); }
+
+/* active session — focused */
+.tm-active {
+  display: none;
+  text-align: center; padding: 48px 24px 40px;
+  background: #FFFFFF; border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(16,16,30,0.05);
+  margin-bottom: 24px;
+  animation: fadeIn 0.3s ease both;
+}
+.tm-active.on { display: block; }
+.tm-active-type {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent);
+  margin-bottom: 18px;
+}
+.tm-active-type svg { width: 14px; height: 14px; }
+.tm-clock {
+  font-size: 72px; font-weight: 700; line-height: 1;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.04em;
+  color: var(--text-primary); margin-bottom: 8px;
+}
+.tm-active-note { font-size: 14px; color: var(--text-tertiary); margin-bottom: 32px; min-height: 18px; }
+.tm-active-actions { display: flex; gap: 12px; justify-content: center; }
+.tm-ctrl {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 26px; border-radius: var(--radius-md);
+  font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  border: 1px solid var(--border-soft); background: rgba(0,0,0,0.03); color: var(--text-secondary);
+  transition: background 0.18s, color 0.18s, filter 0.15s, transform 0.15s var(--spring-bounce);
+}
+.tm-ctrl svg { width: 16px; height: 16px; }
+.tm-ctrl:active { transform: scale(0.97); }
+.tm-ctrl.primary { background: var(--accent); color: #fff; border-color: transparent; }
+.tm-ctrl.primary:hover { filter: brightness(1.05); }
+.tm-ctrl.stop { background: rgba(239,68,68,0.10); color: var(--danger); border-color: rgba(239,68,68,0.22); }
+.tm-ctrl.stop:hover { background: rgba(239,68,68,0.16); }
+@media (max-width: 480px) { .tm-clock { font-size: 56px; } }
+
+/* history */
+.tm-hist-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: 4px 2px 12px;
+}
+.tm-hist-title {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.tm-hist-total { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+.tm-hist { display: flex; flex-direction: column; }
+.tm-hist-day-label {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-quaternary);
+  margin: 16px 2px 6px;
+}
+.tm-row {
+  display: flex; align-items: center; gap: 13px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--border-soft);
+  animation: fadeIn 0.3s ease both;
+}
+.tm-row:last-child { border-bottom: 0; }
+.tm-row-icon {
+  width: 34px; height: 34px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 11px; background: var(--accent-soft); color: var(--accent);
+}
+.tm-row-icon svg { width: 17px; height: 17px; }
+.tm-row-icon.rest { background: rgba(245,158,11,0.12); color: var(--warning); }
+.tm-row-main { flex: 1; min-width: 0; }
+.tm-row-type { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.tm-row-note {
+  font-size: 12px; color: var(--text-tertiary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tm-row-side { text-align: right; flex-shrink: 0; }
+.tm-row-dur { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-primary); letter-spacing: -0.01em; }
+.tm-row-time { font-family: var(--font-mono); font-size: 10px; color: var(--text-quaternary); }
+.tm-row-del {
+  border: 0; background: transparent; color: var(--text-quaternary);
+  cursor: pointer; padding: 4px; line-height: 0; opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+}
+.tm-row-del svg { width: 15px; height: 15px; }
+.tm-row:hover .tm-row-del { opacity: 0.6; }
+.tm-row-del:hover { color: var(--danger); opacity: 1; }
 
 /* ===== Modal ===== */
 .wk-modal-bg {
@@ -338,10 +494,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 .wk-modal {
   width: 100%; max-width: 420px;
   border-radius: var(--radius-lg);
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(40px) saturate(1.6);
-  -webkit-backdrop-filter: blur(40px) saturate(1.6);
+  background: #FFFFFF;
   box-shadow: var(--card-shadow-hover);
   padding: 24px;
   animation: slideUp 0.3s var(--spring-card) both;
@@ -355,18 +508,18 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 }
 .wk-field input[type="text"], .wk-field input[type="date"] {
   width: 100%; padding: 11px 14px;
-  border: 1px solid var(--glass-border); border-radius: var(--radius-md);
-  background: rgba(0,0,0,0.03); color: var(--text-primary);
+  border: 1px solid var(--border-soft); border-radius: var(--radius-md);
+  background: rgba(0,0,0,0.025); color: var(--text-primary);
   font-family: inherit; font-size: 14px; outline: none;
-  transition: border-color 0.18s, box-shadow 0.18s;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
 }
 .wk-field input::placeholder { color: var(--text-quaternary); }
-.wk-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.wk-field input:focus { border-color: var(--accent); background: #FFFFFF; box-shadow: 0 0 0 3px var(--accent-soft); }
 .wk-field input[type="date"] { color-scheme: light; }
 .wk-seg { display: flex; gap: 6px; }
 .wk-seg-btn {
   flex: 1; padding: 9px 8px; border-radius: var(--radius-md);
-  border: 1px solid var(--glass-border); background: rgba(0,0,0,0.03);
+  border: 1px solid var(--border-soft); background: rgba(0,0,0,0.025);
   color: var(--text-secondary); font-family: inherit; font-size: 12px; font-weight: 600;
   cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s;
   -webkit-tap-highlight-color: transparent;
@@ -377,19 +530,18 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 .wk-modal-actions { display: flex; gap: 10px; margin-top: 22px; }
 .wk-btn-cancel {
   flex: 1; padding: 12px; border-radius: var(--radius-md);
-  border: 1px solid var(--glass-border); background: transparent;
+  border: 1px solid var(--border-soft); background: transparent;
   color: var(--text-secondary); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
   transition: background 0.18s, color 0.18s;
 }
 .wk-btn-cancel:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); }
 .wk-btn-save {
   flex: 1.4; padding: 12px; border-radius: var(--radius-md); border: 0;
-  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-strong) 100%); color: #fff;
+  background: var(--accent); color: #fff;
   font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
-  box-shadow: var(--card-shadow);
   transition: transform 0.15s var(--spring-bounce), filter 0.15s;
 }
-.wk-btn-save:hover { filter: brightness(1.04); transform: translateY(-1px); }
+.wk-btn-save:hover { filter: brightness(1.05); }
 .wk-btn-save:active { transform: scale(0.97); }
 
 @media (max-width: 480px) {
@@ -413,43 +565,119 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
       <h1 class="wk-title">Work</h1>
     </div>
     <button type="button" class="wk-new-btn" id="newProjectBtn">
-      <span class="wk-new-btn-plus">+</span> New Project
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Project
     </button>
   </header>
 
-  <div class="wk-stats">
-    <div class="wk-stat">
-      <span class="wk-stat-label">Active</span>
-      <span class="wk-stat-value accent-active" id="statActive">0</span>
-    </div>
-    <div class="wk-stat">
-      <span class="wk-stat-label">On Hold</span>
-      <span class="wk-stat-value accent-hold" id="statHold">0</span>
-    </div>
-    <div class="wk-stat">
-      <span class="wk-stat-label">Open Tasks</span>
-      <span class="wk-stat-value" id="statTasks">0</span>
-    </div>
-    <div class="wk-stat">
-      <span class="wk-stat-label">Done</span>
-      <span class="wk-stat-value accent-done" id="statDone">0</span>
-    </div>
+  <div class="wk-tabs" id="tabs">
+    <button type="button" class="wk-tab active" data-view="projects">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      Projects
+    </button>
+    <button type="button" class="wk-tab" data-view="timer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="14" x2="12" y2="9"/><circle cx="12" cy="14" r="8"/></svg>
+      Timer
+    </button>
   </div>
 
-  <div class="wk-filters" id="filters">
-    <button class="wk-filter active" data-filter="all">All <span class="wk-filter-count" id="cntAll">0</span></button>
-    <button class="wk-filter" data-filter="active">Active <span class="wk-filter-count" id="cntActive">0</span></button>
-    <button class="wk-filter" data-filter="hold">On Hold <span class="wk-filter-count" id="cntHold">0</span></button>
-    <button class="wk-filter" data-filter="done">Done <span class="wk-filter-count" id="cntDone">0</span></button>
-  </div>
+  <!-- ============ PROJECTS VIEW ============ -->
+  <section class="wk-view active" id="viewProjects">
+    <div class="wk-stats">
+      <div class="wk-stat">
+        <span class="wk-stat-label">Active</span>
+        <span class="wk-stat-value accent-active" id="statActive">0</span>
+      </div>
+      <div class="wk-stat">
+        <span class="wk-stat-label">On Hold</span>
+        <span class="wk-stat-value accent-hold" id="statHold">0</span>
+      </div>
+      <div class="wk-stat">
+        <span class="wk-stat-label">Open Tasks</span>
+        <span class="wk-stat-value" id="statTasks">0</span>
+      </div>
+      <div class="wk-stat">
+        <span class="wk-stat-label">Done</span>
+        <span class="wk-stat-value accent-done" id="statDone">0</span>
+      </div>
+    </div>
 
-  <div class="wk-grid" id="projGrid"></div>
+    <div class="wk-filters" id="filters">
+      <button class="wk-filter active" data-filter="all">All <span class="wk-filter-count" id="cntAll">0</span></button>
+      <button class="wk-filter" data-filter="active">Active <span class="wk-filter-count" id="cntActive">0</span></button>
+      <button class="wk-filter" data-filter="hold">On Hold <span class="wk-filter-count" id="cntHold">0</span></button>
+      <button class="wk-filter" data-filter="done">Done <span class="wk-filter-count" id="cntDone">0</span></button>
+    </div>
 
-  <div class="wk-empty" id="emptyState" style="display:none;">
-    <div class="wk-empty-icon">💼</div>
-    <div class="wk-empty-title">No projects yet</div>
-    <div class="wk-empty-sub">Create your first project to start tracking work.</div>
-  </div>
+    <div class="wk-grid" id="projGrid"></div>
+
+    <div class="wk-empty" id="emptyState" style="display:none;">
+      <div class="wk-empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </div>
+      <div class="wk-empty-title">No projects yet</div>
+      <div class="wk-empty-sub">Create your first project to start tracking work and its tasks.</div>
+      <button type="button" class="wk-empty-cta" id="emptyNewBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Project
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ TIMER VIEW ============ -->
+  <section class="wk-view" id="viewTimer">
+    <div class="tm-setup" id="tmSetup">
+      <span class="tm-setup-label">Session type</span>
+      <div class="tm-types" id="tmTypes">
+        <button type="button" class="tm-type sel" data-val="Focus">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="14" x2="12" y2="9"/><circle cx="12" cy="14" r="8"/></svg>
+          Focus
+        </button>
+        <button type="button" class="tm-type" data-val="Meeting">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Meeting
+        </button>
+        <button type="button" class="tm-type" data-val="Break">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+          Break
+        </button>
+      </div>
+      <input type="text" class="tm-note" id="tmNote" placeholder="What are you working on? (optional)" autocomplete="off">
+      <button type="button" class="tm-start" id="tmStart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Start Session
+      </button>
+    </div>
+
+    <div class="tm-active" id="tmActive">
+      <div class="tm-active-type" id="tmActiveType"></div>
+      <div class="tm-clock" id="tmClock">00:00</div>
+      <div class="tm-active-note" id="tmActiveNote"></div>
+      <div class="tm-active-actions">
+        <button type="button" class="tm-ctrl" id="tmPause">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          <span id="tmPauseLabel">Pause</span>
+        </button>
+        <button type="button" class="tm-ctrl stop" id="tmStop">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          Finish
+        </button>
+      </div>
+    </div>
+
+    <div class="tm-hist-head">
+      <span class="tm-hist-title">History</span>
+      <span class="tm-hist-total" id="tmTotal"></span>
+    </div>
+    <div class="tm-hist" id="tmHist"></div>
+    <div class="wk-empty" id="tmEmpty" style="display:none;">
+      <div class="wk-empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="14" x2="12" y2="9"/><circle cx="12" cy="14" r="8"/></svg>
+      </div>
+      <div class="wk-empty-title">No sessions yet</div>
+      <div class="wk-empty-sub">Pick a type and start a session. Completed sessions show up here.</div>
+    </div>
+  </section>
 
 </div>
 
@@ -493,20 +721,46 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
   'use strict';
 
   var STORE_KEY = 'work:projects';
+  var SESS_KEY  = 'work:sessions';
+
+  // ---------- icons ----------
+  var ICON = {
+    plus:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>',
+    chev:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+    x:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    timer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="14" x2="12" y2="9"/><circle cx="12" cy="14" r="8"/></svg>',
+    users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    coffee:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>'
+  };
+  function typeIcon(t) {
+    if (t === 'Meeting') return ICON.users;
+    if (t === 'Break') return ICON.coffee;
+    return ICON.timer;
+  }
 
   // ---------- storage ----------
-  function load() {
+  function loadProjects() {
     try { var v = JSON.parse(localStorage.getItem(STORE_KEY)); return Array.isArray(v) ? v : []; }
     catch (e) { return []; }
   }
-  function save(list) {
+  function saveProjects(list) {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+  function loadSessions() {
+    try { var v = JSON.parse(localStorage.getItem(SESS_KEY)); return Array.isArray(v) ? v : []; }
+    catch (e) { return []; }
+  }
+  function saveSessions(list) {
+    try { localStorage.setItem(SESS_KEY, JSON.stringify(list)); } catch (e) {}
   }
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
   // ---------- date helpers ----------
   function pad2(n) { return String(n).padStart(2, '0'); }
   function todayKey() { var d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function dateKeyOf(ms) { var d = new Date(ms); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
   function fmtDue(s) {
     if (!s) return '';
     var p = s.split('-').map(Number);
@@ -518,7 +772,6 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     if (!s || status === 'done') return '';
     var t = todayKey();
     if (s < t) return 'is-overdue';
-    // within 3 days
     var p = s.split('-').map(Number), due = new Date(p[0], p[1]-1, p[2]);
     var now = new Date(); now.setHours(0,0,0,0);
     var diff = (due - now) / 86400000;
@@ -542,10 +795,20 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     return Math.round(done / tasks.length * 100);
   }
 
-  // ---------- state ----------
-  var projects = load();
+  // ============ TAB SWITCHER ============
+  var views = { projects: document.getElementById('viewProjects'), timer: document.getElementById('viewTimer') };
+  document.getElementById('tabs').addEventListener('click', function (e) {
+    var btn = e.target.closest('.wk-tab');
+    if (!btn) return;
+    var v = btn.getAttribute('data-view');
+    document.querySelectorAll('.wk-tab').forEach(function (b) { b.classList.toggle('active', b === btn); });
+    Object.keys(views).forEach(function (k) { views[k].classList.toggle('active', k === v); });
+  });
+
+  // ============ PROJECTS ============
+  var projects = loadProjects();
   var filter = 'all';
-  var openSet = {}; // id -> true when expanded
+  var openSet = {};
 
   var STATUS_LABEL = { active: 'Active', hold: 'On Hold', done: 'Done' };
   var STATUS_ORDER = ['active', 'hold', 'done'];
@@ -555,9 +818,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
   var grid = document.getElementById('projGrid');
   var emptyState = document.getElementById('emptyState');
 
-  // ---------- render ----------
-  function persist() { save(projects); render(); }
-
+  function persist() { saveProjects(projects); render(); }
   function setText(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
 
   function renderStats() {
@@ -617,7 +878,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     li.appendChild(text);
 
     var del = document.createElement('button');
-    del.className = 'wk-task-del'; del.type = 'button'; del.textContent = '×';
+    del.className = 'wk-task-del'; del.type = 'button'; del.innerHTML = ICON.x;
     del.setAttribute('aria-label', 'Delete task');
     del.addEventListener('click', function () {
       proj.tasks = (proj.tasks || []).filter(function (t) { return t.id !== task.id; });
@@ -632,9 +893,12 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     card.className = 'wk-proj' + (openSet[p.id] ? ' is-open' : '');
     card.setAttribute('data-status', p.status);
 
-    // ----- header -----
     var head = document.createElement('div');
     head.className = 'wk-proj-head';
+
+    var dot = document.createElement('span');
+    dot.className = 'wk-proj-dot';
+    head.appendChild(dot);
 
     var main = document.createElement('div');
     main.className = 'wk-proj-main';
@@ -672,32 +936,30 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     titleRow.appendChild(prio);
     main.appendChild(titleRow);
 
-    // meta
     var meta = document.createElement('div');
     meta.className = 'wk-proj-meta';
     var tasks = p.tasks || [];
     var doneCount = tasks.filter(function (t) { return t.done; }).length;
     var taskItem = document.createElement('span');
     taskItem.className = 'wk-meta-item';
-    taskItem.innerHTML = '✓ ' + doneCount + '/' + tasks.length + ' tasks';
+    taskItem.innerHTML = ICON.check + ' ' + doneCount + '/' + tasks.length + ' tasks';
     meta.appendChild(taskItem);
     if (p.due) {
       var dueItem = document.createElement('span');
       dueItem.className = 'wk-meta-item ' + dueClass(p.due, p.status);
-      dueItem.innerHTML = '◷ ' + dueLabel(p.due, p.status);
+      dueItem.innerHTML = ICON.clock + ' ' + dueLabel(p.due, p.status);
       meta.appendChild(dueItem);
     }
     main.appendChild(meta);
     head.appendChild(main);
 
-    // side
     var side = document.createElement('div');
     side.className = 'wk-proj-side';
     var pct = document.createElement('span');
     pct.className = 'wk-proj-pct'; pct.textContent = progressOf(p) + '%';
     side.appendChild(pct);
     var chev = document.createElement('span');
-    chev.className = 'wk-chev'; chev.textContent = '▾';
+    chev.className = 'wk-chev'; chev.innerHTML = ICON.chev;
     side.appendChild(chev);
     head.appendChild(side);
 
@@ -707,7 +969,6 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     });
     card.appendChild(head);
 
-    // progress bar
     var prog = document.createElement('div');
     prog.className = 'wk-progress';
     var fill = document.createElement('div');
@@ -716,7 +977,6 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     prog.appendChild(fill);
     card.appendChild(prog);
 
-    // ----- body -----
     var body = document.createElement('div');
     body.className = 'wk-proj-body';
 
@@ -732,14 +992,14 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
       body.appendChild(ul);
     }
 
-    // add task
     var addWrap = document.createElement('div');
     addWrap.className = 'wk-task-add';
     var input = document.createElement('input');
     input.className = 'wk-task-input'; input.type = 'text';
     input.placeholder = 'Add a task…'; input.autocomplete = 'off';
     var addBtn = document.createElement('button');
-    addBtn.className = 'wk-task-add-btn'; addBtn.type = 'button'; addBtn.textContent = 'Add';
+    addBtn.className = 'wk-task-add-btn'; addBtn.type = 'button';
+    addBtn.innerHTML = ICON.plus + 'Add';
     function addTask() {
       var v = input.value.trim();
       if (!v) return;
@@ -754,7 +1014,6 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     addWrap.appendChild(input); addWrap.appendChild(addBtn);
     body.appendChild(addWrap);
 
-    // footer
     var footer = document.createElement('div');
     footer.className = 'wk-proj-footer';
     var created = document.createElement('span');
@@ -781,7 +1040,6 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     return list.slice().sort(function (a, b) {
       if (statusRank[a.status] !== statusRank[b.status]) return statusRank[a.status] - statusRank[b.status];
       if (prioRank[a.priority] !== prioRank[b.priority]) return prioRank[a.priority] - prioRank[b.priority];
-      // due date soonest first (no due last)
       var ad = a.due || '9999', bd = b.due || '9999';
       return ad < bd ? -1 : ad > bd ? 1 : 0;
     });
@@ -796,7 +1054,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     if (projects.length === 0) {
       emptyState.style.display = 'block';
       emptyState.querySelector('.wk-empty-title').textContent = 'No projects yet';
-      emptyState.querySelector('.wk-empty-sub').textContent = 'Create your first project to start tracking work.';
+      emptyState.querySelector('.wk-empty-sub').textContent = 'Create your first project to start tracking work and its tasks.';
       return;
     }
     if (visible.length === 0) {
@@ -809,7 +1067,6 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     visible.forEach(function (p) { grid.appendChild(buildProjectCard(p)); });
   }
 
-  // ---------- filters ----------
   document.getElementById('filters').addEventListener('click', function (e) {
     var btn = e.target.closest('.wk-filter');
     if (!btn) return;
@@ -818,7 +1075,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     render();
   });
 
-  // ---------- modal ----------
+  // ---------- project modal ----------
   var modalBg = document.getElementById('modalBg');
   var npName = document.getElementById('npName');
   var npDue = document.getElementById('npDue');
@@ -849,6 +1106,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
   function closeModal() { modalBg.classList.remove('open'); }
 
   document.getElementById('newProjectBtn').addEventListener('click', openModal);
+  document.getElementById('emptyNewBtn').addEventListener('click', openModal);
   document.getElementById('npCancel').addEventListener('click', closeModal);
   modalBg.addEventListener('click', function (e) { if (e.target === modalBg) closeModal(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modalBg.classList.contains('open')) closeModal(); });
@@ -873,19 +1131,227 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
   document.getElementById('npSave').addEventListener('click', saveNew);
   npName.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); saveNew(); } });
 
+  // ============ SESSION TIMER ============
+  var sessions = loadSessions();
+
+  var tmTypes = document.getElementById('tmTypes');
+  var tmNote = document.getElementById('tmNote');
+  var tmSetup = document.getElementById('tmSetup');
+  var tmActive = document.getElementById('tmActive');
+  var tmClock = document.getElementById('tmClock');
+  var tmActiveType = document.getElementById('tmActiveType');
+  var tmActiveNote = document.getElementById('tmActiveNote');
+  var tmPause = document.getElementById('tmPause');
+  var tmPauseLabel = document.getElementById('tmPauseLabel');
+  var tmHist = document.getElementById('tmHist');
+  var tmEmpty = document.getElementById('tmEmpty');
+  var tmTotal = document.getElementById('tmTotal');
+
+  tmTypes.addEventListener('click', function (e) {
+    var b = e.target.closest('.tm-type');
+    if (!b) return;
+    tmTypes.querySelectorAll('.tm-type').forEach(function (x) { x.classList.toggle('sel', x === b); });
+  });
+  function selectedType() {
+    var sel = tmTypes.querySelector('.tm-type.sel');
+    return sel ? sel.getAttribute('data-val') : 'Focus';
+  }
+
+  // active-session runtime state
+  var run = null; // { type, note, startedAt, elapsedMs, running, lastTick, ticker }
+
+  function fmtClock(totalSec) {
+    var h = Math.floor(totalSec / 3600);
+    var m = Math.floor((totalSec % 3600) / 60);
+    var s = totalSec % 60;
+    if (h > 0) return h + ':' + pad2(m) + ':' + pad2(s);
+    return pad2(m) + ':' + pad2(s);
+  }
+  function fmtDur(totalSec) {
+    var h = Math.floor(totalSec / 3600);
+    var m = Math.round((totalSec % 3600) / 60);
+    if (h > 0) return m > 0 ? (h + 'h ' + m + 'm') : (h + 'h');
+    if (m > 0) return m + 'm';
+    return totalSec + 's';
+  }
+  function elapsedSec() {
+    if (!run) return 0;
+    var ms = run.elapsedMs;
+    if (run.running) ms += Date.now() - run.lastTick;
+    return Math.floor(ms / 1000);
+  }
+  function paintClock() { tmClock.textContent = fmtClock(elapsedSec()); }
+
+  function startSession() {
+    var type = selectedType();
+    run = {
+      type: type,
+      note: tmNote.value.trim(),
+      startedAt: Date.now(),
+      elapsedMs: 0,
+      running: true,
+      lastTick: Date.now(),
+      ticker: null
+    };
+    tmActiveType.innerHTML = typeIcon(type) + '<span>' + type + '</span>';
+    tmActiveNote.textContent = run.note || '';
+    tmPauseLabel.textContent = 'Pause';
+    tmSetup.style.display = 'none';
+    tmActive.classList.add('on');
+    paintClock();
+    run.ticker = setInterval(paintClock, 250);
+  }
+
+  function togglePause() {
+    if (!run) return;
+    if (run.running) {
+      run.elapsedMs += Date.now() - run.lastTick;
+      run.running = false;
+      tmPauseLabel.textContent = 'Resume';
+    } else {
+      run.lastTick = Date.now();
+      run.running = true;
+      tmPauseLabel.textContent = 'Pause';
+    }
+    paintClock();
+  }
+
+  function finishSession() {
+    if (!run) return;
+    var durSec = elapsedSec();
+    if (run.ticker) clearInterval(run.ticker);
+    if (durSec >= 1) {
+      sessions.unshift({
+        id: uid(),
+        type: run.type,
+        startedAt: run.startedAt,
+        durationSec: durSec,
+        note: run.note || ''
+      });
+      saveSessions(sessions);
+    }
+    run = null;
+    tmActive.classList.remove('on');
+    tmSetup.style.display = 'block';
+    tmNote.value = '';
+    renderHistory();
+  }
+
+  document.getElementById('tmStart').addEventListener('click', startSession);
+  tmPause.addEventListener('click', togglePause);
+  document.getElementById('tmStop').addEventListener('click', finishSession);
+
+  function dayLabel(key) {
+    if (key === todayKey()) return 'Today';
+    var y = new Date(Date.now() - 86400000);
+    if (key === (y.getFullYear() + '-' + pad2(y.getMonth()+1) + '-' + pad2(y.getDate()))) return 'Yesterday';
+    var p = key.split('-').map(Number);
+    var d = new Date(p[0], p[1]-1, p[2]);
+    var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return days[d.getDay()] + ', ' + mo[d.getMonth()] + ' ' + d.getDate();
+  }
+  function fmtTimeOfDay(ms) {
+    var d = new Date(ms);
+    var h = d.getHours(), m = d.getMinutes();
+    var ap = h >= 12 ? 'PM' : 'AM';
+    var h12 = h % 12; if (h12 === 0) h12 = 12;
+    return h12 + ':' + pad2(m) + ' ' + ap;
+  }
+
+  function renderHistory() {
+    tmHist.innerHTML = '';
+    if (sessions.length === 0) {
+      tmHist.style.display = 'none';
+      tmEmpty.style.display = 'block';
+      tmTotal.textContent = '';
+      return;
+    }
+    tmHist.style.display = 'flex';
+    tmEmpty.style.display = 'none';
+
+    // today total
+    var todaySec = 0;
+    sessions.forEach(function (s) { if (dateKeyOf(s.startedAt) === todayKey()) todaySec += s.durationSec; });
+    tmTotal.textContent = todaySec > 0 ? (fmtDur(todaySec) + ' today') : '';
+
+    // group by day (sessions are newest-first)
+    var lastDay = null;
+    sessions.forEach(function (s) {
+      var key = dateKeyOf(s.startedAt);
+      if (key !== lastDay) {
+        lastDay = key;
+        var lbl = document.createElement('div');
+        lbl.className = 'tm-hist-day-label';
+        lbl.textContent = dayLabel(key);
+        tmHist.appendChild(lbl);
+      }
+      tmHist.appendChild(buildSessionRow(s));
+    });
+  }
+
+  function buildSessionRow(s) {
+    var row = document.createElement('div');
+    row.className = 'tm-row';
+
+    var ic = document.createElement('div');
+    ic.className = 'tm-row-icon' + (s.type === 'Break' ? ' rest' : '');
+    ic.innerHTML = typeIcon(s.type);
+    row.appendChild(ic);
+
+    var main = document.createElement('div');
+    main.className = 'tm-row-main';
+    var ty = document.createElement('div');
+    ty.className = 'tm-row-type'; ty.textContent = s.type;
+    main.appendChild(ty);
+    var nt = document.createElement('div');
+    nt.className = 'tm-row-note'; nt.textContent = s.note || fmtTimeOfDay(s.startedAt);
+    main.appendChild(nt);
+    row.appendChild(main);
+
+    var side = document.createElement('div');
+    side.className = 'tm-row-side';
+    var dur = document.createElement('div');
+    dur.className = 'tm-row-dur'; dur.textContent = fmtDur(s.durationSec);
+    side.appendChild(dur);
+    var tm = document.createElement('div');
+    tm.className = 'tm-row-time'; tm.textContent = fmtTimeOfDay(s.startedAt);
+    side.appendChild(tm);
+    row.appendChild(side);
+
+    var del = document.createElement('button');
+    del.className = 'tm-row-del'; del.type = 'button';
+    del.setAttribute('aria-label', 'Delete session');
+    del.innerHTML = ICON.x;
+    del.addEventListener('click', function () {
+      sessions = sessions.filter(function (x) { return x.id !== s.id; });
+      saveSessions(sessions);
+      renderHistory();
+    });
+    row.appendChild(del);
+    return row;
+  }
+
   // ---------- boot ----------
   render();
+  renderHistory();
 
   // refresh when cloud sync applies remote changes
-  window.addEventListener('storage', function () { projects = load(); render(); });
+  window.addEventListener('storage', function () {
+    projects = loadProjects(); render();
+    sessions = loadSessions(); if (!run) renderHistory();
+  });
 
   document.addEventListener('DOMContentLoaded', function () {
     if (typeof initCloudSync !== 'function') return;
     initCloudSync({
       appKey: 'work',
-      syncedKeys: ['work:projects'],
+      syncedKeys: ['work:projects', 'work:sessions'],
       syncedPrefixes: ['work:'],
-      onApplied: function () { projects = load(); render(); }
+      onApplied: function () {
+        projects = loadProjects(); render();
+        sessions = loadSessions(); if (!run) renderHistory();
+      }
     });
   });
 })();

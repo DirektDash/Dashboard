@@ -4,7 +4,7 @@
 //     <script src="topbar.js" defer></script>
 // It self-injects HTML + CSS, reads progress from localStorage,
 // and renders the water +1 button in the top bar plus the
-// Main/Health/Fitness bottom tabs. Skips chrome on finance.html
+// Main/Health/Fitness/Work bottom tabs. Skips chrome on finance.html
 // and inside iframes (so the water tracker can embed cleanly).
 // =============================================================
 (function () {
@@ -14,6 +14,16 @@
   const TOPBAR_SUPABASE_URL = 'https://midyjdjkqorcxhdnjanh.supabase.co';
   const TOPBAR_SUPABASE_KEY = 'sb_publishable_wsfPg84TDDlqqQk-WO887Q_j0Sa5x4p';
 
+  // -------- Inline SVG icons (Lucide glyphs, currentColor stroke) --------
+  const SVG_ATTR = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+  const icon = {
+    home: `<svg width="22" height="22" viewBox="0 0 24 24" ${SVG_ATTR}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>`,
+    heartPulse: `<svg width="22" height="22" viewBox="0 0 24 24" ${SVG_ATTR}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg>`,
+    dumbbell: `<svg width="22" height="22" viewBox="0 0 24 24" ${SVG_ATTR}><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>`,
+    briefcase: `<svg width="22" height="22" viewBox="0 0 24 24" ${SVG_ATTR}><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>`,
+    wallet: `<svg width="21" height="21" viewBox="0 0 24 24" ${SVG_ATTR}><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>`
+  };
+
   // -------- CSS --------
   const css = `
 .topbar {
@@ -21,30 +31,26 @@
   display: flex; justify-content: flex-end; align-items: center;
   gap: 8px;
   padding: max(10px, env(safe-area-inset-top)) 14px 8px;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--bg, #F5F5F7);
+  border-bottom: 1px solid var(--border-soft, rgba(0, 0, 0, 0.05));
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
 }
 .topbar-water-wrap { display: flex; align-items: stretch; }
 .topbar-water-pill {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 9px 14px;
-  background: rgba(99, 102, 241, 0.07);
-  border: 1px solid rgba(99, 102, 241, 0.18);
-  border-right: none;
+  background: var(--accent-soft, rgba(99, 102, 241, 0.10));
   border-radius: 12px 0 0 12px;
-  text-decoration: none; color: #1A1A1E;
+  text-decoration: none; color: var(--text-primary, #1A1A1E);
   -webkit-tap-highlight-color: transparent;
 }
 .topbar-water-pill .topbar-pill-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: #6366F1; flex-shrink: 0;
+  background: var(--accent, #6366F1); flex-shrink: 0;
 }
-.topbar-water-pill.warn .topbar-pill-dot { background: #fbbf24; }
+.topbar-water-pill.warn .topbar-pill-dot { background: var(--warn, #F59E0B); }
 .topbar-water-pill.miss .topbar-pill-dot {
-  background: #ff8a8a;
+  background: var(--bad, #EF4444);
   animation: topbar-miss-pulse 1.6s ease-in-out infinite;
 }
 @keyframes topbar-miss-pulse {
@@ -53,13 +59,13 @@
 }
 .topbar-pill-count {
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 13px; font-weight: 700; color: #1A1A1E;
+  font-size: 13px; font-weight: 700; color: var(--text-primary, #1A1A1E);
   font-variant-numeric: tabular-nums; white-space: nowrap;
 }
 .topbar-water-add {
   width: 44px;
-  border: 1px solid rgba(99, 102, 241, 0.22);
-  background: linear-gradient(180deg, #6366F1, #4F46E5);
+  border: none;
+  background: var(--accent, #6366F1);
   color: #FFFFFF; font-family: inherit;
   font-size: 20px; font-weight: 700; line-height: 1;
   cursor: pointer; border-radius: 0 12px 12px 0;
@@ -67,63 +73,55 @@
   transition: background 0.15s, transform 0.10s;
 }
 .topbar-water-add:active { transform: scale(0.94); }
-.topbar-water-add.flash {
-  background: linear-gradient(180deg, #818CF8, #6366F1);
-}
+.topbar-water-add.flash { background: var(--accent-strong, #4F46E5); }
 .topbar-finance-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 44px; height: 42px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(0, 0, 0, 0.03);
+  border: none;
+  background: var(--glass-bg, #FFFFFF);
+  color: var(--text-secondary, rgba(0, 0, 0, 0.58));
   border-radius: 12px; text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
-.topbar-finance-btn:hover { background: rgba(0, 0, 0, 0.06); }
-.topbar-finance-icon {
-  font-size: 20px; line-height: 1;
-  opacity: 0.85;
-}
+.topbar-finance-btn:hover { background: var(--glass-bg-hover, #FAFAFB); color: var(--text-primary, #1A1A1E); }
+.topbar-finance-icon { display: inline-flex; align-items: center; justify-content: center; }
 .bottombar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
   display: flex; justify-content: space-around; align-items: stretch;
   gap: 2px;
-  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.80);
-  backdrop-filter: blur(28px) saturate(1.6);
-  -webkit-backdrop-filter: blur(28px) saturate(1.6);
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 -4px 24px rgba(16, 16, 30, 0.06);
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  background: var(--bg, #F5F5F7);
+  border-top: 1px solid var(--border-soft, rgba(0, 0, 0, 0.05));
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
 }
 .bottombar-tab {
   flex: 1;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 4px; padding: 6px 0 5px; text-decoration: none;
-  color: rgba(0, 0, 0, 0.40);
-  font-size: 10px; font-weight: 600; letter-spacing: 0.03em;
-  -webkit-tap-highlight-color: transparent; transition: color 0.2s var(--ease-fast, ease);
+  gap: 3px; padding: 6px 0 4px; text-decoration: none;
+  color: var(--text-tertiary, rgba(0, 0, 0, 0.40));
+  font-size: 10px; font-weight: 500; letter-spacing: 0.01em;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s var(--ease-fast, ease);
 }
 .bottombar-tab-icon {
   display: flex; align-items: center; justify-content: center;
-  width: 46px; height: 30px;
-  font-size: 21px; line-height: 1;
-  border-radius: 11px;
-  filter: grayscale(100%); opacity: 0.5;
-  transition: opacity 0.2s, filter 0.2s, transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1),
-              background 0.2s, box-shadow 0.2s;
+  width: 28px; height: 28px;
+  transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
+.bottombar-tab-icon svg { width: 22px; height: 22px; display: block; }
 .bottombar-tab.active { color: var(--accent, #6366F1); }
-.bottombar-tab.active .bottombar-tab-icon {
-  filter: none; opacity: 1;
-  background: var(--accent-soft, rgba(99, 102, 241, 0.10));
-  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.18);
-  transform: translateY(-1px);
+.bottombar-tab.active .bottombar-tab-icon { transform: translateY(-1px); }
+.bottombar-tab.active::after {
+  content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 18px; height: 2.5px; border-radius: 999px;
+  background: var(--accent, #6366F1);
 }
-.bottombar-tab:not(.active):hover .bottombar-tab-icon { opacity: 0.8; }
+.bottombar-tab:not(.active):hover { color: var(--text-secondary, rgba(0, 0, 0, 0.58)); }
 .bottombar-tab:active .bottombar-tab-icon { transform: scale(0.9); }
 body.has-bottombar {
-  padding-bottom: calc(82px + env(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(78px + env(safe-area-inset-bottom)) !important;
 }
 @media (max-width: 480px) {
   .topbar { padding-left: 10px; padding-right: 10px; gap: 6px; }
@@ -131,8 +129,6 @@ body.has-bottombar {
   .topbar-pill-count { font-size: 12px; }
   .topbar-water-add { width: 40px; font-size: 18px; }
   .topbar-finance-btn { width: 40px; height: 38px; }
-  .topbar-finance-icon { font-size: 18px; }
-  .bottombar-tab-icon { font-size: 20px; width: 42px; height: 28px; }
   .bottombar-tab { font-size: 9.5px; }
 }
 html, body { -webkit-text-size-adjust: 100%; }
@@ -171,23 +167,23 @@ html, body { -webkit-text-size-adjust: 100%; }
     <button class="topbar-water-add" id="topbarWaterAdd" aria-label="Log one drink" type="button">+</button>
   </div>
   <a href="finance.html" class="topbar-finance-btn" id="topbarFinance" aria-label="Finance">
-    <span class="topbar-finance-icon">📊</span>
+    <span class="topbar-finance-icon">${icon.wallet}</span>
   </a>
 </header>`;
 
   const bottombarHtml = `
 <nav class="bottombar" id="bottombar" role="navigation" aria-label="Main tabs">
   <a href="index.html" class="bottombar-tab" data-page="main">
-    <span class="bottombar-tab-icon">🏠</span><span>Main</span>
+    <span class="bottombar-tab-icon">${icon.home}</span><span>Main</span>
   </a>
   <a href="health.html" class="bottombar-tab" data-page="health">
-    <span class="bottombar-tab-icon">💊</span><span>Health</span>
+    <span class="bottombar-tab-icon">${icon.heartPulse}</span><span>Health</span>
   </a>
   <a href="gym.html" class="bottombar-tab" data-page="fitness">
-    <span class="bottombar-tab-icon">💪</span><span>Fitness</span>
+    <span class="bottombar-tab-icon">${icon.dumbbell}</span><span>Fitness</span>
   </a>
   <a href="work.html" class="bottombar-tab" data-page="work">
-    <span class="bottombar-tab-icon">💼</span><span>Work</span>
+    <span class="bottombar-tab-icon">${icon.briefcase}</span><span>Work</span>
   </a>
 </nav>`;
 

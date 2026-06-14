@@ -173,16 +173,13 @@ body {
   margin-bottom: 22px;
   border-radius: var(--radius-lg);
   background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-soft);
   animation: slideUp 0.45s var(--spring-smooth) 0.10s both;
-  transition: background var(--transition-base), box-shadow var(--transition-base), transform 0.25s var(--spring-card);
+  transition: background var(--transition-base), border-color 0.25s ease, transform 0.25s var(--spring-card);
 }
 .day-ring-wrap:hover {
   background: var(--glass-bg-hover);
-  box-shadow: var(--card-shadow-hover);
+  border-color: var(--border);
   transform: translateY(-2px);
 }
 .day-ring {
@@ -232,7 +229,8 @@ body {
   gap: 6px;
   max-width: 280px;
 }
-.day-ring-status { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.day-ring-status { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.day-ring-status svg { flex-shrink: 0; color: var(--text-secondary); }
 .day-ring-remaining { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
 .day-ring-hours { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); }
 @media (max-width: 480px) {
@@ -254,15 +252,12 @@ body {
   padding: 16px 16px 14px;
   border-radius: var(--radius-lg);
   background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-soft);
   cursor: pointer;
   text-decoration: none;
   color: inherit;
   overflow: hidden;
-  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.25s var(--spring-card);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s var(--spring-card);
   -webkit-tap-highlight-color: transparent;
   animation: slideUp 0.45s var(--spring-smooth) 0.22s both;
 }
@@ -282,7 +277,7 @@ body {
 .summary-card-wide .summary-wide-text { display: flex; flex-direction: column; min-width: 0; }
 .summary-card:hover {
   background: var(--glass-bg-hover);
-  box-shadow: var(--card-shadow-hover);
+  border-color: var(--border);
   transform: translateY(-2px);
 }
 .summary-card:active { transform: scale(0.97); }
@@ -294,6 +289,7 @@ body {
   line-height: 1;
   border-radius: 11px;
   background: var(--accent-soft);
+  color: var(--accent-strong);
 }
 .summary-eyebrow {
   font-family: var(--font-mono);
@@ -346,15 +342,14 @@ body {
   padding: 15px 8px 13px;
   border-radius: var(--radius-lg);
   background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-soft);
   color: var(--text-secondary);
   text-decoration: none; cursor: pointer;
   font-family: inherit; font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
-  transition: transform 0.18s var(--spring-card), background 0.2s, box-shadow 0.2s;
+  transition: transform 0.18s var(--spring-card), background 0.2s, border-color 0.2s;
   -webkit-tap-highlight-color: transparent;
 }
-.qa-btn:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
+.qa-btn:hover { transform: translateY(-2px); border-color: var(--border); background: var(--glass-bg-hover); }
 .qa-btn:active { transform: scale(0.95); }
 .qa-icon {
   width: 44px; height: 44px;
@@ -398,14 +393,11 @@ body {
 .gm-card {
   position: relative;
   background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--border-soft);
   border-radius: var(--radius-lg);
   padding: 22px;
   margin-bottom: 14px;
-  backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(1.05);
-  box-shadow: var(--card-shadow);
-  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.25s var(--spring-card);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s var(--spring-card);
   overflow: hidden;
   animation: slideUp 0.45s var(--spring-smooth) 0.18s both;
 }
@@ -474,7 +466,7 @@ body {
   letter-spacing: 0.10em; text-transform: uppercase;
   transition: background 0.25s, color 0.25s, border-color 0.25s;
 }
-.gm-streak-icon { font-size: 13px; }
+.gm-streak-icon { display: inline-flex; align-items: center; }
 .gm-streak-num {
   font-family: var(--font-mono);
   font-weight: 700;
@@ -612,6 +604,7 @@ body {
 }
 
 .gm-queue-btn {
+  display: inline-flex; align-items: center;
   border: 0; background: transparent;
   color: var(--text-tertiary);
   font-size: 14px;
@@ -723,6 +716,7 @@ body {
 .gm-add:active { transform: scale(0.97); filter: brightness(0.96); }
 
 .gm-polish {
+  display: inline-flex; align-items: center; gap: 7px;
   padding: 11px 18px;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
@@ -816,13 +810,13 @@ body {
   <!-- Quick actions -->
   <div class="quick-actions">
     <button type="button" class="qa-btn" id="qaWater">
-      <span class="qa-icon">💧</span>Log water
+      <span class="qa-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7Z"/></svg></span>Log water
     </button>
     <a href="gym.html" class="qa-btn" id="qaWorkout">
-      <span class="qa-icon">💪</span>Workout
+      <span class="qa-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg></span>Workout
     </a>
     <button type="button" class="qa-btn" id="qaGoal">
-      <span class="qa-icon">✓</span>Add goal
+      <span class="qa-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></span>Add goal
     </button>
   </div>
 
@@ -830,35 +824,35 @@ body {
   <div class="summary-grid">
     <a href="health.html" class="summary-card" id="sumSleep">
       <span class="summary-arrow">›</span>
-      <div class="summary-icon">😴</div>
+      <div class="summary-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></div>
       <div class="summary-eyebrow">Sleep</div>
       <div class="summary-value" id="sumSleepVal">—</div>
       <div class="summary-sub" id="sumSleepSub">last night</div>
     </a>
     <a href="gym.html" class="summary-card" id="sumGym">
       <span class="summary-arrow">›</span>
-      <div class="summary-icon">💪</div>
+      <div class="summary-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg></div>
       <div class="summary-eyebrow">Today's Workout</div>
       <div class="summary-value" id="sumGymVal">—</div>
       <div class="summary-sub" id="sumGymSub">loading…</div>
     </a>
     <a href="finance.html" class="summary-card" id="sumFinance">
       <span class="summary-arrow">›</span>
-      <div class="summary-icon">💰</div>
+      <div class="summary-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></div>
       <div class="summary-eyebrow">Net Worth</div>
       <div class="summary-value" id="sumFinanceVal">—</div>
       <div class="summary-sub" id="sumFinanceSub">all accounts</div>
     </a>
     <a href="health.html#water" class="summary-card" id="sumWater">
       <span class="summary-arrow">›</span>
-      <div class="summary-icon">💧</div>
+      <div class="summary-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7Z"/></svg></div>
       <div class="summary-eyebrow">Water</div>
       <div class="summary-value" id="sumWaterVal">—</div>
       <div class="summary-sub" id="sumWaterSub">bottles today</div>
     </a>
     <a href="work.html" class="summary-card summary-card-wide" id="sumWork">
       <span class="summary-arrow">›</span>
-      <div class="summary-icon">💼</div>
+      <div class="summary-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg></div>
       <div class="summary-wide-text">
         <div class="summary-eyebrow">Work</div>
         <div class="summary-value" id="sumWorkVal">—</div>
@@ -882,7 +876,7 @@ body {
           </div>
         </div>
         <div class="gm-streak" id="gmStreak">
-          <span class="gm-streak-icon">⚡</span>
+          <span class="gm-streak-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>
           <span class="gm-streak-num" id="gmStreakNum">0</span>
           <span>day streak</span>
         </div>
@@ -894,7 +888,7 @@ body {
       <div class="goal-input-wrap gm-input-wrap">
         <input id="goalInput" class="gm-input" type="text" placeholder="Add a goal for today…" autocomplete="off">
         <button type="button" id="goalAddBtn"    class="gm-add">+ Add</button>
-        <button type="button" id="goalPolishBtn" class="gm-polish">✨ Polish</button>
+        <button type="button" id="goalPolishBtn" class="gm-polish"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>Polish</button>
         <div class="gm-status" id="polishStatus"></div>
       </div>
     </div>
@@ -913,7 +907,7 @@ body {
       <div class="goal-input-wrap gm-input-wrap">
         <input id="tomorrowInput" class="gm-input" type="text" placeholder="Add a goal for tomorrow…" autocomplete="off">
         <button type="button" id="tomorrowAddBtn"    class="gm-add">+ Add</button>
-        <button type="button" id="tomorrowPolishBtn" class="gm-polish">✨ Polish</button>
+        <button type="button" id="tomorrowPolishBtn" class="gm-polish"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>Polish</button>
         <div class="gm-status" id="tomorrowStatus"></div>
       </div>
     </div>
@@ -1044,13 +1038,14 @@ body {
     const total = goals.length;
     const done  = goals.filter(g => g.done).length;
     if (total === 0) return { items: [{ status: 'empty',   text: 'No goals set for today — add one to get rolling.' }], done, total };
-    if (done === total) return { items: [{ status: 'done', text: '✓ All goals done — solid day.' }], done, total };
+    if (done === total) return { items: [{ status: 'done', text: 'All goals done — solid day.' }], done, total };
     const items = goals.filter(g => !g.done).map(g => ({ status: 'pending', text: g.text }));
     return { items, done, total };
   }
 
+  const CHECK_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
   function statusGlyph(status) {
-    if (status === 'done') return '✓';
+    if (status === 'done') return CHECK_SVG;
     if (status === 'pending') return '○';
     return '·';
   }
@@ -1078,7 +1073,7 @@ body {
 
     const apply = () => {
       statusEl.setAttribute('data-status', item.status);
-      statusEl.textContent = statusGlyph(item.status);
+      statusEl.innerHTML = statusGlyph(item.status);
       textEl.textContent = item.text;
       row.classList.remove('is-fading');
     };
@@ -1146,6 +1141,22 @@ body {
   fillEl.setAttribute('stroke-dasharray', C);
   fillEl.setAttribute('stroke-dashoffset', C);
 
+  // Phase status icons (Lucide glyphs). These strings are static, never user input.
+  const SVG_OPEN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+  const PHASE_ICONS = {
+    bed:   SVG_OPEN + '<path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>',
+    alert: SVG_OPEN + '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+    sun:   SVG_OPEN + '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>',
+    zap:   SVG_OPEN + '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>',
+    flame: SVG_OPEN + '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+    hourglass: SVG_OPEN + '<path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>',
+    moon:  SVG_OPEN + '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>'
+  };
+  function setStatus(el, iconKey, text) {
+    el.innerHTML = PHASE_ICONS[iconKey] + '<span></span>';
+    el.querySelector('span').textContent = text;
+  }
+
   function updateDayRing() {
     const now = new Date();
     const hours = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
@@ -1162,7 +1173,7 @@ body {
       fillEl.style.stroke = '#4D4B47';
       percentEl.textContent = '—';
       phaseEl.textContent   = 'SLEEPING';
-      statusEl.textContent  = '😴 Still sleeping';
+      setStatus(statusEl, 'moon', 'Still sleeping');
       const minsUntil = (WAKE_HOUR - hours) * 60;
       remainingEl.textContent = formatRemaining(minsUntil) + ' until wake-up';
       return;
@@ -1173,7 +1184,7 @@ body {
       fillEl.style.stroke = '#E25D7A';
       percentEl.textContent = '100%';
       phaseEl.textContent   = 'PAST BEDTIME';
-      statusEl.textContent  = '⚠️ Past bedtime';
+      setStatus(statusEl, 'alert', 'Past bedtime');
       remainingEl.textContent = 'Sleep!';
       return;
     }
@@ -1184,14 +1195,14 @@ body {
     fillEl.style.stroke = rgb(paletteAt(percent));
     percentEl.textContent = Math.floor(percent) + '%';
 
-    let phase, status;
-    if (percent < 25)      { phase = 'MORNING';   status = '☀️ Morning — fresh start'; }
-    else if (percent < 50) { phase = 'MIDDAY';    status = '⚡ Midday — keep moving'; }
-    else if (percent < 75) { phase = 'AFTERNOON'; status = '🔥 Afternoon — push it'; }
-    else if (percent < 90) { phase = 'EVENING';   status = '⏳ Evening — wrap up'; }
-    else                   { phase = 'BEDTIME';   status = '🌙 Bedtime soon'; }
+    let phase, icon, status;
+    if (percent < 25)      { phase = 'MORNING';   icon = 'sun';       status = 'Morning — fresh start'; }
+    else if (percent < 50) { phase = 'MIDDAY';    icon = 'zap';       status = 'Midday — keep moving'; }
+    else if (percent < 75) { phase = 'AFTERNOON'; icon = 'flame';     status = 'Afternoon — push it'; }
+    else if (percent < 90) { phase = 'EVENING';   icon = 'hourglass'; status = 'Evening — wrap up'; }
+    else                   { phase = 'BEDTIME';   icon = 'moon';      status = 'Bedtime soon'; }
     phaseEl.textContent  = phase;
-    statusEl.textContent = status;
+    setStatus(statusEl, icon, status);
 
     const minsLeft = (SLEEP_HOUR - hours) * 60;
     remainingEl.textContent = formatRemaining(minsLeft) + ' awake time left';
@@ -1295,7 +1306,7 @@ body {
     const queueBtn = document.createElement('button');
     queueBtn.type = 'button';
     queueBtn.className = 'gm-queue-btn' + (goal.queued ? ' gm-queue-active' : '');
-    queueBtn.textContent = '⚡';
+    queueBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>';
     queueBtn.title = 'Queue for productivity window';
     if (readOnly) queueBtn.disabled = true;
     queueBtn.addEventListener('click', () => {
