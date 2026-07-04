@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#F5F5F7">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07090C">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/Icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,7 +19,7 @@
 <style>
 :root {
   --accent: #46E0A8;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 * { margin: 0; padding: 0; }
@@ -27,7 +27,7 @@
 .shell {
   max-width: 880px;
   margin: 0 auto;
-  padding: 24px 16px 100px;   /* extra bottom padding so tab bar doesn't cover content */
+  padding: 24px 16px calc(110px + env(safe-area-inset-bottom));   /* extra bottom padding so the floating dock doesn't cover content */
 }
 
 /* ===== Back to dashboard ===== */
@@ -57,33 +57,37 @@
 .fin-back-btn svg { display: block; }
 
 /* ===== Bottom tab bar — flat native nav ===== */
+/* Floating glass dock — matches the app-wide bottombar in topbar.js */
 .bottom-tabs {
   position: fixed;
-  bottom: 0; left: 0; right: 0;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  left: 50%; transform: translateX(-50%);
   z-index: 100;
-  display: flex;
-  justify-content: center;
-  gap: 2px;
-  padding: 6px max(8px, env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
-  background: rgba(11,14,19,0.82);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border-top: 1px solid var(--border-soft, rgba(255,255,255,0.06));
+  display: flex; align-items: stretch;
+  gap: 4px;
+  width: min(400px, calc(100% - 28px));
+  padding: 7px;
+  background: rgba(13,17,23,0.78);
+  backdrop-filter: blur(20px) saturate(1.35);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 26px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
 }
 .bot-tab {
-  flex: 1; max-width: 140px;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   background: transparent;
-  border: none;
+  border: none; border-radius: 19px;
   color: var(--text-tertiary);
-  padding: 8px 10px 7px;
+  padding: 8px 0 6px;
   font-family: inherit;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: color 0.15s;
+  transition: color 0.2s, background 0.2s;
 }
 .bot-tab:hover { color: var(--text-secondary); }
-.bot-tab.active { color: var(--accent); }
+.bot-tab.active { color: var(--accent); background: var(--accent-soft); }
 .bot-tab-icon {
   line-height: 0;
   display: inline-flex;
@@ -92,19 +96,6 @@
 .bot-tab-label {
   font-size: 10px; font-weight: 600;
   letter-spacing: 0.06em;
-  position: relative;
-}
-/* Active state via color + underline, not bold */
-.bot-tab.active .bot-tab-label::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: -4px;
-  transform: translateX(-50%);
-  width: 16px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--accent);
 }
 
 /* Sections: hide non-active when bottom tabs are in use */
@@ -721,7 +712,7 @@ html, body { scrollbar-width: none; -ms-overflow-style: none; }
 .ord-add-btn {
   padding: 0 14px;
   background: linear-gradient(180deg, var(--accent), var(--accent-strong));
-  color: #ffffff; border: none;
+  color: var(--on-accent); border: none;
   border-radius: 9px;
   font-family: inherit; font-size: 13px; font-weight: 700;
   cursor: pointer; white-space: nowrap;
@@ -948,7 +939,7 @@ html, body { scrollbar-width: none; -ms-overflow-style: none; }
 .wish-add-btn {
   padding: 0 18px;
   background: linear-gradient(180deg, var(--accent), var(--accent-strong));
-  color: #ffffff; border: none;
+  color: var(--on-accent); border: none;
   border-radius: 9px;
   font-family: inherit; font-size: 14px; font-weight: 700;
   cursor: pointer;
@@ -1437,9 +1428,9 @@ html, body { scrollbar-width: none; -ms-overflow-style: none; }
   min-width: 0;
   flex: 1;
   width: 100%;
-  color-scheme: light;
+  color-scheme: dark;
 }
-input[type="date"] { color-scheme: light; }
+input[type="date"] { color-scheme: dark; }
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: none;
   opacity: 0.7;

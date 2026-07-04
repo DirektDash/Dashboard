@@ -5,6 +5,8 @@
    so existing var(--…) usage converts automatically; pages
    only need their few hardcoded light colors fixed by hand.
    ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
 :root {
   /* Background */
   --bg: #07090C;
@@ -14,6 +16,9 @@
   --accent:        #46E0A8;
   --accent-strong: #2FCF92;
   --accent-soft:   rgba(70, 224, 168, 0.12);
+  --accent-grad:   linear-gradient(180deg, #46E0A8, #2FCF92);
+  /* Text/ink that sits ON an accent-filled surface */
+  --on-accent:     #07090C;
 
   /* Card surfaces — translucent on dark */
   --glass-bg:        rgba(255, 255, 255, 0.028);
@@ -42,6 +47,10 @@
   --border:        rgba(255, 255, 255, 0.08);
   --border-soft:   rgba(255, 255, 255, 0.05);
   --border-strong: rgba(255, 255, 255, 0.16);
+
+  /* Overlay scrim behind modals/sheets + solid sheet surface */
+  --scrim:      rgba(4, 6, 9, 0.66);
+  --sheet-bg:   #0E1218;
 
   /* Elevation — deep shadows read on dark */
   --card-shadow:

@@ -85,54 +85,57 @@
 }
 .topbar-water-add:active { transform: scale(0.94); }
 .topbar-water-add.flash { background: var(--accent-strong, #4F46E5); }
+.topbar-right { display: flex; align-items: stretch; gap: 8px; }
 .topbar-finance-btn {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 44px; height: 42px;
-  border: none;
-  background: var(--glass-bg, #FFFFFF);
-  color: var(--text-secondary, rgba(0, 0, 0, 0.58));
+  width: 44px;
+  background: var(--glass-bg, rgba(255,255,255,0.028));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
+  color: var(--text-tertiary, rgba(244,246,248,0.40));
   border-radius: 12px; text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s, color 0.15s;
+  transition: color 0.15s, border-color 0.15s;
 }
-.topbar-finance-btn:hover { background: var(--glass-bg-hover, #FAFAFB); color: var(--text-primary, #1A1A1E); }
+.topbar-finance-btn:hover { color: var(--text-primary, #F4F6F8); border-color: var(--border-strong, rgba(255,255,255,0.16)); }
 .topbar-finance-icon { display: inline-flex; align-items: center; justify-content: center; }
+/* ── Floating glass dock (self-contained dark palette so it renders
+      identically on every page, incl. index.html's --c-* island) ── */
 .bottombar {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
-  display: flex; justify-content: space-around; align-items: stretch;
-  gap: 2px;
-  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
-  background: var(--bg, #F5F5F7);
-  border-top: 1px solid var(--border-soft, rgba(0, 0, 0, 0.05));
+  position: fixed; z-index: 60;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  left: 50%; transform: translateX(-50%);
+  display: flex; align-items: stretch; gap: 4px;
+  width: min(400px, calc(100% - 28px));
+  padding: 7px;
+  background: rgba(13, 17, 23, 0.78);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+  backdrop-filter: blur(20px) saturate(1.35);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 26px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
 }
 .bottombar-tab {
   flex: 1;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; padding: 6px 0 4px; text-decoration: none;
-  color: var(--text-tertiary, rgba(0, 0, 0, 0.40));
-  font-size: 10px; font-weight: 500; letter-spacing: 0.01em;
-  position: relative;
+  gap: 3px; padding: 8px 0 6px; border-radius: 19px; text-decoration: none;
+  color: rgba(244, 246, 248, 0.45);
+  font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
   -webkit-tap-highlight-color: transparent;
-  transition: color 0.2s var(--ease-fast, ease);
+  transition: color 0.2s, background 0.2s;
 }
 .bottombar-tab-icon {
   display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px;
+  width: 24px; height: 24px;
   transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
-.bottombar-tab-icon svg { width: 22px; height: 22px; display: block; }
-.bottombar-tab.active { color: var(--accent, #6366F1); }
+.bottombar-tab-icon svg { width: 21px; height: 21px; display: block; }
+.bottombar-tab.active { color: #46E0A8; background: rgba(70, 224, 168, 0.10); }
 .bottombar-tab.active .bottombar-tab-icon { transform: translateY(-1px); }
-.bottombar-tab.active::after {
-  content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 18px; height: 2.5px; border-radius: 999px;
-  background: var(--accent, #6366F1);
-}
-.bottombar-tab:not(.active):hover { color: var(--text-secondary, rgba(0, 0, 0, 0.58)); }
+.bottombar-tab:not(.active):hover { color: rgba(244, 246, 248, 0.75); }
 .bottombar-tab:active .bottombar-tab-icon { transform: scale(0.9); }
 body.has-bottombar {
-  padding-bottom: calc(78px + env(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
 }
 @media (max-width: 480px) {
   .topbar { padding-left: 10px; padding-right: 10px; gap: 6px; }
@@ -171,12 +174,15 @@ html, body { -webkit-text-size-adjust: 100%; }
   const topbarHtml = `
 <header class="topbar" id="topbar" role="navigation" aria-label="Navigation">
   <a href="index.html" class="topbar-home" id="topbarHome" aria-label="Home">${icon.home}<span>Home</span></a>
-  <div class="topbar-water-wrap">
-    <a href="health.html#water" class="topbar-water-pill" id="topbarWater" aria-label="Water progress">
-      <span class="topbar-pill-dot"></span>
-      <span class="topbar-pill-count" id="topbarWaterCount">0/0</span>
-    </a>
-    <button class="topbar-water-add" id="topbarWaterAdd" aria-label="Log one drink" type="button">+</button>
+  <div class="topbar-right">
+    <a href="finance.html" class="topbar-finance-btn" aria-label="Finance"><span class="topbar-finance-icon">${icon.wallet}</span></a>
+    <div class="topbar-water-wrap">
+      <a href="health.html#water" class="topbar-water-pill" id="topbarWater" aria-label="Water progress">
+        <span class="topbar-pill-dot"></span>
+        <span class="topbar-pill-count" id="topbarWaterCount">0/0</span>
+      </a>
+      <button class="topbar-water-add" id="topbarWaterAdd" aria-label="Log one drink" type="button">+</button>
+    </div>
   </div>
 </header>`;
 
@@ -204,6 +210,10 @@ html, body { -webkit-text-size-adjust: 100%; }
     try { return window.self !== window.top; } catch (e) { return true; }
   }
   function shouldShowChrome() { return !isFinancePage() && !isEmbedded(); }
+  function isHomePage() {
+    const p = (window.location.pathname || '').toLowerCase();
+    return p === '' || p === '/' || p.endsWith('/index.html') || p === 'index.html';
+  }
   function currentPageKey() {
     const p = (window.location.pathname || '').toLowerCase();
     if (p.endsWith('health.html')) return 'health';
@@ -213,15 +223,28 @@ html, body { -webkit-text-size-adjust: 100%; }
   }
 
   function injectStyleAndHTML() {
-    if (document.getElementById('topbar') || document.getElementById('bottombar')) return;
     if (!shouldShowChrome()) return;
-    const style = document.createElement('style');
-    style.id = 'topbar-style';
-    style.textContent = css;
-    document.head.appendChild(style);
-    const topWrap = document.createElement('div');
-    topWrap.innerHTML = topbarHtml.trim();
-    document.body.insertBefore(topWrap.firstChild, document.body.firstChild);
+    if (!document.getElementById('topbar-style')) {
+      const style = document.createElement('style');
+      style.id = 'topbar-style';
+      style.textContent = css;
+      document.head.appendChild(style);
+    }
+    // Home page keeps its own cinematic topline — dock only.
+    if (!isHomePage() && !document.getElementById('topbar')) {
+      const topWrap = document.createElement('div');
+      topWrap.innerHTML = topbarHtml.trim();
+      document.body.insertBefore(topWrap.firstChild, document.body.firstChild);
+    }
+    if (!document.getElementById('bottombar')) {
+      const botWrap = document.createElement('div');
+      botWrap.innerHTML = bottombarHtml.trim();
+      const bar = botWrap.firstChild;
+      const active = bar.querySelector('[data-page="' + currentPageKey() + '"]');
+      if (active) active.classList.add('active');
+      document.body.appendChild(bar);
+      document.body.classList.add('has-bottombar');
+    }
   }
 
   function calendarDateKey() {

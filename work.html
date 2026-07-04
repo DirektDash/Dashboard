@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F5F5F7">
+<meta name="theme-color" content="#07090C">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/Icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Work">
 <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');</script>
 <title>Work — Dashboard</title>
@@ -42,7 +42,8 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 }
 .wk-title {
   margin: 0;
-  font-size: 30px; font-weight: 700; letter-spacing: -0.03em;
+  font-family: var(--serif);
+  font-size: 34px; font-weight: 400; letter-spacing: -0.01em; font-style: italic;
   color: var(--text-primary);
 }
 .wk-new-btn {
@@ -50,7 +51,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
   padding: 11px 16px;
   border: 0; border-radius: var(--radius-md);
   background: var(--accent);
-  color: #fff; font-family: inherit; font-size: 13px; font-weight: 700;
+  color: var(--on-accent); font-family: inherit; font-size: 13px; font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s var(--spring-bounce), filter 0.15s;
   -webkit-tap-highlight-color: transparent;
@@ -58,7 +59,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 .wk-new-btn:hover { filter: brightness(1.05); }
 .wk-new-btn:active { transform: scale(0.97); }
 .wk-new-btn svg { width: 16px; height: 16px; }
-@media (max-width: 480px) { .wk-title { font-size: 24px; } }
+@media (max-width: 480px) { .wk-title { font-size: 28px; } }
 
 /* ===== Tab switcher (Projects / Timer) ===== */
 .wk-tabs {
@@ -342,7 +343,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 .wk-empty-cta {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 11px 18px; border: 0; border-radius: var(--radius-md);
-  background: var(--accent); color: #fff;
+  background: var(--accent); color: var(--on-accent);
   font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
   transition: filter 0.15s, transform 0.15s var(--spring-bounce);
 }
@@ -386,7 +387,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 .tm-start {
   width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
   padding: 15px; border: 0; border-radius: var(--radius-md);
-  background: var(--accent); color: #fff;
+  background: var(--accent); color: var(--on-accent);
   font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
   transition: filter 0.15s, transform 0.15s var(--spring-bounce);
 }
@@ -427,7 +428,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 }
 .tm-ctrl svg { width: 16px; height: 16px; }
 .tm-ctrl:active { transform: scale(0.97); }
-.tm-ctrl.primary { background: var(--accent); color: #fff; border-color: transparent; }
+.tm-ctrl.primary { background: var(--accent); color: var(--on-accent); border-color: transparent; }
 .tm-ctrl.primary:hover { filter: brightness(1.05); }
 .tm-ctrl.stop { background: rgba(239,68,68,0.10); color: var(--danger); border-color: rgba(239,68,68,0.22); }
 .tm-ctrl.stop:hover { background: rgba(239,68,68,0.16); }
@@ -484,10 +485,10 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 
 /* ===== Modal ===== */
 .wk-modal-bg {
-  position: fixed; inset: 0; z-index: 60;
+  position: fixed; inset: 0; z-index: 300;
   display: none; align-items: center; justify-content: center;
   padding: 20px;
-  background: rgba(255,255,255,0.35);
+  background: var(--scrim);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   animation: fadeIn 0.2s ease both;
 }
@@ -495,7 +496,8 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 .wk-modal {
   width: 100%; max-width: 420px;
   border-radius: var(--radius-lg);
-  background: var(--bg-card);
+  background: var(--sheet-bg);
+  border: 1px solid var(--border-strong);
   box-shadow: var(--card-shadow-hover);
   padding: 24px;
   animation: slideUp 0.3s var(--spring-card) both;
@@ -516,7 +518,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 }
 .wk-field input::placeholder { color: var(--text-quaternary); }
 .wk-field input:focus { border-color: var(--accent); background: var(--bg-card); box-shadow: 0 0 0 3px var(--accent-soft); }
-.wk-field input[type="date"] { color-scheme: light; }
+.wk-field input[type="date"] { color-scheme: dark; }
 .wk-seg { display: flex; gap: 6px; }
 .wk-seg-btn {
   flex: 1; padding: 9px 8px; border-radius: var(--radius-md);
@@ -538,7 +540,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 .wk-btn-cancel:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
 .wk-btn-save {
   flex: 1.4; padding: 12px; border-radius: var(--radius-md); border: 0;
-  background: var(--accent); color: #fff;
+  background: var(--accent); color: var(--on-accent);
   font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
   transition: transform 0.15s var(--spring-bounce), filter 0.15s;
 }

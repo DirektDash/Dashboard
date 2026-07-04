@@ -1,12 +1,17 @@
-const CACHE_NAME = 'dashboard-v3';
+const CACHE_NAME = 'dashboard-v4';
 const CACHED_ASSETS = [
   '/index.html',
+  '/index-classic.html',
   '/finance.html',
   '/gym.html',
   '/health.html',
+  '/work.html',
   '/po-water.html',
   '/sync.js',
   '/topbar.js',
+  '/tokens.css',
+  '/cinematic.css',
+  '/manifest.json',
 ];
 
 self.addEventListener('install', event => {

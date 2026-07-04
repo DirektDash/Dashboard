@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F5F5F7">
+<meta name="theme-color" content="#07090C">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/Icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dashboard">
 <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');</script>
 <title>My Dashboard</title>
@@ -578,7 +578,7 @@ body {
   content: '';
   position: absolute; left: 6px; top: 2px;
   width: 6px; height: 11px;
-  border: solid #FFFFFF;
+  border: solid var(--on-accent);
   border-width: 0 2.5px 2.5px 0;
   transform: rotate(45deg);
   animation: gm-check-pop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -704,8 +704,8 @@ body {
   padding: 11px 20px;
   border: 0;
   border-radius: var(--radius-md);
-  background: linear-gradient(180deg, #46E0A8 0%, #2FCF92 100%);
-  color: #FFFFFF;
+  background: var(--accent-grad);
+  color: var(--on-accent);
   font-family: inherit; font-size: 13px; font-weight: 700;
   cursor: pointer;
   box-shadow:
