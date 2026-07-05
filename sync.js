@@ -13,6 +13,12 @@
     const syncedKeys = (config && config.syncedKeys) || [];
     const syncedPrefixes = (config && config.syncedPrefixes) || [];
     const onApplied = config && config.onApplied;
+    // Optional hooks (used by gym for photo handling):
+    // collectValue(key, parsedValue) -> value to store in the cloud payload
+    // mergeRemote(key, remoteValue, localRawString) -> JSON string to write
+    //   locally, or undefined to use the default overwrite behavior
+    const collectValue = config && config.collectValue;
+    const mergeRemote = config && config.mergeRemote;
     if (!appKey || !window.supabase) return;
     if (!SUPABASE_URL || !SUPABASE_KEY) return;
     if (SUPABASE_URL.indexOf('PASTE-') === 0 || SUPABASE_KEY.indexOf('PASTE-') === 0) return;
@@ -40,7 +46,10 @@
       for (const k of listAllKeys()) {
         const v = localStorage.getItem(k);
         if (v == null) continue;
-        try { out[k] = JSON.parse(v); } catch (e) { out[k] = v; }
+        let parsed;
+        try { parsed = JSON.parse(v); } catch (e) { parsed = v; }
+        if (collectValue) { try { parsed = collectValue(k, parsed); } catch (e) {} }
+        out[k] = parsed;
       }
       return out;
     }
@@ -61,8 +70,10 @@
       try {
         for (const k of Object.keys(remote)) {
           if (!matches(k)) continue;
-          const incoming = JSON.stringify(remote[k]);
           const local = localStorage.getItem(k);
+          let incoming;
+          if (mergeRemote) { try { incoming = mergeRemote(k, remote[k], local); } catch (e) {} }
+          if (incoming === undefined) incoming = JSON.stringify(remote[k]);
           if (local !== incoming) { try { origSet(k, incoming); changed = true; } catch (e) {} }
         }
         for (const k of listAllKeys()) {

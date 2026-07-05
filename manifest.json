@@ -7,6 +7,26 @@
   "orientation": "portrait",
   "theme_color": "#07090C",
   "background_color": "#07090C",
+  "shortcuts": [
+    {
+      "name": "Log water",
+      "short_name": "Water",
+      "url": "/health.html#water",
+      "icons": [{ "src": "/Icons/web-app-manifest-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Start workout",
+      "short_name": "Workout",
+      "url": "/gym.html",
+      "icons": [{ "src": "/Icons/web-app-manifest-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Today's goals",
+      "short_name": "Goals",
+      "url": "/index.html#goals",
+      "icons": [{ "src": "/Icons/web-app-manifest-192x192.png", "sizes": "192x192" }]
+    }
+  ],
   "icons": [
     {
       "src": "/Icons/web-app-manifest-192x192.png",

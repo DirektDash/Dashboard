@@ -1162,6 +1162,16 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
 
   // active-session runtime state
   var run = null; // { type, note, startedAt, elapsedMs, running, lastTick, ticker }
+  // Persisted so the session survives reloads + shows in the topbar chip
+  // on every page (key is covered by the 'work:' sync prefix).
+  var RUN_KEY = 'work:activeSession';
+  function saveRun() {
+    if (!run) { localStorage.removeItem(RUN_KEY); return; }
+    localStorage.setItem(RUN_KEY, JSON.stringify({
+      type: run.type, note: run.note, startedAt: run.startedAt,
+      elapsedMs: run.elapsedMs, running: run.running, lastTick: run.lastTick
+    }));
+  }
 
   function fmtClock(totalSec) {
     var h = Math.floor(totalSec / 3600);
@@ -1203,6 +1213,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
     tmActive.classList.add('on');
     paintClock();
     run.ticker = setInterval(paintClock, 250);
+    saveRun();
   }
 
   function togglePause() {
@@ -1217,6 +1228,7 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
       tmPauseLabel.textContent = 'Pause';
     }
     paintClock();
+    saveRun();
   }
 
   function finishSession() {
@@ -1234,11 +1246,36 @@ body { padding: max(24px, env(safe-area-inset-top)) 20px 80px; }
       saveSessions(sessions);
     }
     run = null;
+    saveRun();
     tmActive.classList.remove('on');
     tmSetup.style.display = 'block';
     tmNote.value = '';
     renderHistory();
   }
+
+  // Restore a persisted session (page reload / navigated away and back).
+  // A running session keeps accruing time while you're away.
+  (function restoreSession() {
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(RUN_KEY)); } catch (e) {}
+    if (!saved || !saved.startedAt) return;
+    run = {
+      type: saved.type || 'Focus',
+      note: saved.note || '',
+      startedAt: saved.startedAt,
+      elapsedMs: saved.elapsedMs || 0,
+      running: !!saved.running,
+      lastTick: saved.lastTick || Date.now(),
+      ticker: null
+    };
+    tmActiveType.innerHTML = typeIcon(run.type) + '<span>' + run.type + '</span>';
+    tmActiveNote.textContent = run.note || '';
+    tmPauseLabel.textContent = run.running ? 'Pause' : 'Resume';
+    tmSetup.style.display = 'none';
+    tmActive.classList.add('on');
+    paintClock();
+    run.ticker = setInterval(paintClock, 250);
+  })();
 
   document.getElementById('tmStart').addEventListener('click', startSession);
   tmPause.addEventListener('click', togglePause);

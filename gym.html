@@ -11,8 +11,9 @@
 <meta name="apple-mobile-web-app-title" content="Dashboard">
 <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');</script>
 <title>Gym</title>
-<script src="topbar.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="sync.js" defer></script>
+<script src="topbar.js" defer></script>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="cinematic.css">
 <style>
@@ -1836,32 +1837,11 @@ $('wtViewerDelete').addEventListener('click',()=>{
 });
 
 // ============================================================
-// CLOUD SYNC via Supabase
+// CLOUD SYNC — shared engine (sync.js) + gym-specific photo hooks
 // ============================================================
-const SUPABASE_URL = 'https://midyjdjkqorcxhdnjanh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_wsfPg84TDDlqqQk-WO887Q_j0Sa5x4p';
-const GYM_APP_KEY  = 'gym-coach';
-const SYNCED_KEYS  = [PLAN_KEY, SESSION_KEY, DONE_KEY, WT_KEY, PHOTO_KEY, ACTIVE_KEY];
-
-let syncSupa=null, syncTimer=null, syncSuppressed=false, syncLastJson=null;
-
-const _origSet=localStorage.setItem.bind(localStorage);
-const _origDel=localStorage.removeItem.bind(localStorage);
-localStorage.setItem=function(k,v){_origSet(k,v);try{if(!syncSuppressed&&SYNCED_KEYS.indexOf(k)!==-1)syncSchedulePush();}catch{}};
-localStorage.removeItem=function(k){_origDel(k);try{if(!syncSuppressed&&SYNCED_KEYS.indexOf(k)!==-1)syncSchedulePush();}catch{}};
-
-function syncCollect(){
-  const out={};
-  for(const k of SYNCED_KEYS){
-    const v=localStorage.getItem(k);if(v==null)continue;
-    try{
-      let val=JSON.parse(v);
-      if(k===PHOTO_KEY&&Array.isArray(val)) val=val.filter(p=>p&&p.url).map(p=>({id:p.id,url:p.url,dateKey:p.dateKey,weight:p.weight}));
-      out[k]=val;
-    }catch{}
-  }
-  return out;
-}
+// Legacy no-op: sync.js patches localStorage.setItem/removeItem and
+// pushes automatically, so explicit nudges are no longer needed.
+function syncSchedulePush(){}
 
 function syncRerender(){
   try{plan=loadPlan();}catch{}
@@ -1875,77 +1855,27 @@ function syncRerender(){
   else if(activePage==='history'){renderHistory();wtRender();photosRender();}
 }
 
-function syncApplyRemote(remote){
-  if(!remote||typeof remote!=='object')return;
-  syncSuppressed=true;let changed=false;
-  try{
-    for(const k of SYNCED_KEYS){
-      if(k in remote){
-        if(k===PHOTO_KEY){
-          let local=[];try{local=JSON.parse(localStorage.getItem(k)||'[]');}catch{}
-          const rPhotos=Array.isArray(remote[k])?remote[k]:[];
-          const rIds=new Set(rPhotos.map(p=>p&&p.id));
-          const merged=[...rPhotos,...local.filter(p=>p&&!p.url&&!rIds.has(p.id))];
-          const inc=JSON.stringify(merged);
-          if(localStorage.getItem(k)!==inc){try{_origSet(k,inc);changed=true;}catch{}}
-          continue;
-        }
-        const inc=JSON.stringify(remote[k]);
-        if(localStorage.getItem(k)!==inc){try{_origSet(k,inc);changed=true;}catch{}}
-      } else if(localStorage.getItem(k)!=null){try{_origDel(k);changed=true;}catch{}}
+document.addEventListener('DOMContentLoaded', function(){
+  if(typeof initCloudSync!=='function')return;
+  initCloudSync({
+    appKey:'gym-coach',
+    syncedKeys:[PLAN_KEY, SESSION_KEY, DONE_KEY, WT_KEY, PHOTO_KEY, ACTIVE_KEY],
+    onApplied:syncRerender,
+    // Only sync photos that finished uploading, and only their synced fields
+    collectValue:function(k,val){
+      if(k===PHOTO_KEY&&Array.isArray(val)) return val.filter(p=>p&&p.url).map(p=>({id:p.id,url:p.url,dateKey:p.dateKey,weight:p.weight}));
+      return val;
+    },
+    // Keep local not-yet-uploaded photos when remote photo list lands
+    mergeRemote:function(k,remoteVal,localRaw){
+      if(k!==PHOTO_KEY)return undefined;
+      let local=[];try{local=JSON.parse(localRaw||'[]');}catch{}
+      const rPhotos=Array.isArray(remoteVal)?remoteVal:[];
+      const rIds=new Set(rPhotos.map(p=>p&&p.id));
+      return JSON.stringify([...rPhotos,...local.filter(p=>p&&!p.url&&!rIds.has(p.id))]);
     }
-  } finally { syncSuppressed=false; }
-  if(changed) try{syncRerender();}catch{}
-}
-
-async function syncPushNow(){
-  if(!syncSupa)return;
-  const s=syncCollect();const j=JSON.stringify(s);
-  if(j===syncLastJson)return;
-  try{
-    const{error}=await syncSupa.from('app_state').upsert({key:GYM_APP_KEY,data:s,updated_at:new Date().toISOString()},{onConflict:'key'});
-    if(!error)syncLastJson=j;
-  }catch{}
-}
-function syncSchedulePush(){if(syncSuppressed)return;clearTimeout(syncTimer);syncTimer=setTimeout(syncPushNow,300);}
-
-function syncFlushOnUnload(){
-  if(!syncSupa)return;
-  const s=syncCollect();const j=JSON.stringify(s);if(j===syncLastJson)return;
-  try{
-    fetch(SUPABASE_URL+'/rest/v1/app_state?on_conflict=key',{
-      method:'POST',
-      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({key:GYM_APP_KEY,data:s,updated_at:new Date().toISOString()}),
-      keepalive:true
-    }).catch(()=>{});
-    syncLastJson=j;
-  }catch{}
-}
-
-(async function initSync(){
-  if(!window.supabase||!SUPABASE_URL||!SUPABASE_KEY)return;
-  syncSupa=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-  try{
-    const{data,error}=await syncSupa.from('app_state').select('data').eq('key',GYM_APP_KEY).maybeSingle();
-    if(!error&&data&&data.data&&Object.keys(data.data).length>0){
-      syncLastJson=JSON.stringify(data.data);
-      syncApplyRemote(data.data);
-    } else if(Object.keys(syncCollect()).length>0){ syncSchedulePush(); }
-  }catch{}
-  syncSupa.channel('gym_state_'+GYM_APP_KEY)
-    .on('postgres_changes',{event:'*',schema:'public',table:'app_state',filter:'key=eq.'+GYM_APP_KEY},(payload)=>{
-      if(!payload.new||!payload.new.data)return;
-      const inc=JSON.stringify(payload.new.data);
-      if(inc===syncLastJson)return;
-      syncLastJson=inc;
-      syncApplyRemote(payload.new.data);
-    }).subscribe();
-})();
-
-window.addEventListener('pagehide',syncFlushOnUnload);
-window.addEventListener('beforeunload',syncFlushOnUnload);
-document.addEventListener('visibilitychange',()=>{if(document.hidden)syncFlushOnUnload();});
+  });
+});
 
 // ============================================================
 // BOOT

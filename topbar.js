@@ -86,6 +86,27 @@
 .topbar-water-add:active { transform: scale(0.94); }
 .topbar-water-add.flash { background: var(--accent-strong, #4F46E5); }
 .topbar-right { display: flex; align-items: stretch; gap: 8px; }
+.topbar-timer-pill {
+  display: none; align-items: center; gap: 7px;
+  padding: 9px 12px; border-radius: 12px;
+  background: var(--accent-soft, rgba(70, 224, 168, 0.12));
+  border: 1px solid rgba(70, 224, 168, 0.28);
+  color: var(--accent, #46E0A8); text-decoration: none;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;
+  -webkit-tap-highlight-color: transparent;
+}
+.topbar-timer-pill.on { display: inline-flex; }
+.topbar-timer-pill.paused { color: var(--warn, #FBBF24); background: rgba(251, 191, 36, 0.10); border-color: rgba(251, 191, 36, 0.28); }
+.topbar-timer-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0;
+  animation: topbar-timer-pulse 1.8s ease-in-out infinite;
+}
+.topbar-timer-pill.paused .topbar-timer-dot { animation: none; opacity: 0.6; }
+@keyframes topbar-timer-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
 .topbar-finance-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 44px;
@@ -151,16 +172,16 @@ html, body { -webkit-text-size-adjust: 100%; }
   ::-webkit-scrollbar { width: 0; height: 0; display: none; }
   html, body { scrollbar-width: none; -ms-overflow-style: none; }
 }
-.modal-bg, .modal, .po-modal-bg, .po-modal, .wt-overlay, .wt-viewer {
+.modal-bg, .modal, .wt-overlay, .wt-viewer {
   overscroll-behavior: contain;
 }
 @media (max-width: 480px) {
-  .modal-bg, .po-modal-bg {
+  .modal-bg {
     padding: 0 !important;
     align-items: stretch !important;
     justify-content: stretch !important;
   }
-  .modal, .po-modal {
+  .modal {
     width: 100% !important; max-width: 100% !important;
     max-height: 100vh !important; height: 100vh !important;
     border-radius: 0 !important;
@@ -175,6 +196,9 @@ html, body { -webkit-text-size-adjust: 100%; }
 <header class="topbar" id="topbar" role="navigation" aria-label="Navigation">
   <a href="index.html" class="topbar-home" id="topbarHome" aria-label="Home">${icon.home}<span>Home</span></a>
   <div class="topbar-right">
+    <a href="work.html" class="topbar-timer-pill" id="topbarTimer" aria-label="Work session running">
+      <span class="topbar-timer-dot"></span><span id="topbarTimerText">0:00</span>
+    </a>
     <a href="finance.html" class="topbar-finance-btn" aria-label="Finance"><span class="topbar-finance-icon">${icon.wallet}</span></a>
     <div class="topbar-water-wrap">
       <a href="health.html#water" class="topbar-water-pill" id="topbarWater" aria-label="Water progress">
@@ -301,6 +325,24 @@ html, body { -webkit-text-size-adjust: 100%; }
     setPillStatus(waterEl, classifyStatus(w.done, w.total));
   }
 
+  // -------- Work-session timer chip (state written by work.html) --------
+  function renderTimer() {
+    const el = document.getElementById('topbarTimer');
+    if (!el) return;
+    let st = null;
+    try { st = JSON.parse(localStorage.getItem('work:activeSession')); } catch (e) {}
+    if (!st || !st.startedAt) { el.classList.remove('on', 'paused'); return; }
+    let ms = st.elapsedMs || 0;
+    if (st.running) ms += Date.now() - (st.lastTick || Date.now());
+    const s = Math.max(0, Math.floor(ms / 1000));
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    const pad = (n) => String(n).padStart(2, '0');
+    const txt = document.getElementById('topbarTimerText');
+    if (txt) txt.textContent = h > 0 ? h + ':' + pad(m) + ':' + pad(sec) : m + ':' + pad(sec);
+    el.classList.add('on');
+    el.classList.toggle('paused', !st.running);
+  }
+
   function defaultWaterState() {
     return {
       unit: 'bottle', bottleMl: 500, glassMl: 250, weightUnit: 'kg',
@@ -356,11 +398,13 @@ html, body { -webkit-text-size-adjust: 100%; }
     const btn = document.getElementById('topbarWaterAdd');
     if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); addWater(); });
     render();
+    renderTimer();
     lockGestures();
-    window.addEventListener('storage', render);
+    window.addEventListener('storage', () => { render(); renderTimer(); });
     window.addEventListener('focus', render);
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) { render(); renderTimer(); } });
     setInterval(render, 30 * 1000);
+    setInterval(renderTimer, 1000);
   }
 
   if (document.readyState === 'loading') {

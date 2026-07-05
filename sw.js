@@ -1,11 +1,10 @@
-const CACHE_NAME = 'dashboard-v5';
+const CACHE_NAME = 'dashboard-v6';
 const CACHED_ASSETS = [
   '/index.html',
   '/finance.html',
   '/gym.html',
   '/health.html',
   '/work.html',
-  '/po-water.html',
   '/sync.js',
   '/topbar.js',
   '/tokens.css',

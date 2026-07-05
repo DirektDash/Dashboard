@@ -320,7 +320,7 @@ html, body { scrollbar-width: none; -ms-overflow-style: none; }
 
 /* Inline label eyebrow */
 .label {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--text-tertiary);
   margin-bottom: 10px;
   font-weight: 800;
@@ -414,7 +414,7 @@ html, body { scrollbar-width: none; -ms-overflow-style: none; }
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -469,7 +469,7 @@ html, body { scrollbar-width: none; -ms-overflow-style: none; }
   padding: 4px 6px;
 }
 .nw-stat-label {
-  font-size: 9px; letter-spacing: 0.16em; font-weight: 800;
+  font-size: 10px; letter-spacing: 0.16em; font-weight: 800;
   text-transform: uppercase; color: var(--text-tertiary);
   font-family: var(--font-mono);
 }
@@ -548,7 +548,7 @@ html, body { scrollbar-width: none; -ms-overflow-style: none; }
   line-height: 1;
 }
 .nw-donut-sub {
-  font-size: 9px; letter-spacing: 0.18em; font-weight: 700;
+  font-size: 10px; letter-spacing: 0.18em; font-weight: 700;
   text-transform: uppercase; color: var(--text-tertiary);
   margin-top: 4px;
 }
@@ -594,7 +594,7 @@ html, body { scrollbar-width: none; -ms-overflow-style: none; }
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -859,8 +859,9 @@ html, body { scrollbar-width: none; -ms-overflow-style: none; }
   margin-bottom: 6px;
 }
 .wish-hero-num {
-  font-size: 32px; font-weight: 700; letter-spacing: -0.025em;
-  font-variant-numeric: tabular-nums; line-height: 1;
+  font-family: var(--serif);
+  font-size: 34px; font-weight: 400; letter-spacing: -0.01em;
+  line-height: 1;
   color: var(--text-primary);
 }
 .wish-hero-pct-wrap { text-align: right; }
@@ -1082,7 +1083,7 @@ html, body { scrollbar-width: none; -ms-overflow-style: none; }
   50%      { box-shadow: 0 0 14px 0 rgba(239,68,68,0.30); }
 }
 .ticker-tag {
-  font-size: 9.5px; letter-spacing: 0.18em; font-weight: 800;
+  font-size: 10px; letter-spacing: 0.18em; font-weight: 800;
   text-transform: uppercase; color: var(--text-tertiary);
   padding: 3px 8px;
   background: rgba(255,255,255,0.05);
@@ -1203,7 +1204,7 @@ html, body { scrollbar-width: none; -ms-overflow-style: none; }
   border: 1px solid rgba(255,255,255,0.10);
   color: var(--text-tertiary);
   font-family: inherit;
-  font-size: 10.5px;
+  font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 4px 9px;
@@ -1517,7 +1518,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-tertiary);
@@ -1593,6 +1594,82 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border-color: rgba(16,185,129,0.25);
   background: rgba(16,185,129,0.08);
 }
+
+/* ===== Net worth hero total — serif display number ===== */
+#netWorthTotal {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 48px;
+  color: var(--text-primary);
+  line-height: 1.02;
+  margin-top: 4px;
+  letter-spacing: -0.01em;
+}
+
+/* ===== Themed header/composer selects (was inline styles) ===== */
+.fin-select {
+  padding: 6px 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.fin-select-sm {
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* ===== Styled confirm dialog (replaces native confirm()) ===== */
+.confirm-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: var(--scrim);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.18s ease both;
+}
+.confirm-sheet {
+  width: min(360px, 100%);
+  background: var(--sheet-bg);
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  padding: 22px 20px 18px;
+  box-shadow: var(--card-shadow-hover);
+  animation: slideUp 0.28s var(--spring-smooth) both;
+}
+.confirm-msg {
+  font-size: 14px; line-height: 1.5;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+  overflow-wrap: break-word;
+}
+.confirm-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.confirm-btn {
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-family: inherit; font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.confirm-btn:active { transform: scale(0.97); }
+.confirm-btn:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.confirm-btn.cancel {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.confirm-btn.cancel:hover { background: rgba(255,255,255,0.09); color: var(--text-primary); }
+.confirm-btn.danger {
+  background: rgba(248,113,113,0.14);
+  border: 1px solid rgba(248,113,113,0.35);
+  color: var(--bad);
+}
+.confirm-btn.danger:hover { background: rgba(248,113,113,0.22); }
 </style>
 </head>
 <body>
@@ -1620,12 +1697,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:14px">
       <div>
         <div style="font-size:10.5px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.12em;font-weight:700">Total net worth</div>
-        <div id="netWorthTotal" style="font-size:46px;font-weight:700;color:var(--text-primary);line-height:1.02;margin-top:4px;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">NOK 0</div>
+        <div id="netWorthTotal">NOK 0</div>
         <div id="netWorthBreakdown" style="font-size:11.5px;color:var(--text-tertiary);margin-top:6px"></div>
       </div>
       <div style="display:flex;align-items:center;gap:6px">
         <span style="font-size:11px;color:var(--text-tertiary)">NOK</span>
-        <select id="netWorthCurrency" style="background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;font-family:inherit;cursor:pointer">
+        <select id="netWorthCurrency" class="fin-select fin-select-sm">
           <option value="NOK">NOK</option>
           <option value="USD">USD</option>
           <option value="EUR">EUR</option>
@@ -1777,20 +1854,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="quick-add" style="flex-wrap:wrap;gap:6px">
       <input type="text" placeholder="Service (e.g. Netflix)" id="subName" style="flex:1.5;min-width:120px" />
       <input type="number" placeholder="Amount" id="subAmount" step="0.01" style="flex:1;max-width:100px" />
-      <select id="subCurrency" style="padding:6px 10px;border:0.5px solid var(--border);border-radius:var(--radius-md);font-size:12px;font-family:inherit;background:var(--bg-card);color:var(--text-primary);max-width:90px">
+      <select id="subCurrency" class="fin-select" style="max-width:90px">
         <option value="NOK">NOK</option>
         <option value="USD">USD</option>
         <option value="EUR">EUR</option>
         <option value="GBP">GBP</option>
         <option value="CHF">CHF</option>
       </select>
-      <select id="subPeriod" style="padding:6px 10px;border:0.5px solid var(--border);border-radius:var(--radius-md);font-size:12px;font-family:inherit;background:var(--bg-card);color:var(--text-primary);max-width:100px">
+      <select id="subPeriod" class="fin-select" style="max-width:100px">
         <option value="monthly">Monthly</option>
         <option value="yearly">Yearly</option>
         <option value="weekly">Weekly</option>
       </select>
       <label class="date-field" title="Next renewal date" style="min-width:150px"><span class="date-emoji" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><input type="date" id="subRenewal" /></label>
-      <select id="subFromCat" title="Which net worth account to deduct from" style="padding:6px 10px;border:0.5px solid var(--border);border-radius:var(--radius-md);font-size:12px;font-family:inherit;background:var(--bg-card);color:var(--text-primary);min-width:130px">
+      <select id="subFromCat" title="Which net worth account to deduct from" class="fin-select" style="min-width:130px">
         <option value="">No accounts yet</option>
       </select>
       <label class="sub-auto-toggle" title="Auto-deduct from the linked account on each renewal">
@@ -1932,6 +2009,55 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
   function storeSet(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  // ============================================================
+  // confirmDialog — promise-based styled replacement for native
+  // confirm(). Resolves true on Confirm, false on Cancel/Escape/
+  // scrim click. Confirm is danger-styled (used for deletes).
+  // ============================================================
+  function confirmDialog(msg) {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.className = 'confirm-overlay';
+      const sheet = document.createElement('div');
+      sheet.className = 'confirm-sheet';
+      sheet.setAttribute('role', 'alertdialog');
+      sheet.setAttribute('aria-modal', 'true');
+      const msgEl = document.createElement('div');
+      msgEl.className = 'confirm-msg';
+      msgEl.textContent = msg;
+      const actions = document.createElement('div');
+      actions.className = 'confirm-actions';
+      const cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'confirm-btn cancel';
+      cancelBtn.textContent = 'Cancel';
+      const okBtn = document.createElement('button');
+      okBtn.type = 'button';
+      okBtn.className = 'confirm-btn danger';
+      okBtn.textContent = 'Confirm';
+      actions.appendChild(cancelBtn);
+      actions.appendChild(okBtn);
+      sheet.appendChild(msgEl);
+      sheet.appendChild(actions);
+      overlay.appendChild(sheet);
+      function close(result) {
+        document.removeEventListener('keydown', onKey);
+        overlay.remove();
+        resolve(result);
+      }
+      function onKey(e) {
+        if (e.key === 'Escape') { e.preventDefault(); close(false); }
+        else if (e.key === 'Enter') { e.preventDefault(); close(true); }
+      }
+      cancelBtn.addEventListener('click', () => close(false));
+      okBtn.addEventListener('click', () => close(true));
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) close(false); });
+      document.addEventListener('keydown', onKey);
+      document.body.appendChild(overlay);
+      okBtn.focus();
+    });
   }
 
   // ============================================================
@@ -2529,7 +2655,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       row.className = 'sub-row' + (isUrgent ? ' is-urgent' : '');
       row.style.cssText = 'display:grid;grid-template-columns:1fr auto auto;align-items:center;padding:12px 14px;background:rgba(255,255,255,0.03);border-radius:var(--radius-md);margin-bottom:8px;gap:12px;';
       const renewLine = it.renewal
-        ? '<div class="sub-renew-line" style="font-size:10px;color:#F2C063;margin-top:3px;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>Renews ' + formatRenewal(it.renewal) + '</div>'
+        ? '<div class="sub-renew-line" style="font-size:11px;color:var(--warn);margin-top:3px;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>Renews ' + formatRenewal(it.renewal) + '</div>'
         : '';
       // Linked NW account + auto-deduct toggle pills
       let metaLine = '';
@@ -2555,12 +2681,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       cost.style.cssText = 'text-align:right;line-height:1.1';
       const bigNum = fmtMoney(m);
       const origHint = (it.entered_currency && it.entered_currency !== 'NOK' && it.entered_amount != null)
-        ? '<div style="font-size:10px;color:var(--text-tertiary);margin-top:2px">billed ' + it.entered_currency + ' ' + Number(it.entered_amount).toLocaleString('en-US', { minimumFractionDigits: it.entered_amount % 1 === 0 ? 0 : 2, maximumFractionDigits: 2 }) + ' / ' + it.period + '</div>'
+        ? '<div style="font-size:10.5px;color:var(--text-tertiary);margin-top:2px">billed ' + it.entered_currency + ' ' + Number(it.entered_amount).toLocaleString('en-US', { minimumFractionDigits: it.entered_amount % 1 === 0 ? 0 : 2, maximumFractionDigits: 2 }) + ' / ' + it.period + '</div>'
         : (it.period !== 'monthly'
-            ? '<div style="font-size:10px;color:var(--text-tertiary);margin-top:2px">billed ' + fmtMoney(it.amount) + ' / ' + it.period + '</div>'
+            ? '<div style="font-size:10.5px;color:var(--text-tertiary);margin-top:2px">billed ' + fmtMoney(it.amount) + ' / ' + it.period + '</div>'
             : '');
       cost.innerHTML = '<div style="font-size:20px;font-weight:700;color:var(--text-primary);font-variant-numeric:tabular-nums">' + bigNum + '</div>' +
-        '<div style="font-size:10px;color:var(--text-tertiary);margin-top:1px">/ month</div>' +
+        '<div style="font-size:10.5px;color:var(--text-tertiary);margin-top:1px">/ month</div>' +
         origHint;
       const actions = document.createElement('div');
       actions.style.cssText = 'display:flex;flex-direction:column;gap:4px;align-items:center';
@@ -2573,8 +2699,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       del.title = 'Delete';
       del.style.cssText = 'background:transparent;border:1px solid rgba(255,255,255,0.10);color:var(--text-tertiary);cursor:pointer;font-size:12px;padding:3px 7px;border-radius:5px;font-family:inherit;line-height:1';
       del.textContent = '×';
-      del.addEventListener('click', () => {
-        if (!confirm('Delete "' + it.name + '"?')) return;
+      del.addEventListener('click', async () => {
+        if (!(await confirmDialog('Delete "' + it.name + '"?'))) return;
         items.splice(idx, 1); storeSet('subs', items); renderSubs();
       });
       actions.appendChild(editBtn);
@@ -3137,9 +3263,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       + '<button class="ord-deduct-cancel" type="button">cancel</button>';
     cardEl.appendChild(chooser);
     chooser.querySelectorAll('.ord-deduct-opt').forEach(b => {
-      b.addEventListener('click', () => {
+      b.addEventListener('click', async () => {
         if (b.dataset.insuf === '1') {
-          if (!confirm('That account doesn\'t have enough — deduct anyway? (it will go negative)')) return;
+          if (!(await confirmDialog('That account doesn\'t have enough — deduct anyway? (it will go negative)'))) return;
         }
         confirmDeduct(orderId, b.dataset.cat, b.dataset.name);
       });
