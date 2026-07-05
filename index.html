@@ -220,6 +220,17 @@ body { padding: max(26px, env(safe-area-inset-top)) 22px 60px; font-family: var(
   *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .12s !important; }
 }
 
+/* ── Revisit: entrance/draw-in animations play once per session.
+      Coming back via the dock renders instantly; ambient loops
+      (waves, radar sweep, pulse, halo) keep running. ── */
+html.revisit .topline, html.revisit .hero, html.revisit .tile { animation: none; }
+html.revisit .spark-line { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; }
+html.revisit .spark-area { animation: none; }
+html.revisit .spark-dot { animation: none; opacity: 1; }
+html.revisit .candle, html.revisit .wick { animation: none; transform: scaleY(1); }
+html.revisit .wave-fill { transition: none; }
+html.revisit .mini-ring-fill { transition: stroke .3s ease; }
+
 /* ── Goals overlay (opens from the Today tile) ── */
 .goals-overlay { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .goals-overlay[hidden] { display: none; }
@@ -276,6 +287,13 @@ body { padding: max(26px, env(safe-area-inset-top)) 22px 60px; font-family: var(
   font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: filter .15s, transform .15s; }
 .goals-add-btn:hover { filter: brightness(1.08); }
 .goals-add-btn:active { transform: scale(.96); }
+.goals-polish-btn { width: 44px; flex-shrink: 0; border: 1px solid var(--c-border); border-radius: 12px;
+  background: var(--c-card); color: var(--c-text-3); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  transition: color .2s, border-color .2s; }
+.goals-polish-btn:hover { color: var(--mood); border-color: var(--mood); }
+.goals-polish-btn:disabled { opacity: .5; cursor: wait; }
+.goals-status { min-height: 16px; margin-top: 6px; font-size: 11px; color: var(--c-text-3); }
+.goals-status.error { color: var(--danger); }
 .goals-push { width: 100%; margin-top: 12px; padding: 10px; border: 1px dashed var(--c-border-hi); border-radius: 12px;
   background: transparent; color: var(--c-text-3); font-family: inherit; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: color .18s, border-color .18s; }
 .goals-push[hidden] { display: none; }
@@ -285,6 +303,13 @@ body { padding: max(26px, env(safe-area-inset-top)) 22px 60px; font-family: var(
 </style>
 </head>
 <body>
+<script>
+/* Before first paint: skip entrance animations on revisits this session */
+try {
+  if (sessionStorage.getItem('dash_home_seen')) document.documentElement.classList.add('revisit');
+  sessionStorage.setItem('dash_home_seen', '1');
+} catch (e) {}
+</script>
 <div class="bg-fx"></div>
 <div class="bg-grain"></div>
 <div class="bg-vignette"></div>
@@ -293,7 +318,7 @@ body { padding: max(26px, env(safe-area-inset-top)) 22px 60px; font-family: var(
 
   <div class="topline">
     <div class="brand"><span class="brand-dot"></span><span>Dashboard</span></div>
-    <a class="setup-pill" href="index-classic.html"><span>Goals &amp; classic</span><span class="sp-arrow">→</span></a>
+    <a class="setup-pill" href="#goals" id="goalsPill"><span>Goals</span><span class="sp-arrow">→</span></a>
   </div>
 
   <section class="hero">
@@ -379,7 +404,7 @@ body { padding: max(26px, env(safe-area-inset-top)) 22px 60px; font-family: var(
     </a>
 
     <!-- 06 TODAY -->
-    <a class="tile tile-today" href="index-classic.html" id="tToday" style="--tile-glow:rgba(70,224,168,0.10)">
+    <a class="tile tile-today" href="#goals" id="tToday" style="--tile-glow:rgba(70,224,168,0.10)">
       <span class="tile-num">06</span>
       <span class="tile-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 12H3"/><path d="M16 6H3"/><path d="M16 18H3"/><path d="m19 10-3 3-2-2"/></svg></span>
       <div class="tile-body" style="display:flex;align-items:center;gap:16px;">
@@ -423,8 +448,10 @@ body { padding: max(26px, env(safe-area-inset-top)) 22px 60px; font-family: var(
     <button class="goals-push" id="goalsPushBtn" hidden>Push remaining to tomorrow</button>
     <div class="goals-add">
       <input id="goalsInput" class="goals-input" type="text" placeholder="Add a goal for today…" autocomplete="off">
+      <button id="goalsPolishBtn" class="goals-polish-btn" type="button" title="Rewrite with AI, then add"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg></button>
       <button id="goalsAddBtn" class="goals-add-btn" type="button">+ Add</button>
     </div>
+    <div class="goals-status" id="goalsStatus"></div>
 
     <div class="goals-tomorrow">
       <div class="goals-eyebrow" id="goalsTomorrowLabel">Plan tomorrow</div>
@@ -921,6 +948,26 @@ body { padding: max(26px, env(safe-area-inset-top)) 22px 60px; font-family: var(
   function addGoal(input, key){ const t=input.value.trim(); if(!t) return;
     const l=getGoals(key); l.push({text:t,done:false}); setGoals(key,l); input.value=''; render(); }
 
+  // AI polish — Supabase edge fn rewrites the goal text; falls back to as-typed
+  const polishBtn=document.getElementById('goalsPolishBtn');
+  const statusEl=document.getElementById('goalsStatus');
+  function goalsStatus(msg, isError){ statusEl.textContent=msg; statusEl.classList.toggle('error', !!isError);
+    clearTimeout(statusEl._t); statusEl._t=setTimeout(()=>{ statusEl.textContent=''; statusEl.classList.remove('error'); }, 3500); }
+  async function polishOne(text){
+    const res=await fetch('https://midyjdjkqorcxhdnjanh.supabase.co/functions/v1/ai-polish', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text}) });
+    const data=await res.json();
+    if(!res.ok || data.error) throw new Error(data.error || 'polish failed');
+    return data.polished;
+  }
+  if(polishBtn) polishBtn.addEventListener('click', async ()=>{
+    const input=document.getElementById('goalsInput');
+    const t=input.value.trim(); if(!t) return;
+    polishBtn.disabled=true;
+    try { input.value=await polishOne(t); addGoal(input, todayKey()); }
+    catch(e){ addGoal(input, todayKey()); goalsStatus('Polish failed — added as-typed.', true); }
+    finally { polishBtn.disabled=false; }
+  });
   document.getElementById('goalsAddBtn').addEventListener('click', ()=> addGoal(document.getElementById('goalsInput'), todayKey()));
   document.getElementById('goalsInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); addGoal(document.getElementById('goalsInput'), todayKey()); } });
   document.getElementById('goalsTomorrowAddBtn').addEventListener('click', ()=> addGoal(document.getElementById('goalsTomorrowInput'), tomorrowKey()));
@@ -939,6 +986,8 @@ body { padding: max(26px, env(safe-area-inset-top)) 22px 60px; font-family: var(
   function closeOverlay(){ overlay.hidden=true; document.body.style.overflow=''; }
   const tToday=document.getElementById('tToday');
   if(tToday) tToday.addEventListener('click', e=>{ e.preventDefault(); openOverlay(); });
+  const goalsPill=document.getElementById('goalsPill');
+  if(goalsPill) goalsPill.addEventListener('click', e=>{ e.preventDefault(); openOverlay(); });
   document.getElementById('goalsClose').addEventListener('click', closeOverlay);
   document.getElementById('goalsBackdrop').addEventListener('click', closeOverlay);
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !overlay.hidden) closeOverlay(); });

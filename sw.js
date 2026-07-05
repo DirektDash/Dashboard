@@ -1,7 +1,6 @@
-const CACHE_NAME = 'dashboard-v4';
+const CACHE_NAME = 'dashboard-v5';
 const CACHED_ASSETS = [
   '/index.html',
-  '/index-classic.html',
   '/finance.html',
   '/gym.html',
   '/health.html',

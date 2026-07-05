@@ -12,356 +12,584 @@
 <meta name="apple-mobile-web-app-title" content="Dashboard">
 <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');</script>
 <title>Health — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="sync.js" defer></script>
 <script src="topbar.js" defer></script>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="cinematic.css">
 <style>
+/* ============================================================
+   health.html — cinematic dark health hub
+   Wellness score · native water coach · sleep · nutrition
+   ============================================================ */
 :root {
-  --bg-input:       rgba(255,255,255, 0.03);
-  --bg-input-focus: rgba(255,255,255,0.10);
+  --bg-input:       rgba(255,255,255,0.03);
+  --bg-input-focus: rgba(255,255,255,0.07);
+  --water-grad:     linear-gradient(90deg, #60A5FA, #46E0A8);
 }
 
 main {
   position: relative;
   max-width: 680px; margin: 0 auto;
-  padding: 56px 20px 80px;
-  padding-top: max(56px, env(safe-area-inset-top, 56px));
-  font-size: 15px; line-height: 1.5;
+  padding: 14px 20px 56px;
 }
 
-.section-title {
-  font-family: var(--font-mono);
-  font-size: 10.5px; font-weight: 700;
-  letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--text-tertiary);
-  margin: 0 4px 14px;
+@keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+
+/* ── Page head ── */
+.page-head { margin: 10px 4px 6px; animation: rise .6s var(--spring-smooth) both; }
+.ph-eyebrow {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--text-3);
+}
+.ph-title {
+  font-family: var(--serif); font-weight: 400;
+  font-size: clamp(38px, 8vw, 52px); line-height: .98; letter-spacing: -.01em;
+  color: var(--text-1); margin: 8px 0 8px;
+}
+.ph-title em { font-style: italic; color: var(--accent); }
+.ph-sub { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .04em; color: var(--text-3); }
+.ph-sub b { color: var(--text-2); font-weight: 600; }
+
+/* ── Sections ── */
+.section { margin-top: 34px; animation: rise .6s var(--spring-smooth) both; }
+#wellness    { animation-delay: .06s; }
+#water       { animation-delay: .12s; }
+#sleepSection{ animation-delay: .18s; }
+#calSection  { animation-delay: .24s; }
+
+.sec-head {
   display: flex; align-items: center; gap: 12px;
+  margin: 0 6px 12px;
 }
-.section-title::before {
-  content: ''; width: 18px; height: 1px;
-  background: rgba(255,255,255,0.14);
-  flex-shrink: 0;
+.sec-num {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: .1em; color: var(--text-4);
 }
-.section-title::after {
-  content: ''; flex: 1; height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.10), transparent);
+.sec-title {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--text-3);
+}
+.sec-head::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255,255,255,0.10), transparent); }
+
+.card {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 22px;
+  padding: 22px 20px 20px;
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
 }
 
-.water-embed { margin-top: 56px; animation: slideUp 0.5s var(--spring-smooth) both; }
-.water-iframe {
-  display: block;
-  width: 100%;
-  height: 880px;
-  border: 0;
-  background: transparent;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  color-scheme: dark;
+.card-title {
+  font-family: var(--serif); font-style: italic; font-weight: 400;
+  font-size: 26px; line-height: 1; color: var(--text-1); margin: 0;
 }
-@media (max-width: 480px) {
-  .water-embed { margin-top: 40px; }
-  .water-iframe { height: 780px; }
+.card-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 12px; margin-bottom: 14px;
+}
+.card-eyebrow {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--text-3);
+  display: block; margin-bottom: 7px;
 }
 
-/* ── Shared health card shell ── */
-.health-section {
-  margin-top: 40px;
-  animation: slideUp 0.45s var(--spring-smooth) 0.12s both;
+.icon-btn {
+  width: 36px; height: 36px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  border-radius: 12px; color: var(--text-2); cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .18s ease, color .18s ease, border-color .18s ease;
 }
-.health-section + .health-section { animation-delay: 0.22s; }
+.icon-btn:hover { background: var(--glass-bg-hover); color: var(--text-1); border-color: var(--border-strong); }
 
-.health-card {
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-lg);
-  padding: 4px 4px 8px;
-  box-shadow: none;
+/* ── Shared primitives ── */
+.big-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.big-num {
+  font-size: 46px; font-weight: 700; letter-spacing: -.03em; line-height: 1;
+  color: var(--text-1); font-variant-numeric: tabular-nums;
 }
-
-.hl-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 11px; font-weight: 600;
-  letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--text-tertiary); display: block;
-}
+.big-total { font-family: var(--font-mono); font-size: 17px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.big-unit  { font-size: 13px; font-weight: 600; color: var(--text-3); }
 
 .hl-track {
-  height: 5px; background: rgba(255,255,255,0.07);
+  height: 6px; background: rgba(255,255,255,0.07);
   border-radius: 999px; overflow: hidden; margin: 10px 0 4px;
+  position: relative;
 }
 .hl-fill {
-  height: 100%; width: 0%; background: var(--success);
+  height: 100%; width: 0%;
+  background: var(--accent-grad);
   border-radius: 999px;
-  transition: width 0.55s var(--spring-smooth);
+  transition: width .55s var(--spring-smooth);
 }
-.hl-fill.is-warn { background: var(--warning); }
-.hl-fill.is-over { background: var(--warning); }
+.hl-fill.is-warn, .hl-fill.is-over { background: linear-gradient(180deg, var(--warn), #E0A82F); }
 
-.hl-stat-row {
-  display: flex; align-items: baseline; gap: 6px;
-  margin-bottom: 6px; flex-wrap: wrap;
+.hl-eyebrow {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--text-3); display: block;
 }
-.hl-big-num {
-  font-size: 40px; font-weight: 700;
-  letter-spacing: -0.025em; line-height: 1;
-  color: var(--text-primary); font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-}
-.hl-big-unit { font-size: 16px; color: var(--text-tertiary); font-weight: 500; }
-.hl-status-dot {
+
+.status-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: var(--text-quaternary);
-  margin-left: 4px; flex-shrink: 0; align-self: center;
-  transition: background 0.3s, box-shadow 0.3s;
+  background: var(--text-4); flex-shrink: 0; align-self: center;
+  transition: background .3s, box-shadow .3s;
 }
-.hl-status-dot.is-good { background: var(--success); box-shadow: 0 0 6px rgba(52,211,153,0.6); }
-.hl-status-dot.is-warn { background: var(--warning); box-shadow: 0 0 6px rgba(251,191,36,0.5); }
-.hl-status-dot.is-bad  { background: var(--danger); animation: hl-pulse 1.6s ease-in-out infinite; }
-@keyframes hl-pulse {
+.status-dot.is-good { background: var(--good); box-shadow: 0 0 8px rgba(52,211,153,0.6); }
+.status-dot.is-warn { background: var(--warn); box-shadow: 0 0 8px rgba(251,191,36,0.5); }
+.status-dot.is-bad  { background: var(--bad);  animation: dot-pulse 1.6s ease-in-out infinite; }
+@keyframes dot-pulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(248,113,113,0.5); }
-  50%      { box-shadow: 0 0 0 5px rgba(248,113,113,0); }
+  50%     { box-shadow: 0 0 0 5px rgba(248,113,113,0); }
 }
-.hl-status-label { font-size: 12px; font-weight: 600; color: var(--text-tertiary); align-self: center; }
+.status-label { font-size: 12px; font-weight: 600; color: var(--text-3); align-self: center; }
 
-.hl-goal-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.hl-goal-val {
-  font-family: var(--font-mono); font-size: 13px;
-  color: var(--text-secondary); font-variant-numeric: tabular-nums;
-}
-.hl-goal-edit-btn {
-  background: rgba(255,255,255,0.04); border: 1px solid var(--border-soft);
-  color: var(--text-tertiary); font-size: 10px; font-family: var(--font-mono);
-  font-weight: 700; letter-spacing: 0.06em; padding: 3px 9px; border-radius: 6px;
-  cursor: pointer; transition: color 0.15s, background 0.15s, border-color 0.15s;
-}
-.hl-goal-edit-btn:hover {
-  color: var(--text-primary);
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(255,255,255,0.14);
-}
-
-.hl-week-strip {
-  display: grid; grid-template-columns: repeat(7,1fr);
-  gap: 5px; margin: 14px 0 10px;
-}
-.hl-week-day { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+/* 7-day / 14-day strips (classnames consumed by JS) */
+.hl-week-strip { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; margin: 16px 0 4px; }
+.hl-week-day  { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .hl-week-day-lbl {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
-  color: var(--text-quaternary); text-transform: uppercase; font-family: var(--font-mono);
+  font-size: 8.5px; font-weight: 700; letter-spacing: .08em;
+  color: var(--text-4); text-transform: uppercase; font-family: var(--font-mono);
 }
 .hl-week-bar-wrap {
-  width: 100%; height: 36px; background: rgba(255,255,255,0.05);
-  border-radius: 5px; display: flex; align-items: flex-end; overflow: hidden;
+  width: 100%; height: 38px; background: rgba(255,255,255,0.045);
+  border-radius: 6px; display: flex; align-items: flex-end; overflow: hidden;
 }
 .hl-week-bar {
-  width: 100%; min-height: 2px; background: rgba(255,255,255,0.14);
-  border-radius: 4px; transition: height 0.5s var(--spring-smooth);
+  width: 100%; min-height: 2px; background: rgba(255,255,255,0.16);
+  border-radius: 5px; transition: height .5s var(--spring-smooth);
 }
-.hl-week-bar.is-good  { background: var(--success); box-shadow: 0 0 8px rgba(16,185,129,0.35); }
+.hl-week-bar.is-good  { background: var(--accent); box-shadow: 0 0 8px rgba(70,224,168,0.35); }
 .hl-week-bar.is-today { box-shadow: 0 0 0 1.5px rgba(70,224,168,0.55); }
 .hl-week-day-val {
   font-size: 9px; font-family: var(--font-mono);
-  color: var(--text-tertiary); font-variant-numeric: tabular-nums;
+  color: var(--text-3); font-variant-numeric: tabular-nums;
 }
 
-.hl-streak { font-size: 12px; font-weight: 600; color: var(--good); margin-bottom: 14px; display: block; }
+/* Inputs + buttons */
+.form-wrap { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--border-soft); }
+.form-lbl  { margin-bottom: 10px; }
+.form-row  { display: flex; gap: 8px; align-items: center; }
 
-.hl-form-wrap { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-soft); }
-.hl-form-lbl { margin-bottom: 10px; }
-.hl-form-row { display: flex; gap: 8px; align-items: center; }
-
-.hl-input {
-  font-size: 15px; padding: 10px 13px; border-radius: var(--radius-sm);
-  border: 1px solid var(--border-soft); background: var(--bg-input);
-  color: var(--text-primary); font-family: var(--font-mono);
+.inp {
+  font-size: 15px; padding: 11px 13px; border-radius: 12px;
+  border: 1px solid var(--glass-border); background: var(--bg-input);
+  color: var(--text-1); font-family: var(--font-mono);
   font-variant-numeric: tabular-nums; flex: 1; min-width: 0;
-  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+  transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
   -moz-appearance: textfield;
 }
-.hl-input::-webkit-outer-spin-button,
-.hl-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.hl-input::placeholder { color: var(--text-quaternary); }
-.hl-input:focus {
-  outline: none;
-  border-color: var(--accent);
+.inp::-webkit-outer-spin-button, .inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.inp::placeholder { color: var(--text-4); }
+.inp:focus {
+  outline: none; border-color: var(--accent);
   background: var(--bg-input-focus);
-  box-shadow: 0 0 0 3px rgba(70,224,168,0.15);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
+.inp-sm { max-width: 92px; }
 
-.hl-btn {
-  font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: var(--radius-md);
-  border: none;
-  background: var(--accent-grad);
-  color: var(--on-accent); cursor: pointer; white-space: nowrap; font-family: inherit;
-  box-shadow:
-    0 4px 16px rgba(70,224,168,0.35),
-    0 1px 3px rgba(0,0,0,0.5);
-  transition: transform 0.15s var(--spring-bounce), filter 0.15s ease;
+.btn {
+  font-size: 13px; font-weight: 700; padding: 11px 20px; border-radius: 12px;
+  border: none; background: var(--accent-grad); color: var(--on-accent);
+  cursor: pointer; white-space: nowrap; font-family: inherit;
+  box-shadow: 0 4px 16px rgba(70,224,168,0.30), 0 1px 3px rgba(0,0,0,0.5);
+  transition: transform .15s var(--spring-bounce), filter .15s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.hl-btn:hover  { filter: brightness(1.04); transform: translateY(-1px); }
-.hl-btn:active { transform: scale(0.97); filter: brightness(0.96); }
+.btn:hover  { filter: brightness(1.05); transform: translateY(-1px); }
+.btn:active { transform: scale(0.97); filter: brightness(0.96); }
 
-.hl-goal-editor { margin-top: 12px; }
-
-/* ── Calorie indicator boxes ── */
-.cal-indicators { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-.cal-box {
-  background: rgba(255,255,255,0.025);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
-  padding: 14px 12px 12px;
-  box-shadow: none;
-  transition: background 0.2s ease;
-}
-.cal-box:hover {
-  background: rgba(255,255,255,0.045);
-}
-.cal-box-lbl {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--text-tertiary); font-family: var(--font-mono); margin-bottom: 5px;
-}
-.cal-box-num {
-  font-size: 20px; font-weight: 700; line-height: 1.1;
-  color: var(--text-primary); font-family: var(--font-mono); font-variant-numeric: tabular-nums;
-}
-.cal-box-unit { font-size: 11px; color: var(--text-tertiary); font-weight: 500; }
-.cal-box-goal {
-  font-size: 10px; font-family: var(--font-mono);
-  color: var(--text-tertiary); font-variant-numeric: tabular-nums; margin-top: 2px;
-}
-
-.cal-food-list { display: flex; flex-direction: column; gap: 5px; }
-.cal-food-row {
-  display: flex; align-items: center; gap: 10px; padding: 9px 12px;
-  border-radius: var(--radius-sm); background: rgba(255,255,255,0.025);
-  border: 1px solid var(--border-soft); font-size: 13px;
-  transition: background 0.15s ease;
-}
-.cal-food-row:hover { background: rgba(255,255,255,0.05); }
-.cal-food-name {
-  flex: 1; color: var(--text-primary); min-width: 0;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.cal-food-meta {
-  font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary);
-  font-variant-numeric: tabular-nums; white-space: nowrap; flex-shrink: 0;
-}
-.cal-food-del {
-  background: transparent; border: none; color: var(--text-quaternary);
-  cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 6px;
-  opacity: 0.6; flex-shrink: 0; line-height: 1; transition: color 0.15s, background 0.15s;
-}
-.cal-food-del:hover { opacity: 1; color: var(--danger); background: rgba(239,68,68,0.10); }
-.cal-food-empty { font-size: 12px; color: var(--text-quaternary); font-style: italic; padding: 4px 12px; }
-
-.cal-food-form { display: flex; flex-direction: column; gap: 8px; }
-.cal-nums-row  { display: flex; gap: 8px; align-items: center; }
-.hl-input-sm   { max-width: 90px; }
-
-.hl-goals-toggle {
+.btn-ghost {
   display: flex; align-items: center; justify-content: space-between;
-  width: 100%; margin-top: 14px; padding: 10px 14px; border-radius: var(--radius-sm);
-  background: rgba(255,255,255,0.025); border: 1px solid var(--border-soft);
-  color: var(--text-secondary); font-family: inherit; font-size: 12px; font-weight: 600;
-  cursor: pointer; letter-spacing: 0.04em; transition: background 0.18s ease, border-color 0.18s ease;
+  width: 100%; margin-top: 16px; padding: 11px 14px; border-radius: 12px;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  color: var(--text-2); font-family: inherit; font-size: 12px; font-weight: 600;
+  cursor: pointer; letter-spacing: .04em;
+  transition: background .18s ease, border-color .18s ease, color .18s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.hl-goals-toggle:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.14);
-}
-.hl-goals-arrow { font-size: 10px; transition: transform 0.2s; }
-.hl-goals-panel { margin-top: 10px; }
-.cal-goals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-ghost:hover { background: var(--glass-bg-hover); border-color: var(--border-strong); color: var(--text-1); }
 
-/* ── Daily Wellness hero ── */
-.wellness-hero { margin-top: 8px; }
-.wellness-card {
-  padding: 24px 22px 20px;
-  background: rgba(255,255,255,0.025);
-  border: 1px solid var(--border-soft);
-  box-shadow: none;
-}
+/* ── Wellness hero ── */
 .wellness-top { display: flex; align-items: center; gap: 22px; }
-.wellness-ring-wrap { position: relative; width: 116px; height: 116px; flex-shrink: 0; }
-.wellness-ring { width: 116px; height: 116px; transform: rotate(-90deg); }
-.wellness-ring-bg { fill: none; stroke: rgba(255,255,255,0.07); stroke-width: 10; }
+.wellness-ring-wrap { position: relative; width: 118px; height: 118px; flex-shrink: 0; }
+.wellness-ring { width: 118px; height: 118px; transform: rotate(-90deg); }
+.wellness-ring-bg { fill: none; stroke: rgba(255,255,255,0.07); stroke-width: 9; }
 .wellness-ring-fill {
-  fill: none; stroke: url(#wellnessGrad); stroke-width: 10; stroke-linecap: round;
-  transition: stroke-dashoffset 0.8s var(--spring-smooth);
+  fill: none; stroke: url(#wellnessGrad); stroke-width: 9; stroke-linecap: round;
+  transition: stroke-dashoffset .8s var(--spring-smooth);
+  filter: drop-shadow(0 0 6px rgba(70,224,168,0.35));
 }
 .wellness-ring-center {
-  position: absolute; inset: 0; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 1px;
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
 }
 .wellness-score {
-  font-size: 34px; font-weight: 800; line-height: 1; letter-spacing: -0.03em;
-  color: var(--text-primary); font-variant-numeric: tabular-nums;
+  font-size: 34px; font-weight: 700; line-height: 1; letter-spacing: -.03em;
+  color: var(--text-1); font-variant-numeric: tabular-nums;
 }
 .wellness-score-lbl {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--text-tertiary); font-family: var(--font-mono);
+  font-size: 8.5px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--text-3); font-family: var(--font-mono);
 }
 .wellness-meta { flex: 1; min-width: 0; }
 .wellness-headline {
-  font-size: 19px; font-weight: 700; letter-spacing: -0.01em;
-  color: var(--text-primary); margin: 6px 0 6px;
+  font-family: var(--serif); font-style: italic; font-weight: 400;
+  font-size: 27px; line-height: 1.05; letter-spacing: -.01em;
+  color: var(--text-1); margin: 7px 0 8px;
 }
-.wellness-nudge {
-  font-size: 13px; font-weight: 500; color: var(--text-secondary); line-height: 1.4;
-}
+.wellness-nudge { font-size: 13px; font-weight: 500; color: var(--text-2); line-height: 1.45; }
 .wellness-bars {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px;
   margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border-soft);
 }
 .wellness-bar-lbl {
   display: flex; align-items: center; justify-content: space-between;
-  font-size: 11px; font-weight: 600; color: var(--text-secondary);
+  font-size: 11px; font-weight: 600; color: var(--text-2);
 }
 .wellness-bar-lbl .wb-name { display: inline-flex; align-items: center; gap: 6px; }
-.wellness-bar-lbl .wb-icon { color: var(--text-tertiary); flex-shrink: 0; }
-.wellness-bar-lbl .wb-pct { font-family: var(--font-mono); color: var(--text-tertiary); }
+.wellness-bar-lbl .wb-icon { color: var(--text-3); flex-shrink: 0; }
+.wellness-bar-lbl .wb-pct  { font-family: var(--font-mono); color: var(--text-3); font-variant-numeric: tabular-nums; }
 
-/* ── Nutrition 7-day trends ── */
-.cal-trends { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 4px; }
-@media (max-width: 480px) { .cal-trends { grid-template-columns: 1fr; } }
-.cal-trend-lbl { margin-bottom: 4px; }
+/* ── Water ── */
+.water-ml-line {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .03em;
+  color: var(--text-3); margin-top: 8px; font-variant-numeric: tabular-nums;
+}
+.water-bar-wrap { margin: 14px 0 6px; }
+.water-track {
+  position: relative; height: 12px; border-radius: 999px;
+  background: rgba(255,255,255,0.05); overflow: hidden;
+}
+.water-fill {
+  position: absolute; inset: 0 auto 0 0; width: 0%;
+  border-radius: 999px; background: var(--water-grad);
+  transition: width .55s var(--spring-smooth);
+}
+.water-fill.over { background: linear-gradient(90deg, #46E0A8, var(--warn)); }
+.water-zone { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.16); }
+.water-bar-labels {
+  display: flex; justify-content: space-between; margin-top: 7px;
+  font-family: var(--font-mono); font-size: 10px; color: var(--text-3);
+}
+.water-bar-labels .zone-name { color: var(--good); font-weight: 700; letter-spacing: .1em; text-transform: lowercase; }
+
+.water-actions { display: grid; grid-template-columns: 54px 1fr; gap: 10px; margin-top: 16px; }
+.water-minus {
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  border-radius: 14px; color: var(--text-1);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .18s ease, border-color .18s ease;
+}
+.water-minus:hover { background: var(--glass-bg-hover); border-color: var(--border-strong); }
+.water-minus:disabled { opacity: .3; cursor: not-allowed; }
+.water-plus {
+  border: none; border-radius: 14px;
+  background: var(--accent-grad); color: var(--on-accent);
+  font-family: inherit; font-size: 15px; font-weight: 700;
+  padding: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 4px 18px rgba(70,224,168,0.32), 0 1px 3px rgba(0,0,0,0.5);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .15s var(--spring-bounce), filter .15s ease;
+}
+.water-plus:hover  { filter: brightness(1.05); transform: translateY(-1px); }
+.water-plus:active { transform: scale(0.97); filter: brightness(0.96); }
+.water-helper {
+  text-align: center; font-size: 12px; color: var(--text-3);
+  margin-top: 12px; font-style: italic;
+}
+.water-helper.good { color: var(--good); font-style: normal; }
+.water-helper .helper-icon { vertical-align: -2px; }
+
+.water-hist { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-soft); }
+.water-hist-strip { display: grid; grid-template-columns: repeat(14,1fr); gap: 4px; margin-top: 12px; }
+.wh-col { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.wh-bar-wrap {
+  width: 100%; height: 44px; background: rgba(255,255,255,0.045);
+  border-radius: 5px; display: flex; align-items: flex-end; overflow: hidden;
+}
+.wh-bar {
+  width: 100%; min-height: 2px; background: rgba(96,165,250,0.45);
+  border-radius: 4px; transition: height .5s var(--spring-smooth);
+}
+.wh-bar.is-good  { background: var(--accent); box-shadow: 0 0 8px rgba(70,224,168,0.35); }
+.wh-bar.is-today { box-shadow: 0 0 0 1.5px rgba(70,224,168,0.55); }
+.wh-lbl { font-size: 8px; font-family: var(--font-mono); color: var(--text-4); font-variant-numeric: tabular-nums; }
+
+/* ── Sleep ── */
+.goal-row { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px; }
+.goal-lbl { font-size: 12px; color: var(--text-3); font-weight: 600; }
+.goal-val { font-family: var(--font-mono); font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.goal-edit-btn {
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  color: var(--text-3); font-size: 10px; font-family: var(--font-mono);
+  font-weight: 700; letter-spacing: .06em; padding: 3px 10px; border-radius: 7px;
+  cursor: pointer; transition: color .15s, background .15s, border-color .15s;
+}
+.goal-edit-btn:hover { color: var(--text-1); background: var(--glass-bg-hover); border-color: var(--border-strong); }
+.hl-streak {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--good); margin-top: 12px;
+}
+.goal-editor { margin-top: 12px; }
+
+/* ── Nutrition ── */
+.cal-indicators { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.cal-box {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px; padding: 14px 12px 12px;
+  transition: background .2s ease, border-color .2s ease;
+}
+.cal-box:hover { background: rgba(255,255,255,0.04); border-color: var(--glass-border); }
+.cal-box-lbl {
+  font-size: 9.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-3); font-family: var(--font-mono); margin-bottom: 6px;
+}
+.cal-box-num {
+  font-size: 20px; font-weight: 700; line-height: 1.1;
+  color: var(--text-1); font-variant-numeric: tabular-nums;
+}
+.cal-box-unit { font-size: 11px; color: var(--text-3); font-weight: 500; }
+.cal-box-goal {
+  font-size: 10px; font-family: var(--font-mono);
+  color: var(--text-3); font-variant-numeric: tabular-nums; margin-top: 3px;
+}
+.cal-trends { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 2px; }
+.cal-trend-lbl { margin-bottom: 2px; }
+
+.cal-food-list { display: flex; flex-direction: column; gap: 6px; }
+.cal-food-row {
+  display: flex; align-items: center; gap: 10px; padding: 10px 13px;
+  border-radius: 12px; background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-soft); font-size: 13px;
+  transition: background .15s ease;
+}
+.cal-food-row:hover { background: rgba(255,255,255,0.045); }
+.cal-food-name { flex: 1; color: var(--text-1); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-food-meta {
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-3);
+  font-variant-numeric: tabular-nums; white-space: nowrap; flex-shrink: 0;
+}
+.cal-food-del {
+  background: transparent; border: none; color: var(--text-4);
+  cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 6px;
+  flex-shrink: 0; line-height: 1; transition: color .15s, background .15s;
+}
+.cal-food-del:hover { color: var(--bad); background: rgba(248,113,113,0.10); }
+.cal-food-empty { font-size: 12px; color: var(--text-4); font-style: italic; padding: 4px 12px; }
+
+.cal-food-form { display: flex; flex-direction: column; gap: 8px; }
+.cal-nums-row  { display: flex; gap: 8px; align-items: center; }
+.goals-panel { margin-top: 10px; }
+.cal-goals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.goals-arrow { display: inline-flex; transition: transform .2s; color: var(--text-3); }
 
 .attribution {
-  text-align: center; margin-top: 28px;
-  font-family: var(--font-mono); font-size: 10px;
-  letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--text-quaternary);
+  text-align: center; margin-top: 34px;
+  font-family: var(--font-mono); font-size: 9.5px;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--text-4);
 }
 
+/* ── Water settings modal ── */
+.modal-bg {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: var(--scrim);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  align-items: center; justify-content: center; padding: 20px;
+  padding-top: max(20px, env(safe-area-inset-top));
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+.modal-bg.show { display: flex; animation: fadeIn .22s ease both; }
+.modal {
+  width: 100%; max-width: 480px;
+  background: var(--sheet-bg);
+  border: 1px solid var(--border-strong);
+  border-radius: 24px;
+  padding: 24px 22px;
+  max-height: calc(88vh - env(safe-area-inset-bottom)); overflow-y: auto;
+  animation: sheetUp .4s var(--spring-smooth) both;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+@keyframes sheetUp { from { opacity: 0; transform: translateY(28px) scale(.98); } to { opacity: 1; transform: none; } }
+.modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 18px; }
+.modal-title { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 26px; color: var(--text-1); margin: 0; }
+.modal-close {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--glass-border); background: var(--glass-bg);
+  color: var(--text-2); font-size: 18px; line-height: 1; cursor: pointer;
+  transition: color .2s, border-color .2s;
+}
+.modal-close:hover { color: var(--text-1); border-color: var(--border-strong); }
+
+.set-section { margin-bottom: 22px; }
+.set-section h4 {
+  margin: 0 0 10px; font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--text-3);
+}
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.field label {
+  font-size: 10.5px; color: var(--text-3); font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase; font-family: var(--font-mono);
+}
+.field input[type="number"], .field input[type="text"] {
+  background: var(--bg-input);
+  border: 1px solid var(--glass-border);
+  color: var(--text-1); font-family: inherit; font-size: 14px;
+  padding: 10px 12px; border-radius: 12px; outline: none;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+.field input[type="number"]::-webkit-outer-spin-button,
+.field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field-note { font-size: 11px; color: var(--text-3); margin-top: 4px; line-height: 1.45; }
+
+.seg {
+  display: flex; gap: 4px;
+  background: var(--bg-input);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px; padding: 3px;
+}
+.seg button {
+  flex: 1; padding: 9px 4px; border: none; background: transparent;
+  color: var(--text-3); border-radius: 9px;
+  font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .15s, background .15s;
+}
+.seg button.active { background: var(--accent-grad); color: var(--on-accent); }
+
+/* substance search */
+.search-wrap { position: relative; }
+.search-results {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--sheet-bg);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px; padding: 4px;
+  max-height: 240px; overflow-y: auto; z-index: 5; display: none;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+}
+.search-results.show { display: block; }
+.search-result {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 13px;
+  -webkit-tap-highlight-color: transparent;
+}
+.search-result:hover { background: rgba(255,255,255,0.05); }
+.search-result-name { color: var(--text-1); font-weight: 600; }
+.search-result-meta { font-size: 10.5px; color: var(--text-3); font-family: var(--font-mono); }
+.search-result-add  { color: var(--good); }
+
+.subs-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.sub-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px; flex-wrap: wrap;
+}
+.sub-row-info { flex: 1; min-width: 140px; }
+.sub-row-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.sub-row-meta {
+  font-size: 11px; color: var(--text-3); margin-top: 2px;
+  font-variant-numeric: tabular-nums; font-family: var(--font-mono);
+}
+.sub-row-dose {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--bg-input); border: 1px solid var(--glass-border);
+  border-radius: 9px; padding: 4px 8px;
+}
+.sub-dose-input {
+  width: 56px; background: transparent; border: none; outline: none;
+  color: var(--text-1); font-family: inherit; font-size: 13px;
+  font-weight: 600; text-align: center; font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+.sub-dose-input::-webkit-outer-spin-button,
+.sub-dose-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.sub-dose-unit { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); white-space: nowrap; }
+.sub-row-del {
+  background: transparent; border: none; color: var(--text-4);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 4px 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.sub-row-del:hover { color: var(--bad); }
+
+/* target breakdown inside modal */
+.why-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 13px; padding: 4px 0; font-variant-numeric: tabular-nums;
+}
+.why-row .why-label { color: var(--text-2); }
+.why-row .why-val   { color: var(--text-1); font-weight: 600; font-family: var(--font-mono); }
+.why-row.total { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 10px; }
+.why-row.total .why-label { color: var(--good); font-weight: 700; }
+.why-row.total .why-val   { color: var(--good); }
+
+.data-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-secondary {
+  padding: 10px 15px;
+  border: 1px solid var(--glass-border); background: var(--glass-bg);
+  color: var(--text-1); border-radius: 12px;
+  font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .18s ease, border-color .18s ease;
+}
+.btn-secondary:hover { background: var(--glass-bg-hover); border-color: var(--border-strong); }
+.modal-done { width: 100%; margin-top: 6px; padding: 13px; font-size: 14px; border-radius: 14px; }
 
 @media (max-width: 480px) {
-  main { padding: 40px 14px 80px; }
-  .health-card { padding: 4px 2px 8px; }
-  .wellness-card { padding: 18px 16px 16px; }
-  .hl-big-num { font-size: 34px; }
+  main { padding: 8px 14px 48px; }
+  .card { padding: 18px 15px 16px; }
+  .big-num { font-size: 40px; }
+  .wellness-top { gap: 16px; }
+  .wellness-ring-wrap, .wellness-ring { width: 104px; height: 104px; }
+  .wellness-headline { font-size: 23px; }
   .cal-indicators { gap: 6px; }
   .cal-box-num { font-size: 17px; }
   .cal-goals-grid { grid-template-columns: 1fr; }
-  .hl-input-sm { max-width: 80px; }
+  .inp-sm { max-width: 82px; }
+  .water-hist-strip { gap: 3px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .12s !important; }
 }
 </style>
 </head>
 <body>
 
 <main>
-  <section id="wellness" class="health-section wellness-hero">
-    <div class="section-title">Daily Wellness</div>
-    <div class="health-card wellness-card">
+
+  <header class="page-head">
+    <div class="ph-eyebrow" id="phDate">Health</div>
+    <h1 class="ph-title">Daily <em>vitality</em></h1>
+    <div class="ph-sub" id="phSub">Water, sleep &amp; fuel — <b>all in one place</b></div>
+  </header>
+
+  <!-- ── 01 · WELLNESS ── -->
+  <section id="wellness" class="section">
+    <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">Wellness</span></div>
+    <div class="card">
       <div class="wellness-top">
         <div class="wellness-ring-wrap">
           <svg class="wellness-ring" viewBox="0 0 116 116" aria-hidden="true">
             <defs>
               <linearGradient id="wellnessGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%"  stop-color="#818CF8"/>
+                <stop offset="0%"  stop-color="#60A5FA"/>
                 <stop offset="100%" stop-color="#46E0A8"/>
               </linearGradient>
             </defs>
@@ -374,7 +602,7 @@ main {
           </div>
         </div>
         <div class="wellness-meta">
-          <span class="hl-eyebrow">How today's going</span>
+          <span class="card-eyebrow" style="margin-bottom:0">How today's going</span>
           <div class="wellness-headline" id="wellnessHeadline">Let's get started</div>
           <div class="wellness-nudge" id="wellnessNudge">Log your day to build your score.</div>
         </div>
@@ -383,60 +611,126 @@ main {
     </div>
   </section>
 
-  <section id="water" class="water-embed">
-    <div class="section-title">Water Tracker</div>
-    <iframe src="po-water.html" class="water-iframe" loading="lazy" title="Water Tracker"></iframe>
-  </section>
-
-  <section id="sleepSection" class="health-section">
-    <div class="section-title">Sleep Log</div>
-    <div class="health-card">
-
-      <div class="hl-stat-row">
-        <div class="hl-big-num" id="sleepNum">—</div>
-        <div class="hl-big-unit">hrs</div>
-        <div class="hl-status-dot" id="sleepDot"></div>
-        <div class="hl-status-label" id="sleepLabel">No entry yet</div>
+  <!-- ── 02 · WATER ── -->
+  <section id="water" class="section">
+    <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">Water</span></div>
+    <div class="card">
+      <div class="card-top">
+        <div>
+          <span class="card-eyebrow" id="waterUnitLabel">Bottles today</span>
+          <h2 class="card-title">Hydration</h2>
+        </div>
+        <button class="icon-btn" id="waterSettingsBtn" type="button" title="Water settings" aria-label="Water settings">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
       </div>
 
-      <div class="hl-goal-row">
-        <span class="hl-eyebrow" style="letter-spacing:0.04em;text-transform:none;font-size:12px">Goal:</span>
-        <span class="hl-goal-val" id="sleepGoalDisplay">8 hrs</span>
-        <button class="hl-goal-edit-btn" id="sleepGoalEditBtn">Edit</button>
+      <div class="big-row">
+        <span class="big-num" id="waterNum">0</span>
+        <span class="big-total" id="waterTarget">/ 0</span>
+        <span class="big-unit" id="waterUnitSuffix">bottles</span>
       </div>
+      <div class="water-ml-line" id="waterMlLine">—</div>
 
-      <div class="hl-track"><div class="hl-fill" id="sleepFill"></div></div>
-      <div class="hl-eyebrow" id="sleepPctText" style="margin-bottom:0">0% of goal</div>
-
-      <div class="hl-week-strip" id="sleepWeek" aria-label="Last 7 days"></div>
-      <span class="hl-streak" id="sleepStreak" style="display:none"></span>
-
-      <div class="hl-form-wrap">
-        <span class="hl-eyebrow hl-form-lbl">Log last night</span>
-        <div class="hl-form-row">
-          <input id="sleepInput" type="number" min="0" max="24" step="0.5"
-                 inputmode="decimal" placeholder="7.5" class="hl-input" />
-          <button id="sleepLogBtn" class="hl-btn">Log</button>
+      <div class="water-bar-wrap">
+        <div class="water-track">
+          <div class="water-fill" id="waterBarFill"></div>
+          <div class="water-zone" id="waterZoneStart" style="left:43.3%"></div>
+          <div class="water-zone" id="waterZoneEnd"   style="left:66.7%"></div>
+        </div>
+        <div class="water-bar-labels">
+          <span>0</span>
+          <span class="zone-name">healthy zone</span>
+          <span id="waterBarMax">—</span>
         </div>
       </div>
 
-      <div class="hl-goal-editor" id="sleepGoalEditor" hidden>
-        <div class="hl-form-wrap" style="margin-top:10px;padding-top:10px">
-          <span class="hl-eyebrow hl-form-lbl">Sleep target (hours)</span>
-          <div class="hl-form-row">
-            <input id="sleepGoalInput" type="number" min="1" max="14" step="0.5"
-                   inputmode="decimal" placeholder="8" class="hl-input" />
-            <button id="sleepGoalSaveBtn" class="hl-btn">Save</button>
-          </div>
-        </div>
+      <div class="water-actions">
+        <button class="water-minus" id="waterMinusBtn" type="button" aria-label="Remove one">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button class="water-plus" id="waterPlusBtn" type="button">
+          <span id="waterPlusLabel">Drank a bottle</span>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+        </button>
       </div>
+      <div class="water-helper" id="waterHelper">Start the day — first one in.</div>
 
+      <div class="water-hist">
+        <span class="hl-eyebrow">Last 14 days</span>
+        <div class="water-hist-strip" id="waterHist" aria-label="Water last 14 days"></div>
+      </div>
     </div>
   </section>
 
-  <section id="calSection" class="health-section">
-    <div class="section-title">Nutrition &amp; Steps</div>
-    <div class="health-card">
+  <!-- ── 03 · SLEEP ── -->
+  <section id="sleepSection" class="section">
+    <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Sleep</span></div>
+    <div class="card">
+      <div class="card-top">
+        <div>
+          <span class="card-eyebrow">Last night</span>
+          <h2 class="card-title">Rest</h2>
+        </div>
+        <span style="color:var(--text-3)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+        </span>
+      </div>
+
+      <div class="big-row">
+        <span class="big-num" id="sleepNum">—</span>
+        <span class="big-unit">hrs</span>
+        <span class="status-dot" id="sleepDot"></span>
+        <span class="status-label" id="sleepLabel">No entry yet</span>
+      </div>
+
+      <div class="goal-row">
+        <span class="goal-lbl">Goal:</span>
+        <span class="goal-val" id="sleepGoalDisplay">8 hrs</span>
+        <button class="goal-edit-btn" id="sleepGoalEditBtn" type="button">EDIT</button>
+      </div>
+
+      <div class="hl-track"><div class="hl-fill" id="sleepFill"></div></div>
+      <span class="hl-eyebrow" id="sleepPctText">0% of goal</span>
+
+      <div class="hl-week-strip" id="sleepWeek" aria-label="Sleep last 7 days"></div>
+      <span class="hl-streak" id="sleepStreak" style="display:none"></span>
+
+      <div class="form-wrap">
+        <span class="hl-eyebrow form-lbl">Log last night</span>
+        <div class="form-row">
+          <input id="sleepInput" type="number" min="0" max="24" step="0.5"
+                 inputmode="decimal" placeholder="7.5" class="inp" />
+          <button id="sleepLogBtn" class="btn" type="button">Log</button>
+        </div>
+      </div>
+
+      <div class="goal-editor" id="sleepGoalEditor" hidden>
+        <div class="form-wrap" style="margin-top:10px;padding-top:12px">
+          <span class="hl-eyebrow form-lbl">Sleep target (hours)</span>
+          <div class="form-row">
+            <input id="sleepGoalInput" type="number" min="1" max="14" step="0.5"
+                   inputmode="decimal" placeholder="8" class="inp" />
+            <button id="sleepGoalSaveBtn" class="btn" type="button">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 04 · NUTRITION & STEPS ── -->
+  <section id="calSection" class="section">
+    <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">Nutrition &amp; Steps</span></div>
+    <div class="card">
+      <div class="card-top">
+        <div>
+          <span class="card-eyebrow">Today's intake</span>
+          <h2 class="card-title">Fuel</h2>
+        </div>
+        <span style="color:var(--text-3)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h0a2 2 0 0 0 2-2V2"/><path d="M5 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+        </span>
+      </div>
 
       <div class="cal-indicators">
         <div class="cal-box">
@@ -470,63 +764,628 @@ main {
         </div>
       </div>
 
-      <div class="hl-form-wrap">
-        <span class="hl-eyebrow hl-form-lbl">Today's food</span>
+      <div class="form-wrap">
+        <span class="hl-eyebrow form-lbl">Today's food</span>
         <div id="calFoodList" class="cal-food-list"></div>
       </div>
 
-      <div class="hl-form-wrap">
-        <span class="hl-eyebrow hl-form-lbl">Add food</span>
+      <div class="form-wrap">
+        <span class="hl-eyebrow form-lbl">Add food</span>
         <div class="cal-food-form">
-          <input id="calFoodName" type="text" placeholder="Food name (optional)" class="hl-input" />
+          <input id="calFoodName" type="text" placeholder="Food name (optional)" class="inp" style="font-family:inherit" />
           <div class="cal-nums-row">
             <input id="calFoodKcal"    type="number" min="0" step="1" inputmode="numeric"
-                   placeholder="kcal" class="hl-input hl-input-sm" />
+                   placeholder="kcal" class="inp inp-sm" />
             <input id="calFoodProtein" type="number" min="0" step="1" inputmode="numeric"
-                   placeholder="g protein" class="hl-input hl-input-sm" />
-            <button id="calFoodAddBtn" class="hl-btn">Add</button>
+                   placeholder="g protein" class="inp inp-sm" />
+            <button id="calFoodAddBtn" class="btn" type="button">Add</button>
           </div>
         </div>
       </div>
 
-      <div class="hl-form-wrap">
-        <span class="hl-eyebrow hl-form-lbl">Steps today</span>
-        <div class="hl-form-row">
+      <div class="form-wrap">
+        <span class="hl-eyebrow form-lbl">Steps today</span>
+        <div class="form-row">
           <input id="calStepsInput" type="number" min="0" step="100"
-                 inputmode="numeric" placeholder="0" class="hl-input" />
-          <button id="calStepsSaveBtn" class="hl-btn">Save</button>
+                 inputmode="numeric" placeholder="0" class="inp" />
+          <button id="calStepsSaveBtn" class="btn" type="button">Save</button>
         </div>
       </div>
 
-      <button class="hl-goals-toggle" id="calGoalsToggle" type="button" aria-expanded="false">
-        <span>Edit Goals</span>
-        <span class="hl-goals-arrow" id="calGoalsArrow">▸</span>
+      <button class="btn-ghost" id="calGoalsToggle" type="button" aria-expanded="false">
+        <span>Edit goals</span>
+        <span class="goals-arrow" id="calGoalsArrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </span>
       </button>
-      <div class="hl-goals-panel" id="calGoalsPanel" hidden>
+      <div class="goals-panel" id="calGoalsPanel" hidden>
         <div class="cal-goals-grid">
-          <div class="hl-form-wrap" style="margin:0;padding-top:0;border-top:none">
-            <label class="hl-eyebrow hl-form-lbl" for="calGoalKcal">Calorie goal</label>
-            <input id="calGoalKcal" type="number" min="500" step="50" inputmode="numeric" class="hl-input" />
+          <div class="field" style="margin:0">
+            <label for="calGoalKcal">Calorie goal</label>
+            <input id="calGoalKcal" type="number" min="500" step="50" inputmode="numeric" class="inp" />
           </div>
-          <div class="hl-form-wrap" style="margin:0;padding-top:0;border-top:none">
-            <label class="hl-eyebrow hl-form-lbl" for="calGoalProtein">Protein goal (g)</label>
-            <input id="calGoalProtein" type="number" min="10" step="5" inputmode="numeric" class="hl-input" />
+          <div class="field" style="margin:0">
+            <label for="calGoalProtein">Protein goal (g)</label>
+            <input id="calGoalProtein" type="number" min="10" step="5" inputmode="numeric" class="inp" />
           </div>
-          <div class="hl-form-wrap" style="margin:0;padding-top:0;border-top:none">
-            <label class="hl-eyebrow hl-form-lbl" for="calGoalSteps">Steps goal</label>
-            <input id="calGoalSteps" type="number" min="1000" step="500" inputmode="numeric" class="hl-input" />
+          <div class="field" style="margin:0">
+            <label for="calGoalSteps">Steps goal</label>
+            <input id="calGoalSteps" type="number" min="1000" step="500" inputmode="numeric" class="inp" />
           </div>
           <div style="display:flex;align-items:flex-end">
-            <button id="calGoalsSaveBtn" class="hl-btn" style="width:100%">Save Goals</button>
+            <button id="calGoalsSaveBtn" class="btn" type="button" style="width:100%">Save goals</button>
           </div>
         </div>
       </div>
-
     </div>
   </section>
 
-  <div class="attribution">// editable template · all data stays in your browser</div>
+  <div class="attribution">// all data stays synced to your cloud</div>
 </main>
+
+<!-- ── Water settings modal ── -->
+<div class="modal-bg" id="setModalBg">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Water settings">
+    <div class="modal-head">
+      <h3 class="modal-title">Water settings</h3>
+      <button class="modal-close" id="setClose" type="button" aria-label="Close">×</button>
+    </div>
+
+    <div class="set-section">
+      <h4>Profile</h4>
+      <div class="field-row">
+        <div class="field">
+          <label>Weight</label>
+          <input type="number" id="setWeight" step="0.5" min="20" max="660">
+        </div>
+        <div class="field">
+          <label>Weight unit</label>
+          <div class="seg" id="setWeightUnit">
+            <button type="button" data-u="kg">kg</button>
+            <button type="button" data-u="lb">lb</button>
+          </div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Age</label>
+          <input type="number" id="setAge" min="13" max="100">
+        </div>
+        <div class="field">
+          <label>Sex</label>
+          <div class="seg" id="setSex">
+            <button type="button" data-s="m">Male</button>
+            <button type="button" data-s="f">Female</button>
+            <button type="button" data-s="o">Other</button>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Activity (training hours / week)</label>
+        <input type="number" id="setActivity" min="0" max="40" step="0.5">
+      </div>
+    </div>
+
+    <div class="set-section">
+      <h4>Display</h4>
+      <div class="field">
+        <label>Show water as</label>
+        <div class="seg" id="setUnit">
+          <button type="button" data-u="bottle">Bottles</button>
+          <button type="button" data-u="glass">Glasses</button>
+          <button type="button" data-u="oz">oz</button>
+          <button type="button" data-u="ml">ml</button>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Bottle size (ml)</label>
+          <input type="number" id="setBottleMl" min="100" max="2000" step="50">
+        </div>
+        <div class="field">
+          <label>Glass size (ml)</label>
+          <input type="number" id="setGlassMl" min="100" max="500" step="10">
+        </div>
+      </div>
+    </div>
+
+    <div class="set-section">
+      <h4>Caffeine</h4>
+      <div class="field">
+        <label>Average caffeine per day (mg)</label>
+        <input type="number" id="setCaffeine" min="0" max="1000" step="10">
+        <div class="field-note">
+          ~1 cup of coffee = 95mg · espresso shot = 75mg · energy drink = 160mg.
+          Above 200mg/day starts to add a small water requirement.
+        </div>
+      </div>
+    </div>
+
+    <div class="set-section">
+      <h4>Stimulants &amp; meds</h4>
+      <div class="field">
+        <label>Search to add</label>
+        <div class="search-wrap">
+          <input type="text" id="subSearch" placeholder="Type a name (Adderall, Concerta, Lithium…)" autocomplete="off">
+          <div class="search-results" id="subResults"></div>
+        </div>
+        <div class="field-note">
+          Each substance bumps your daily water target. Includes ADHD stims,
+          diuretics, decongestants, nicotine, alcohol, and a few others.
+        </div>
+      </div>
+      <div class="subs-list" id="subsList"></div>
+    </div>
+
+    <div class="set-section">
+      <h4>Daily target</h4>
+      <div id="whyBody"></div>
+    </div>
+
+    <div class="set-section">
+      <h4>Data</h4>
+      <div class="data-btns">
+        <button class="btn-secondary" id="setExport" type="button">Export JSON</button>
+        <button class="btn-secondary" id="setImport" type="button">Import JSON</button>
+        <button class="btn-secondary" id="setReset" type="button" style="color:var(--bad);border-color:rgba(248,113,113,0.3)">Reset water data</button>
+      </div>
+      <input type="file" id="setImportFile" accept=".json" style="display:none">
+    </div>
+
+    <button class="btn modal-done" id="setDone" type="button">Done</button>
+  </div>
+</div>
+
+<!-- ── Page head date ── -->
+<script>
+(() => {
+  'use strict';
+  function boot() {
+    const d = new Date();
+    const dows = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+    const mons = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const el = document.getElementById('phDate');
+    if (el) el.textContent = 'Health · ' + dows[d.getDay()] + ' ' + mons[d.getMonth()] + ' ' + d.getDate();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
+  else boot();
+})();
+</script>
+
+<!-- ── Native Water Coach (replaces the po-water iframe; same po_water_v1 state) ── -->
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const LS_KEY = 'po_water_v1';
+
+  const DEFAULTS = {
+    unit: 'bottle', bottleMl: 500, glassMl: 250, weightUnit: 'kg',
+    profile: { weightKg: 75, age: 25, sex: 'm', activityHrsPerWeek: 5 },
+    caffeineMgPerDay: 200, substances: [], logs: {}
+  };
+
+  // Same substance database as po-water.html — dose × mlPerUnit = daily bump.
+  const SUBSTANCE_DB = [
+    { id: 'adderall',    name: 'Adderall (mixed amphetamine salts)', cat: 'ADHD stim',    unit: 'mg',           defaultDose: 20,   mlPerUnit: 25,    note: 'Stim · reduces thirst signal · dries you out' },
+    { id: 'concerta',    name: 'Concerta (methylphenidate ER)',      cat: 'ADHD stim',    unit: 'mg',           defaultDose: 36,   mlPerUnit: 13.9,  note: 'Stim · reduces thirst signal' },
+    { id: 'vyvanse',     name: 'Vyvanse (lisdexamfetamine)',         cat: 'ADHD stim',    unit: 'mg',           defaultDose: 50,   mlPerUnit: 10,    note: 'Stim prodrug · long acting' },
+    { id: 'ritalin',     name: 'Ritalin IR (methylphenidate)',       cat: 'ADHD stim',    unit: 'mg',           defaultDose: 20,   mlPerUnit: 20,    note: 'Short-acting stim' },
+    { id: 'focalin',     name: 'Focalin / Focalin XR',               cat: 'ADHD stim',    unit: 'mg',           defaultDose: 20,   mlPerUnit: 20,    note: 'Methylphenidate isomer' },
+    { id: 'modafinil',   name: 'Modafinil',                          cat: 'Wakefulness',  unit: 'mg',           defaultDose: 200,  mlPerUnit: 1.75,  note: 'Mild dehydrating effect' },
+    { id: 'lithium',     name: 'Lithium',                            cat: 'Mood',         unit: 'mg',           defaultDose: 600,  mlPerUnit: 1.67,  note: 'Critical — narrow therapeutic window, dehydration → toxicity' },
+    { id: 'hctz',        name: 'Hydrochlorothiazide (HCTZ)',         cat: 'Diuretic',     unit: 'mg',           defaultDose: 25,   mlPerUnit: 40,    note: 'Direct diuretic — drink to compensate' },
+    { id: 'lasix',       name: 'Furosemide (Lasix)',                 cat: 'Diuretic',     unit: 'mg',           defaultDose: 40,   mlPerUnit: 30,    note: 'Loop diuretic · talk to your doctor about target' },
+    { id: 'spironol',    name: 'Spironolactone',                     cat: 'Diuretic',     unit: 'mg',           defaultDose: 50,   mlPerUnit: 12,    note: 'K-sparing diuretic' },
+    { id: 'sudafed',     name: 'Pseudoephedrine (Sudafed)',          cat: 'Decongestant', unit: 'mg',           defaultDose: 60,   mlPerUnit: 4.17,  note: 'Sympathomimetic · dries mucous membranes' },
+    { id: 'phenyl',      name: 'Phenylephrine',                      cat: 'Decongestant', unit: 'mg',           defaultDose: 10,   mlPerUnit: 20,    note: 'Vasoconstrictor — mild' },
+    { id: 'nicotine',    name: 'Nicotine pouch (Velo / Zyn)',        cat: 'Stim',         unit: 'pouches/day',  defaultDose: 4,    mlPerUnit: 62.5,  note: 'Vasoconstriction + dry mouth' },
+    { id: 'nicpatch',    name: 'Nicotine patch',                     cat: 'Stim',         unit: 'mg',           defaultDose: 14,   mlPerUnit: 18,    note: '24-h transdermal · sustained release' },
+    { id: 'alcohol',     name: 'Alcohol',                            cat: 'Depressant',   unit: 'drinks/day',   defaultDose: 1,    mlPerUnit: 400,   note: '~10ml urine per gram ethanol — adds up fast' },
+    { id: 'cannabis',    name: 'Cannabis / THC',                     cat: 'Other',        unit: 'sessions/day', defaultDose: 1,    mlPerUnit: 250,   note: 'Cottonmouth — saliva gland inhibition' },
+    { id: 'creatine',    name: 'Creatine monohydrate',               cat: 'Supplement',   unit: 'g/day',        defaultDose: 5,    mlPerUnit: 80,    note: 'Pulls water into muscle cells — drink more' },
+    { id: 'preworkout',  name: 'Pre-workout (caffeine + others)',    cat: 'Stim',         unit: 'servings/day', defaultDose: 1,    mlPerUnit: 300,   note: 'High-stim formula on top of caffeine' },
+    { id: 'metformin',   name: 'Metformin',                          cat: 'Glucose',      unit: 'mg',           defaultDose: 1000, mlPerUnit: 0.3,   note: 'Mild GI fluid loss' },
+    { id: 'sertraline',  name: 'SSRI (sertraline / escitalopram / fluoxetine)', cat: 'SSRI', unit: 'mg',        defaultDose: 50,   mlPerUnit: 4,     note: 'Mild dry mouth in some users' },
+    { id: 'wellbutrin',  name: 'Bupropion (Wellbutrin)',             cat: 'NDRI',         unit: 'mg',           defaultDose: 300,  mlPerUnit: 1.17,  note: 'Stim-like profile' }
+  ];
+
+  // ---------- state (identical shape to po-water) ----------
+  function normalize(s) {
+    s = s || {};
+    s.unit = s.unit || DEFAULTS.unit;
+    s.bottleMl = s.bottleMl || DEFAULTS.bottleMl;
+    s.glassMl  = s.glassMl  || DEFAULTS.glassMl;
+    s.weightUnit = s.weightUnit || 'kg';
+    s.profile = Object.assign({}, DEFAULTS.profile, s.profile || {});
+    s.caffeineMgPerDay = (s.caffeineMgPerDay != null) ? s.caffeineMgPerDay : DEFAULTS.caffeineMgPerDay;
+    s.substances = Array.isArray(s.substances) ? s.substances : [];
+    s.logs = (s.logs && typeof s.logs === 'object') ? s.logs : {};
+    return s;
+  }
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (raw) return normalize(JSON.parse(raw));
+    } catch (e) {}
+    return normalize({});
+  }
+  function saveState() {
+    // localStorage.setItem goes through sync.js's patched setter → cloud push.
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  let state = loadState();
+
+  function dateKey(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function todayKey() { return dateKey(new Date()); }
+  function todayCount() { return state.logs[todayKey()] || 0; }
+
+  // ---------- hydration math (matches topbar.js dashWaterProgress) ----------
+  function subExtraMl(s) {
+    const dose = (s.dose != null ? s.dose : s.defaultDose) || 0;
+    return Math.max(0, dose * (s.mlPerUnit || 0));
+  }
+  function subDoseLabel(s) {
+    const dose = (s.dose != null ? s.dose : s.defaultDose);
+    return dose + ' ' + (s.unit || '');
+  }
+  function computeTargetMl() {
+    const p = state.profile;
+    const wKg = state.weightUnit === 'lb' ? (p.weightKg || 0) / 2.20462 : (p.weightKg || 0);
+    const base = wKg * 35;
+    const exercise = (p.activityHrsPerWeek || 0) / 7 * 500;
+    const caffeine = Math.max(0, (state.caffeineMgPerDay || 0) - 200) * 1.5;
+    const subs = (state.substances || []).reduce((s, x) => s + subExtraMl(x), 0);
+    let adjust = 0;
+    if (p.sex === 'm') adjust += 200;
+    if ((p.age || 0) >= 50) adjust += 100;
+    return { base, exercise, caffeine, subs, adjust, total: base + exercise + caffeine + subs + adjust };
+  }
+  function unitVolMl() {
+    if (state.unit === 'glass') return state.glassMl || 250;
+    if (state.unit === 'oz')    return 30;
+    if (state.unit === 'ml')    return 1;
+    return state.bottleMl || 500;
+  }
+  function unitPlural() {
+    if (state.unit === 'bottle') return 'bottles';
+    if (state.unit === 'glass')  return 'glasses';
+    return state.unit;
+  }
+  function unitSingular() {
+    if (state.unit === 'bottle') return 'bottle';
+    if (state.unit === 'glass')  return 'glass';
+    return state.unit;
+  }
+  function fmtMl(ml) {
+    if (ml >= 1000) return (ml / 1000).toFixed(1) + ' L';
+    return Math.round(ml) + ' ml';
+  }
+
+  // Prefer topbar.js's shared math so the pill and card always agree;
+  // fall back to the identical local computation if topbar.js isn't loaded
+  // yet or there's no saved state (topbar reports 0/0 until first save).
+  function progress() {
+    try {
+      if (typeof window.dashWaterProgress === 'function') {
+        const w = window.dashWaterProgress();
+        if (w && w.total > 0) return w;
+      }
+    } catch (e) {}
+    const total = Math.max(1, Math.ceil(computeTargetMl().total / unitVolMl()));
+    return { done: todayCount(), total };
+  }
+
+  function notifyChange() {
+    // topbar pill + wellness ring + sleep/cal scripts all listen for these.
+    try { window.dispatchEvent(new Event('storage')); } catch (e) {}
+    try { window.dispatchEvent(new Event('health-change')); } catch (e) {}
+  }
+
+  // ---------- render ----------
+  function render() {
+    if (!$('waterNum')) return;
+    const p = progress();
+    const calc = computeTargetMl();
+    const count = p.done, target = p.total;
+
+    $('waterUnitLabel').textContent = unitPlural() + ' today';
+    $('waterUnitSuffix').textContent = unitPlural();
+    $('waterNum').textContent = count;
+    $('waterTarget').textContent = '/ ' + target;
+    $('waterPlusLabel').textContent =
+      (state.unit === 'oz' || state.unit === 'ml') ? '+1 ' + unitSingular() : 'Drank a ' + unitSingular();
+    $('waterMlLine').textContent = fmtMl(count * unitVolMl()) + ' of ' + fmtMl(calc.total) + ' target';
+
+    // Bar spans 0–150% of target; healthy zone marked at 65% and 100%.
+    const pctRaw = target > 0 ? (count / target) * 100 : 0;
+    const fill = $('waterBarFill');
+    fill.style.width = (Math.min(150, pctRaw) / 1.5) + '%';
+    fill.classList.toggle('over', pctRaw > 100);
+    $('waterZoneStart').style.left = (65 / 1.5) + '%';
+    $('waterZoneEnd').style.left   = (100 / 1.5) + '%';
+    $('waterBarMax').textContent = Math.ceil(target * 1.5) + '+';
+
+    // Helper text
+    const helper = $('waterHelper');
+    const checkIcon = '<svg class="helper-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+    if (count === 0)        { helper.textContent = 'Start the day — first one in.'; helper.classList.remove('good'); }
+    else if (pctRaw < 50)   { helper.textContent = 'Behind pace — drink one in the next hour.'; helper.classList.remove('good'); }
+    else if (pctRaw < 100)  { helper.textContent = (target - count) + ' to go. Pacing well.'; helper.classList.remove('good'); }
+    else if (pctRaw < 130)  { helper.innerHTML = checkIcon + ' Target hit — top up if you train this evening.'; helper.classList.add('good'); }
+    else                    { helper.textContent = 'Strong — way past target.'; helper.classList.add('good'); }
+
+    $('waterMinusBtn').disabled = count <= 0;
+
+    renderHist(target);
+  }
+
+  function renderHist(target) {
+    const host = $('waterHist');
+    host.innerHTML = '';
+    const vals = [];
+    const today = new Date();
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(today); d.setDate(d.getDate() - i);
+      vals.push({ d, v: state.logs[dateKey(d)] || 0, isToday: i === 0 });
+    }
+    const max = Math.max(target, vals.reduce((m, x) => Math.max(m, x.v), 0)) || 1;
+    vals.forEach(({ d, v, isToday }) => {
+      const pct = Math.max(4, (v / max) * 100);
+      const col = document.createElement('div');
+      col.className = 'wh-col';
+      col.title = dateKey(d) + ' · ' + v + '/' + target;
+      col.innerHTML =
+        '<div class="wh-bar-wrap"><div class="wh-bar' + (v >= target && v > 0 ? ' is-good' : '') +
+        (isToday ? ' is-today' : '') + '" style="height:' + pct.toFixed(1) + '%"></div></div>' +
+        '<span class="wh-lbl">' + d.getDate() + '</span>';
+      host.appendChild(col);
+    });
+  }
+
+  // ---------- +1 / −1 ----------
+  function bump(delta) {
+    if (delta > 0 && typeof window.dashAddWater === 'function') {
+      window.dashAddWater();               // keeps the topbar pill in sync + cloud merge
+      state = loadState();
+    } else {
+      const k = todayKey();
+      const n = Math.max(0, (state.logs[k] || 0) + delta);
+      if (n <= 0) delete state.logs[k];
+      else state.logs[k] = n;
+      saveState();
+    }
+    render();
+    notifyChange();
+  }
+
+  // ---------- settings modal ----------
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function setSegActive(segId, value) {
+    $(segId).querySelectorAll('button').forEach(b => {
+      const v = b.dataset.u || b.dataset.s;
+      b.classList.toggle('active', v === value);
+    });
+  }
+  function bindSeg(segId, attr, onPick) {
+    $(segId).querySelectorAll('button').forEach(b => {
+      b.addEventListener('click', () => {
+        $(segId).querySelectorAll('button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        onPick(b.dataset[attr]);
+      });
+    });
+  }
+  function afterSettingChange() {
+    saveState();
+    render();
+    renderWhy();
+    notifyChange();
+  }
+
+  function renderSettings() {
+    $('setWeight').value = state.profile.weightKg;
+    $('setAge').value = state.profile.age;
+    $('setActivity').value = state.profile.activityHrsPerWeek;
+    $('setCaffeine').value = state.caffeineMgPerDay;
+    $('setBottleMl').value = state.bottleMl;
+    $('setGlassMl').value = state.glassMl;
+    setSegActive('setUnit', state.unit);
+    setSegActive('setWeightUnit', state.weightUnit);
+    setSegActive('setSex', state.profile.sex);
+    renderSubsList();
+    renderWhy();
+  }
+
+  function renderWhy() {
+    const wrap = $('whyBody');
+    if (!wrap) return;
+    const calc = computeTargetMl();
+    const targetUnits = Math.max(1, Math.ceil(calc.total / unitVolMl()));
+    const u = state.weightUnit;
+    let html = '';
+    html += '<div class="why-row"><span class="why-label">Base (' + (state.profile.weightKg || 0).toFixed(0) + ' ' + u + ' × 35 ml)</span><span class="why-val">' + fmtMl(calc.base) + '</span></div>';
+    if (calc.exercise > 0)
+      html += '<div class="why-row"><span class="why-label">+ Exercise (' + state.profile.activityHrsPerWeek + ' h/wk)</span><span class="why-val">+ ' + fmtMl(calc.exercise) + '</span></div>';
+    if (calc.caffeine > 0)
+      html += '<div class="why-row"><span class="why-label">+ Caffeine (' + state.caffeineMgPerDay + ' mg/day)</span><span class="why-val">+ ' + fmtMl(calc.caffeine) + '</span></div>';
+    (state.substances || []).forEach(s => {
+      html += '<div class="why-row"><span class="why-label">+ ' + escapeHtml(s.name) + ' (' + escapeHtml(subDoseLabel(s)) + ')</span><span class="why-val">+ ' + fmtMl(subExtraMl(s)) + '</span></div>';
+    });
+    if (calc.adjust > 0)
+      html += '<div class="why-row"><span class="why-label">+ Sex / age adjustment</span><span class="why-val">+ ' + fmtMl(calc.adjust) + '</span></div>';
+    html += '<div class="why-row total"><span class="why-label">Daily target</span><span class="why-val">' + fmtMl(calc.total) + ' ≈ ' + targetUnits + ' ' + unitPlural() + '</span></div>';
+    wrap.innerHTML = html;
+  }
+
+  function renderSubsList() {
+    const list = $('subsList');
+    if (!state.substances || !state.substances.length) {
+      list.innerHTML = '<div style="font-size:12px;color:var(--text-3);text-align:center;padding:12px 0;font-style:italic;">No substances added.</div>';
+      return;
+    }
+    list.innerHTML = state.substances.map((s, i) =>
+      '<div class="sub-row" data-i="' + i + '">'
+      + '<div class="sub-row-info">'
+      +   '<div class="sub-row-name">' + escapeHtml(s.name) + '</div>'
+      +   '<div class="sub-row-meta">+ ' + fmtMl(subExtraMl(s)) + ' / day · ' + escapeHtml(s.cat || '') + '</div>'
+      + '</div>'
+      + '<div class="sub-row-dose">'
+      +   '<input type="number" class="sub-dose-input" data-i="' + i + '" min="0" step="0.5" value="' + (s.dose != null ? s.dose : s.defaultDose) + '">'
+      +   '<span class="sub-dose-unit">' + escapeHtml(s.unit || '') + '</span>'
+      + '</div>'
+      + '<button class="sub-row-del" type="button" data-i="' + i + '" aria-label="Remove"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'
+      + '</div>'
+    ).join('');
+    list.querySelectorAll('.sub-dose-input').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const i = parseInt(inp.dataset.i, 10);
+        state.substances[i].dose = parseFloat(inp.value) || 0;
+        const meta = inp.closest('.sub-row').querySelector('.sub-row-meta');
+        meta.textContent = '+ ' + fmtMl(subExtraMl(state.substances[i])) + ' / day · ' + (state.substances[i].cat || '');
+        afterSettingChange();
+      });
+    });
+    list.querySelectorAll('.sub-row-del').forEach(b => {
+      b.addEventListener('click', () => {
+        state.substances.splice(parseInt(b.dataset.i, 10), 1);
+        renderSubsList();
+        afterSettingChange();
+      });
+    });
+  }
+
+  // ---------- boot ----------
+  function boot() {
+    render();
+
+    $('waterPlusBtn').addEventListener('click', () => {
+      bump(1);
+      const btn = $('waterPlusBtn');
+      btn.style.transform = 'scale(0.97)';
+      setTimeout(() => { btn.style.transform = ''; }, 120);
+    });
+    $('waterMinusBtn').addEventListener('click', () => bump(-1));
+
+    // Settings modal open/close
+    $('waterSettingsBtn').addEventListener('click', () => {
+      state = loadState();
+      renderSettings();
+      $('setModalBg').classList.add('show');
+    });
+    const closeModal = () => $('setModalBg').classList.remove('show');
+    $('setClose').addEventListener('click', closeModal);
+    $('setDone').addEventListener('click', closeModal);
+    $('setModalBg').addEventListener('click', (e) => { if (e.target === $('setModalBg')) closeModal(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && $('setModalBg').classList.contains('show')) closeModal();
+    });
+
+    // Segmented controls
+    bindSeg('setUnit', 'u',        (v) => { state.unit = v; afterSettingChange(); });
+    bindSeg('setWeightUnit', 'u',  (v) => { state.weightUnit = v; afterSettingChange(); });
+    bindSeg('setSex', 's',         (v) => { state.profile.sex = v; afterSettingChange(); });
+
+    // Numeric fields — save-as-you-type, same as po-water
+    ['setWeight','setAge','setActivity','setCaffeine','setBottleMl','setGlassMl'].forEach(id => {
+      $(id).addEventListener('input', () => {
+        const v = parseFloat($(id).value);
+        if (id === 'setWeight') state.profile.weightKg = v || 0;
+        else if (id === 'setAge') state.profile.age = v || 0;
+        else if (id === 'setActivity') state.profile.activityHrsPerWeek = v || 0;
+        else if (id === 'setCaffeine') state.caffeineMgPerDay = v || 0;
+        else if (id === 'setBottleMl') state.bottleMl = v || 500;
+        else if (id === 'setGlassMl') state.glassMl = v || 250;
+        afterSettingChange();
+      });
+    });
+
+    // Substance search
+    $('subSearch').addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      const results = $('subResults');
+      if (!q) { results.classList.remove('show'); results.innerHTML = ''; return; }
+      const matches = SUBSTANCE_DB.filter(s =>
+        s.name.toLowerCase().includes(q) || s.cat.toLowerCase().includes(q)
+      ).slice(0, 8);
+      if (!matches.length) {
+        results.innerHTML = '<div class="search-result"><span class="search-result-name">No matches</span><span class="search-result-meta">Try a different name or category</span></div>';
+        results.classList.add('show');
+        return;
+      }
+      results.innerHTML = matches.map(s => {
+        const defaultExtra = (s.defaultDose || 0) * (s.mlPerUnit || 0);
+        return '<div class="search-result" data-id="' + s.id + '">'
+          + '<span class="search-result-name">' + escapeHtml(s.name) + ' <span class="search-result-add">+</span></span>'
+          + '<span class="search-result-meta">' + escapeHtml(s.cat) + ' · ' + s.defaultDose + ' ' + escapeHtml(s.unit) + ' default → adds ~' + fmtMl(defaultExtra) + '/day · ' + escapeHtml(s.note) + '</span>'
+          + '</div>';
+      }).join('');
+      results.classList.add('show');
+      results.querySelectorAll('.search-result').forEach(el => {
+        el.addEventListener('click', () => {
+          const sub = SUBSTANCE_DB.find(x => x.id === el.dataset.id);
+          if (!sub) return;
+          if ((state.substances || []).find(x => x.id === sub.id)) { alert('Already added — edit the dose below.'); return; }
+          state.substances.push({
+            id: sub.id, name: sub.name, cat: sub.cat,
+            unit: sub.unit, mlPerUnit: sub.mlPerUnit,
+            defaultDose: sub.defaultDose, dose: sub.defaultDose
+          });
+          $('subSearch').value = '';
+          results.classList.remove('show');
+          renderSubsList();
+          afterSettingChange();
+        });
+      });
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-wrap')) $('subResults').classList.remove('show');
+    });
+
+    // Export / import / reset
+    $('setExport').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'water-coach-data-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(url);
+    });
+    $('setImport').addEventListener('click', () => $('setImportFile').click());
+    $('setImportFile').addEventListener('change', (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const parsed = JSON.parse(r.result);
+          if (!confirm('Replace ALL current water data with the imported file?')) return;
+          state = normalize(parsed);
+          saveState(); renderSettings(); render(); notifyChange();
+        } catch (err) { alert('Import failed: ' + err.message); }
+      };
+      r.readAsText(f);
+    });
+    $('setReset').addEventListener('click', () => {
+      if (!confirm('Wipe ALL water logs and settings? This cannot be undone.')) return;
+      localStorage.removeItem(LS_KEY);
+      state = loadState();
+      $('setModalBg').classList.remove('show');
+      render(); notifyChange();
+    });
+
+    // React to cloud sync / other-tab changes + day rollover
+    window.addEventListener('storage', () => { state = loadState(); render(); });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) { state = loadState(); render(); } });
+    setInterval(() => { state = loadState(); render(); }, 60_000);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
+  else boot();
+})();
+</script>
 
 <!-- ── Sleep Log ── -->
 <script>
@@ -572,15 +1431,16 @@ main {
       fillEl.classList.toggle('is-warn', todayVal < goal);
       pctEl.textContent = pct + '% of goal';
       dotEl.classList.remove('is-good','is-warn','is-bad');
-      if (todayVal >= goal)         dotEl.classList.add('is-good');
+      if (todayVal >= goal)            dotEl.classList.add('is-good');
       else if (todayVal >= goal * 0.8) dotEl.classList.add('is-warn');
-      else                          dotEl.classList.add('is-bad');
+      else                             dotEl.classList.add('is-bad');
       labelEl.textContent = todayVal >= goal ? 'Goal met' : (todayVal + ' / ' + goal + ' hrs');
     } else {
       numEl.textContent = '—';
       fillEl.style.width = '0%';
+      fillEl.classList.remove('is-warn');
       pctEl.textContent = '0% of goal';
-      dotEl.className = 'hl-status-dot';
+      dotEl.className = 'status-dot';
       labelEl.textContent = 'No entry yet';
     }
 
@@ -838,7 +1698,7 @@ main {
   const DAY_LABELS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
   const RING_CIRC = 2 * Math.PI * 50; // r=50
 
-  // Inline Lucide icons (rendered into innerHTML beside bar labels)
+  // Inline Lucide icons (rendered beside bar labels)
   const svgIcon = (paths) => '<svg class="wb-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" '
     + 'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
     + paths + '</svg>';
@@ -908,7 +1768,7 @@ main {
 
   function setBar(host, label, ratio) {
     const pct = Math.round(ratio * 100);
-    const cls = ratio >= 0.8 ? '' : (ratio >= 0.5 ? ' is-warn' : ' is-warn');
+    const cls = ratio >= 0.8 ? '' : ' is-warn';
     const wrap = document.createElement('div');
     wrap.innerHTML =
       '<div class="wellness-bar-lbl"><span class="wb-name">' + label + '</span><span class="wb-pct">' + pct + '%</span></div>' +
@@ -988,6 +1848,8 @@ main {
 })();
 </script>
 
+<!-- ── Cloud sync (same keys + appKey as before; water now syncs directly
+       from this page instead of via the embedded iframe) ── -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     if (typeof initCloudSync !== 'function') return;
